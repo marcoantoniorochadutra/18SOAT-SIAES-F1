@@ -10,15 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "vehicles")
+//@Entity
+//@Table(name = "vehicles")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehicleJpa {
 
-    @Id
     private VehicleId id;
 
     private CustomerId ownerId;

@@ -11,15 +11,14 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "service_offerings")
+//@Entity
+//@Table(name = "service_offerings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MaintenanceJpaEntity {
 
-    @Id
     private MaintenanceId id;
 
     private String description;

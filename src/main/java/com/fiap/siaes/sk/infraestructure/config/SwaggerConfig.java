@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenApiConfig {
+public class SwaggerConfig {
 
     @Bean
-    public OpenAPI siaesOpenAPI() {
+    public OpenAPI buildOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("SIAES API")

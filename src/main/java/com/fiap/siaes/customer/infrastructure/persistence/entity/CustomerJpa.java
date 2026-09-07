@@ -12,15 +12,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "customers")
+//@Entity
+//@Table(name = "customers")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerJpa {
 
-    @Id
     private CustomerId id;
 
     private String documentValue;

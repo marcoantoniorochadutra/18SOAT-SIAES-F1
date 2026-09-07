@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreateUserAppService implements CreateUserUseCase {
 
-    private final UserRepository userRepository;
-    private final CustomerRepository customerRepository;
+//    private final UserRepository userRepository;
+//    private final CustomerRepository customerRepository;
 
     @Override
     @Transactional
     public UserId execute(CreateUserCommand command) {
-
+        return null;
     }
 }
