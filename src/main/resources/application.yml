@@ -39,7 +39,7 @@ spring:
     default-timeout: 30s
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8715}
   shutdown: graceful
   servlet:
     context-path: ${SERVER_CONTEXT_PATH:/}
