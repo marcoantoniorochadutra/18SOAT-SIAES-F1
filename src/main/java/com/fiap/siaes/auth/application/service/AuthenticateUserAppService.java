@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticateUserAppService implements AuthenticateUserUseCase {
 
-//    private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public AuthToken execute(AuthenticateCommand command) {
-        // Implement the logic to validate credentials and issue a token
+
         return null;
     }
 }

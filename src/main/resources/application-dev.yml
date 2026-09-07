@@ -23,6 +23,13 @@ spring:
       include-binding-errors: always
       include-stacktrace: on_param
 
+siaes:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:dev-only-insecure-secret-key-please-change-0123456789}
+      access-expiration-days: ${SIAES_AUTH_TOKEN_EXPIRATION:365}
+      refresh-expiration-hours: ${SIAES_AUTH_TOKEN_REFRESH_EXPIRATION:1}
+
 management:
   datadog:
     metrics:

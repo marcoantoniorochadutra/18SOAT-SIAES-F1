@@ -7,6 +7,13 @@ spring:
       maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
       minimum-idle: ${DB_POOL_MIN_IDLE:5}
 
+siaes:
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      access-expiration-days: ${SIAES_AUTH_TOKEN_EXPIRATION}
+      refresh-expiration-hours: ${SIAES_AUTH_TOKEN_REFRESH_EXPIRATION}
+
 logging:
   structured:
     format:

@@ -4,6 +4,7 @@
 @JavaTypeRegistration(descriptorClass = WorkOrderIdJavaType.class, javaType = WorkOrderId.class)
 
 @JavaTypeRegistration(descriptorClass = UserIdJavaType.class, javaType = UserId.class)
+@JavaTypeRegistration(descriptorClass = UserStatusHistoryIdJavaType.class, javaType = UserStatusHistoryId.class)
 @JavaTypeRegistration(descriptorClass = CustomerIdJavaType.class, javaType = CustomerId.class)
 
 @JavaTypeRegistration(descriptorClass = VehicleIdJavaType.class, javaType = VehicleId.class)
@@ -21,6 +22,8 @@ import com.fiap.siaes.supplies.domain.model.SuppliesId;
 import com.fiap.siaes.supplies.domain.model.SuppliesId.SuppliesIdJavaType;
 import com.fiap.siaes.user.domain.model.UserId;
 import com.fiap.siaes.user.domain.model.UserId.UserIdJavaType;
+import com.fiap.siaes.user.domain.model.UserStatusHistoryId;
+import com.fiap.siaes.user.domain.model.UserStatusHistoryId.UserStatusHistoryIdJavaType;
 import com.fiap.siaes.vehicle.domain.model.VehicleId;
 import com.fiap.siaes.vehicle.domain.model.VehicleId.VehicleIdJavaType;
 import com.fiap.siaes.workorder.domain.model.WorkOrderId;
