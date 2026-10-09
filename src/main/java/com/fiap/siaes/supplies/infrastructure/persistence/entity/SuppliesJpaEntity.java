@@ -1,7 +1,6 @@
 package com.fiap.siaes.supplies.infrastructure.persistence.entity;
 
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
-import jakarta.persistence.Id;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,10 @@
 package com.fiap.siaes.vehicle.application.service;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.vehicle.application.usecase.CreateVehicleUseCase;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.vehicle.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

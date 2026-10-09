@@ -1,7 +1,6 @@
 package com.fiap.siaes.workorder.infrastructure.persistence.entity;
 
-import com.fiap.siaes.workorder.domain.model.WorkOrderId;
-import jakarta.persistence.Id;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

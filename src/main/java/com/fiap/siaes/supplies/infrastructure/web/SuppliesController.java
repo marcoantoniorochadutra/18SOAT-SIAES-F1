@@ -10,7 +10,7 @@ import com.fiap.siaes.supplies.application.usecase.ListSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase.UpdateSuppliesCommand;
 import com.fiap.siaes.supplies.domain.model.Supplies;
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

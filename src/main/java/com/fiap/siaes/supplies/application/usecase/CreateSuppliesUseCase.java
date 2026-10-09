@@ -1,6 +1,6 @@
 package com.fiap.siaes.supplies.application.usecase;
 
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 
 import java.math.BigDecimal;
 

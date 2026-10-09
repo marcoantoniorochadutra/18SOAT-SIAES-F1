@@ -3,9 +3,9 @@ services:
     image: postgres:17-alpine
     container_name: siaes-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-siaes}
-      POSTGRES_USER: ${DB_USERNAME:-siaes}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-siaes}
+      POSTGRES_DB: ${DB_NAME:siaes}
+      POSTGRES_USER: ${DB_USERNAME:siaes}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:siaes}
     ports:
       - "5432:5432"
     volumes:
@@ -15,6 +15,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  siaes-mailpit:
+    image: axllent/mailpit:latest
+    container_name: siaes-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   siaes-postgres-data:

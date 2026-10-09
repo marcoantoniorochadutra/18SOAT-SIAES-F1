@@ -1,10 +1,7 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.entity;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

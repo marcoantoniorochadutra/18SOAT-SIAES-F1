@@ -7,6 +7,27 @@ spring:
       maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
       minimum-idle: ${DB_POOL_MIN_IDLE:5}
 
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+siaes:
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      access-expiration-days: ${SIAES_AUTH_TOKEN_EXPIRATION}
+      refresh-expiration-hours: ${SIAES_AUTH_TOKEN_REFRESH_EXPIRATION}
+  mail:
+    from: ${MAIL_FROM}
+
 logging:
   structured:
     format:

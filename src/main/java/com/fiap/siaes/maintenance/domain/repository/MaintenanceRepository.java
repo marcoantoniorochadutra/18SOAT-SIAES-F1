@@ -1,16 +1,12 @@
 package com.fiap.siaes.maintenance.domain.repository;
 
 import com.fiap.siaes.maintenance.domain.model.Maintenance;
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
+import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface MaintenanceRepository {
-
-    Maintenance save(Maintenance maintenance);
-
-    Optional<Maintenance> findById(MaintenanceId id);
+public interface MaintenanceRepository extends RepositoryBase<Maintenance, MaintenanceId> {
 
     List<Maintenance> findAll();
 

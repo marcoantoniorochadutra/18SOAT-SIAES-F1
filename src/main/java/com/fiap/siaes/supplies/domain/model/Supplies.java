@@ -1,5 +1,6 @@
 package com.fiap.siaes.supplies.domain.model;
 
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

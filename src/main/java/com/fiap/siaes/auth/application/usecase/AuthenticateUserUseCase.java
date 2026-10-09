@@ -2,9 +2,13 @@ package com.fiap.siaes.auth.application.usecase;
 
 public interface AuthenticateUserUseCase {
 
-    AuthToken execute(AuthenticateCommand command);
+    AuthenticationWrapper execute(AuthenticateUserCommand command);
 
-    record AuthenticateCommand(String email, String password) {}
+    record AuthenticateUserCommand(String email, String password) {}
 
-    record AuthToken(String token) {}
+    record AuthenticationWrapper(String token, String refreshToken) {
+        public static AuthenticationWrapper of(String token, String refreshToken) {
+            return new AuthenticationWrapper(token, refreshToken);
+        }
+    }
 }

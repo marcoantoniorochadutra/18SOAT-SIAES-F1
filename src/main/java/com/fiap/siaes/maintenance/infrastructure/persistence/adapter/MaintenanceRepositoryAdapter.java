@@ -1,7 +1,7 @@
 package com.fiap.siaes.maintenance.infrastructure.persistence.adapter;
 
 import com.fiap.siaes.maintenance.domain.model.Maintenance;
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import com.fiap.siaes.maintenance.domain.repository.MaintenanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

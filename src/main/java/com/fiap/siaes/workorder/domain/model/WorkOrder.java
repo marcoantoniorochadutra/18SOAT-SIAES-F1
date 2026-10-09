@@ -1,8 +1,9 @@
 package com.fiap.siaes.workorder.domain.model;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

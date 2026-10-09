@@ -1,17 +1,13 @@
 package com.fiap.siaes.quotation.domain.repository;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.domain.model.Quotation;
-import com.fiap.siaes.quotation.domain.model.QuotationId;
+import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
+import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface QuotationRepository {
-
-    Quotation save(Quotation quotation);
-
-    Optional<Quotation> findById(QuotationId id);
+public interface QuotationRepository extends RepositoryBase<Quotation, QuotationId> {
 
     List<Quotation> findAll();
 
