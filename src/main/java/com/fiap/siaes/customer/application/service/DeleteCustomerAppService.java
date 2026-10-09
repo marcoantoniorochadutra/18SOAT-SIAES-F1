@@ -1,7 +1,8 @@
 package com.fiap.siaes.customer.application.service;
 
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.Customer;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ public class DeleteCustomerAppService implements DeleteCustomerUseCase {
     @Override
     @Transactional
     public void execute(CustomerId id) {
-        this.customerRepository.deleteById(id);
+        Customer customer = this.customerRepository.findByIdOrThrowNotFound(id);
+
+        this.customerRepository.deleteById(customer.getId());
     }
 }

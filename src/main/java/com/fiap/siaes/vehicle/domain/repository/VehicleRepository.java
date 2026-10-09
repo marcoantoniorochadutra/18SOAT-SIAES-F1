@@ -1,17 +1,13 @@
 package com.fiap.siaes.vehicle.domain.repository;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface VehicleRepository {
-
-    Vehicle save(Vehicle vehicle);
-
-    Optional<Vehicle> findById(VehicleId id);
+public interface VehicleRepository extends RepositoryBase<Vehicle, VehicleId> {
 
     List<Vehicle> findAll();
 

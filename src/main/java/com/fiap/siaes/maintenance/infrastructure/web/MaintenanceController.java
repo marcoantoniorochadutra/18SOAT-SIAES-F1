@@ -8,7 +8,7 @@ import com.fiap.siaes.maintenance.application.usecase.ListMaintenancesUseCase;
 import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase.UpdateMaintenanceCommand;
 import com.fiap.siaes.maintenance.domain.model.Maintenance;
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

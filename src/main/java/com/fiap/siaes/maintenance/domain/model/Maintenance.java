@@ -1,5 +1,6 @@
 package com.fiap.siaes.maintenance.domain.model;
 
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

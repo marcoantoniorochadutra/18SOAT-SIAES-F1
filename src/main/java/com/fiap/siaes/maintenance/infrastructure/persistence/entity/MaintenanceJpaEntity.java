@@ -1,9 +1,6 @@
 package com.fiap.siaes.maintenance.infrastructure.persistence.entity;
 
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

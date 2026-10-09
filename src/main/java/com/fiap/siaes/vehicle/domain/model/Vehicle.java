@@ -1,6 +1,7 @@
 package com.fiap.siaes.vehicle.domain.model;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

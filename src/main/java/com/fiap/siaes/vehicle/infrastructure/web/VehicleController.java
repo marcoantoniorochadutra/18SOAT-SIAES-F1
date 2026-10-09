@@ -8,7 +8,7 @@ import com.fiap.siaes.vehicle.application.usecase.ListVehiclesUseCase;
 import com.fiap.siaes.vehicle.application.usecase.UpdateVehicleUseCase;
 import com.fiap.siaes.vehicle.application.usecase.UpdateVehicleUseCase.UpdateVehicleCommand;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

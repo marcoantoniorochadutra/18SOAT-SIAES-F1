@@ -1,9 +1,10 @@
 package com.fiap.siaes.quotation.domain.model;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationStatus;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
-import com.fiap.siaes.workorder.domain.model.WorkOrderId;
+import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

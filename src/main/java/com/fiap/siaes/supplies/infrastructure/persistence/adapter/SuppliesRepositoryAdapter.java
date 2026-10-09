@@ -1,7 +1,7 @@
 package com.fiap.siaes.supplies.infrastructure.persistence.adapter;
 
 import com.fiap.siaes.supplies.domain.model.Supplies;
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.domain.repository.SuppliesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

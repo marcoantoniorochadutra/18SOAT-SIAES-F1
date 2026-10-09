@@ -13,20 +13,20 @@
 
 package com.fiap.siaes;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
-import com.fiap.siaes.customer.domain.model.CustomerId.CustomerIdJavaType;
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId;
-import com.fiap.siaes.maintenance.domain.model.MaintenanceId.MaintenanceIdJavaType;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId.CustomerIdJavaType;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId.MaintenanceIdJavaType;
 import com.fiap.siaes.sk.infraestructure.persistence.UUIDWrapperJdbcType;
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
-import com.fiap.siaes.supplies.domain.model.SuppliesId.SuppliesIdJavaType;
-import com.fiap.siaes.user.domain.model.UserId;
-import com.fiap.siaes.user.domain.model.UserId.UserIdJavaType;
-import com.fiap.siaes.user.domain.model.UserStatusHistoryId;
-import com.fiap.siaes.user.domain.model.UserStatusHistoryId.UserStatusHistoryIdJavaType;
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
-import com.fiap.siaes.vehicle.domain.model.VehicleId.VehicleIdJavaType;
-import com.fiap.siaes.workorder.domain.model.WorkOrderId;
-import com.fiap.siaes.workorder.domain.model.WorkOrderId.WorkOrderIdJavaType;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId.SuppliesIdJavaType;
+import com.fiap.siaes.user.domain.model.vo.UserId;
+import com.fiap.siaes.user.domain.model.vo.UserId.UserIdJavaType;
+import com.fiap.siaes.user.domain.model.vo.UserStatusHistoryId;
+import com.fiap.siaes.user.domain.model.vo.UserStatusHistoryId.UserStatusHistoryIdJavaType;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId.VehicleIdJavaType;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId.WorkOrderIdJavaType;
 import org.hibernate.annotations.JavaTypeRegistration;
 import org.hibernate.annotations.JdbcTypeRegistration;

@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.application.usecase;
 
-import com.fiap.siaes.vehicle.domain.model.VehicleId;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 
 public interface CreateVehicleUseCase {
 

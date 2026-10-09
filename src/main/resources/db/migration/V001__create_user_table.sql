@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY NOT NULL,
     name VARCHAR(250) NOT NULL,
@@ -21,6 +20,7 @@ CREATE TABLE IF NOT EXISTS user_status_history (
     user_id UUID NOT NULL,
     status SMALLINT NOT NULL,
     updated_at TIMESTAMP NOT NULL,
+    observation VARCHAR(150),
     CONSTRAINT fk_user_status_history_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

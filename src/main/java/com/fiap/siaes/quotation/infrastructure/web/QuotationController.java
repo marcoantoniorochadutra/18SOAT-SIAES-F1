@@ -1,7 +1,7 @@
 package com.fiap.siaes.quotation.infrastructure.web;
 
 import com.fiap.siaes.quotation.domain.model.Quotation;
-import com.fiap.siaes.quotation.domain.model.QuotationId;
+import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

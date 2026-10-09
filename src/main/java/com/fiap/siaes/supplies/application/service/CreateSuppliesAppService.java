@@ -2,7 +2,7 @@ package com.fiap.siaes.supplies.application.service;
 
 import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase;
 import com.fiap.siaes.supplies.domain.model.Supplies;
-import com.fiap.siaes.supplies.domain.model.SuppliesId;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.domain.repository.SuppliesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

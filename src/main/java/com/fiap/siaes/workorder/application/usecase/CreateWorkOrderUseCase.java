@@ -1,6 +1,6 @@
 package com.fiap.siaes.workorder.application.usecase;
 
-import com.fiap.siaes.workorder.domain.model.WorkOrderId;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 
 import java.util.List;
 

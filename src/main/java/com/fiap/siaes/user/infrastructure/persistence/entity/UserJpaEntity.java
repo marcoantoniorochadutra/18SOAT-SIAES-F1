@@ -1,7 +1,7 @@
 package com.fiap.siaes.user.infrastructure.persistence.entity;
 
-import com.fiap.siaes.customer.domain.model.CustomerId;
-import com.fiap.siaes.user.domain.model.UserId;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.enums.UserStatus;
 import jakarta.persistence.CascadeType;
@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,11 +20,12 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.Set;
 
-@Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity(name = "users")
 public class UserJpaEntity {
 
     @Id

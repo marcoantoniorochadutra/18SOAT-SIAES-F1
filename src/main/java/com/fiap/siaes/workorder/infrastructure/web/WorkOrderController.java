@@ -2,7 +2,7 @@ package com.fiap.siaes.workorder.infrastructure.web;
 
 import com.fiap.siaes.workorder.application.usecase.CreateWorkOrderUseCase;
 import com.fiap.siaes.workorder.application.usecase.CreateWorkOrderUseCase.CreateWorkOrderCommand;
-import com.fiap.siaes.workorder.domain.model.WorkOrderId;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

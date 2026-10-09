@@ -3,36 +3,40 @@ package com.fiap.siaes.customer.infrastructure.persistence.mapper;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.infrastructure.persistence.entity.CustomerJpa;
 import com.fiap.siaes.sk.document.domain.Document;
+import lombok.experimental.UtilityClass;
 
-public final class CustomerMapper {
+import static java.util.Objects.isNull;
 
-    private CustomerMapper() {
-    }
+@UtilityClass
+public class CustomerMapper {
 
     public static CustomerJpa toEntity(Customer customer) {
-        if (customer == null) {
+        if (isNull(customer))
             return null;
-        }
-        return new CustomerJpa(
-                customer.getId(),
-                customer.getDocument().value(),
-                customer.getDocument().type(),
-                customer.getName(),
-                customer.getPhone(),
-                customer.getEmail()
-        );
+
+        return CustomerJpa.builder()
+                .id(customer.getId())
+                .document(customer.getDocument().getValue())
+                .name(customer.getName())
+                .phone(customer.getPhone())
+                .email(customer.getEmail())
+                .createdAt(customer.getCreatedAt())
+                .updatedAt(customer.getUpdatedAt())
+                .build();
     }
 
     public static Customer toDomain(CustomerJpa entity) {
-        if (entity == null) {
+        if (isNull(entity))
             return null;
-        }
-        return Customer.builder()
+
+        return Customer.recreate()
                 .id(entity.getId())
-                .document(new Document(entity.getDocumentValue(), entity.getDocumentType()))
+                .document(Document.recreate(entity.getDocument()))
                 .name(entity.getName())
                 .phone(entity.getPhone())
                 .email(entity.getEmail())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }
