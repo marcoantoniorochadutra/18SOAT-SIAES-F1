@@ -21,6 +21,14 @@ public class UserTestFactory {
                 .build();
     }
 
+    public static AuthenticatedUser authenticatedUserManager() {
+        return AuthenticatedUser.builder()
+                .id(UserId.generate())
+                .email("manager@email.com")
+                .userRole(UserRole.MANAGER)
+                .build();
+    }
+
     public static AuthenticatedUser authenticatedUserCustomer() {
         return authenticatedUserCustomer(null);
     }

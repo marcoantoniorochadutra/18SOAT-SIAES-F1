@@ -5,7 +5,7 @@ import com.fiap.siaes.supplies.application.usecase.AdjustSuppliesStockUseCase.Ad
 import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase.CreateSuppliesCommand;
 import com.fiap.siaes.supplies.application.usecase.DeleteSuppliesUseCase;
-import com.fiap.siaes.supplies.application.usecase.GetSuppliesUseCase;
+import com.fiap.siaes.supplies.application.usecase.GetSuppliesByIdUseCase;
 import com.fiap.siaes.supplies.application.usecase.ListSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase.UpdateSuppliesCommand;
@@ -42,7 +42,7 @@ public class SuppliesController {
 
     private final CreateSuppliesUseCase createSuppliesUseCase;
     private final UpdateSuppliesUseCase updateSuppliesUseCase;
-    private final GetSuppliesUseCase getSuppliesUseCase;
+    private final GetSuppliesByIdUseCase getSuppliesByIdUseCase;
     private final ListSuppliesUseCase listSuppliessUseCase;
     private final DeleteSuppliesUseCase deleteSuppliesUseCase;
     private final AdjustSuppliesStockUseCase adjustSuppliesStockUseCase;
@@ -64,7 +64,7 @@ public class SuppliesController {
     @Operation(summary = "Busca uma peça/insumo pelo id")
     @GetMapping("/{id}")
     public Supplies get(@PathVariable SuppliesId id) {
-        return this.getSuppliesUseCase.execute(id);
+        return this.getSuppliesByIdUseCase.execute(id);
     }
 
     @Operation(summary = "Lista todas as peças/insumos")

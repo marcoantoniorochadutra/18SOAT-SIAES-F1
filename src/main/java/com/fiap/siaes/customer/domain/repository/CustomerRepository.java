@@ -17,6 +17,14 @@ public interface CustomerRepository extends RepositoryBase<Customer, CustomerId>
                 .orElseThrow(() -> new CustomerNotFoundException(id.toString()));
     }
 
+    boolean existsById(CustomerId id);
+
+    default void existsByIdOrThrowNotFound(CustomerId id) {
+        if (!this.existsById(id)) {
+            throw new CustomerNotFoundException(id.toString());
+        }
+    }
+
     boolean existsByDocument(Document document);
 
     boolean existsByDocumentAndIdNot(String document, CustomerId id);

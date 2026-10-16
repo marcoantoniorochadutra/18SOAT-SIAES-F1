@@ -2,14 +2,12 @@ package com.fiap.siaes.customer.application.service;
 
 import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
-import com.fiap.siaes.customer.application.usecase.GetCustomerUseCase.GetCustomerByIdCommand;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
 import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.sk.document.domain.enums.DocumentType;
 import com.fiap.siaes.user.UserTestFactory;
-import com.fiap.siaes.user.domain.model.enums.UserRole;
-import com.fiap.siaes.user.domain.model.vo.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,17 +24,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UnitTest - App Service - Get Customer")
-class GetCustomerAppServiceTest {
+@DisplayName("UnitTest - App Service - Get Customer By Id")
+class GetCustomerByIdAppServiceTest {
 
-    private static final AuthenticatedUser AUTHENTICATED_USER =
-            new AuthenticatedUser(UserId.generate(), null, "maria@email.com", UserRole.MANAGER);
+    private static final AuthenticatedUser AUTHENTICATED_USER = UserTestFactory.authenticatedUserManager();
 
     @Mock
     private CustomerRepository customerRepository;
 
     @InjectMocks
-    private GetCustomerAppService getCustomerAppService;
+    private GetCustomerByIdAppService getCustomerByIdAppService;
 
     @Test
     @DisplayName("Deve buscar um cliente pelo id com sucesso")
@@ -46,7 +43,7 @@ class GetCustomerAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
         var command = GetCustomerByIdCommand.from(customer.getId(), AUTHENTICATED_USER);
-        CustomerResponse response = this.getCustomerAppService.execute(command);
+        CustomerResponse response = this.getCustomerByIdAppService.execute(command);
 
         assertEquals(customer.getId(), response.id());
         assertEquals(customer.getDocument().getValue(), response.document());
@@ -63,7 +60,7 @@ class GetCustomerAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(id)).thenThrow(new CustomerNotFoundException(id.toString()));
 
         var command = GetCustomerByIdCommand.from(id, AUTHENTICATED_USER);
-        var exception = assertThrows(CustomerNotFoundException.class, () -> this.getCustomerAppService.execute(command));
+        var exception = assertThrows(CustomerNotFoundException.class, () -> this.getCustomerByIdAppService.execute(command));
 
         assertExceptionParameters(exception, id.toString());
     }
@@ -77,7 +74,7 @@ class GetCustomerAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
         var command = GetCustomerByIdCommand.from(CustomerId.generate(), authenticatedCustomer);
-        CustomerResponse response = this.getCustomerAppService.execute(command);
+        CustomerResponse response = this.getCustomerByIdAppService.execute(command);
 
         assertEquals(customer.getId(), response.id());
         assertEquals(customer.getEmail(), response.email());
@@ -93,7 +90,7 @@ class GetCustomerAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
         var command = GetCustomerByIdCommand.from(requestedId, authenticatedCustomer);
-        this.getCustomerAppService.execute(command);
+        this.getCustomerByIdAppService.execute(command);
 
         verify(this.customerRepository, never()).findByIdOrThrowNotFound(requestedId);
     }
@@ -109,6 +106,6 @@ class GetCustomerAppServiceTest {
 
         var command = GetCustomerByIdCommand.from(CustomerId.generate(), authenticatedCustomer);
 
-        assertThrows(CustomerNotFoundException.class, () -> this.getCustomerAppService.execute(command));
+        assertThrows(CustomerNotFoundException.class, () -> this.getCustomerByIdAppService.execute(command));
     }
 }

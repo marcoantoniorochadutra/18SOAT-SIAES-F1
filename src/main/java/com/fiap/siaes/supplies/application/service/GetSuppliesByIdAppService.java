@@ -1,6 +1,6 @@
 package com.fiap.siaes.supplies.application.service;
 
-import com.fiap.siaes.supplies.application.usecase.GetSuppliesUseCase;
+import com.fiap.siaes.supplies.application.usecase.GetSuppliesByIdUseCase;
 import com.fiap.siaes.supplies.domain.model.Supplies;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.domain.repository.SuppliesRepository;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GetSuppliesAppService implements GetSuppliesUseCase {
+public class GetSuppliesByIdAppService implements GetSuppliesByIdUseCase {
 
     private final SuppliesRepository suppliesRepository;
 

@@ -3,7 +3,7 @@ package com.fiap.siaes.maintenance.infrastructure.web;
 import com.fiap.siaes.maintenance.application.usecase.CreateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.CreateMaintenanceUseCase.CreateMaintenanceCommand;
 import com.fiap.siaes.maintenance.application.usecase.DeleteMaintenanceUseCase;
-import com.fiap.siaes.maintenance.application.usecase.GetMaintenanceUseCase;
+import com.fiap.siaes.maintenance.application.usecase.GetMaintenanceByIdUseCase;
 import com.fiap.siaes.maintenance.application.usecase.ListMaintenancesUseCase;
 import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase.UpdateMaintenanceCommand;
@@ -39,7 +39,7 @@ public class MaintenanceController {
 
     private final CreateMaintenanceUseCase createMaintenanceUseCase;
     private final UpdateMaintenanceUseCase updateMaintenanceUseCase;
-    private final GetMaintenanceUseCase getMaintenanceUseCase;
+    private final GetMaintenanceByIdUseCase getMaintenanceByIdUseCase;
     private final ListMaintenancesUseCase listMaintenancesUseCase;
     private final DeleteMaintenanceUseCase deleteMaintenanceUseCase;
 
@@ -60,7 +60,7 @@ public class MaintenanceController {
     @Operation(summary = "Busca um serviço pelo id")
     @GetMapping("/{id}")
     public Maintenance get(@PathVariable MaintenanceId id) {
-        return this.getMaintenanceUseCase.execute(id);
+        return this.getMaintenanceByIdUseCase.execute(id);
     }
 
     @Operation(summary = "Lista todos os serviços do catálogo")

@@ -14,9 +14,10 @@ import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnitTest - App Service - Delete Customer")
@@ -33,7 +34,7 @@ class DeleteCustomerAppServiceTest {
     void shouldDeleteCustomerSuccessfully() {
         var customer = createCustomer();
 
-        when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
+        doNothing().when(this.customerRepository).existsByIdOrThrowNotFound(customer.getId());
 
         this.deleteCustomerAppService.execute(customer.getId());
 
@@ -45,7 +46,7 @@ class DeleteCustomerAppServiceTest {
     void shouldNotDeleteCustomerWhenNotFound() {
         var id = CustomerId.generate();
 
-        when(this.customerRepository.findByIdOrThrowNotFound(id)).thenThrow(new CustomerNotFoundException(id.toString()));
+        doThrow(new CustomerNotFoundException(id.toString())).when(this.customerRepository).existsByIdOrThrowNotFound(id);
 
         var exception = assertThrows(CustomerNotFoundException.class, () -> this.deleteCustomerAppService.execute(id));
 

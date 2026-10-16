@@ -30,16 +30,17 @@ public interface CustomerControllerOpenApi {
 
     @Operation(summary = "customer.update.summary", description = "customer.update.description", method = "PUT",
                responses = {
-                     @ApiResponse(responseCode = "200", description = "customer.update.response.success"),
+                     @ApiResponse(responseCode = "200", description = "customer.update.response.success",
+                                  headers = @Header(name = "Location")),
                      @ApiResponse(responseCode = "400", description = "customer.update.response.badrequest"),
-                     @ApiResponse(responseCode = "404", description = "customer.update.response.notfound"),
+                     @ApiResponse(responseCode = "404", description = "customer.response.notfound"),
     })
-    public CustomerResponse update(CustomerId id, UpdateCustomerCommand command, AuthenticatedUser authenticatedUser);
+    public ResponseEntity<CustomerId> update(CustomerId id, UpdateCustomerCommand command, AuthenticatedUser authenticatedUser);
 
     @Operation(summary = "customer.get.summary", description = "customer.get.description", method = "GET",
                responses = {
                      @ApiResponse(responseCode = "200", description = "customer.get.response.success"),
-                     @ApiResponse(responseCode = "404", description = "customer.get.response.notfound"),
+                     @ApiResponse(responseCode = "404", description = "customer.response.notfound"),
     })
     public CustomerResponse getById(CustomerId id, AuthenticatedUser authenticatedUser);
 
@@ -61,7 +62,7 @@ public interface CustomerControllerOpenApi {
     @Operation(summary = "customer.delete.summary", description = "customer.delete.description", method = "DELETE",
                responses = {
                      @ApiResponse(responseCode = "204", description = "customer.delete.response.success"),
-                     @ApiResponse(responseCode = "404", description = "customer.delete.response.notfound"),
+                     @ApiResponse(responseCode = "404", description = "customer.response.notfound"),
     })
     public void delete(CustomerId id);
 

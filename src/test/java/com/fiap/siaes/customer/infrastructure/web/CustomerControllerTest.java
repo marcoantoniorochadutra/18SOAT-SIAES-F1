@@ -4,8 +4,8 @@ import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
-import com.fiap.siaes.customer.application.usecase.GetCustomerUseCase;
-import com.fiap.siaes.customer.application.usecase.GetCustomerUseCase.GetCustomerByIdCommand;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase.UpdateCustomerCommand;
@@ -49,7 +49,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     private UpdateCustomerUseCase updateCustomerUseCase;
 
     @MockitoBean
-    private GetCustomerUseCase getCustomerUseCase;
+    private GetCustomerByIdUseCase getCustomerByIdUseCase;
 
     @MockitoBean
     private ListCustomersUseCase listCustomersUseCase;
@@ -146,14 +146,12 @@ class CustomerControllerTest extends ControllerTestUtils {
                 .email(EMAIL)
                 .authenticatedUser(AUTHENTICATED_USER_ADMIN)
                 .build();
-        var response = new CustomerResponse(id, SANITIZED_DOCUMENT, DocumentType.CPF, "Maria Silva", null, EMAIL);
-
-        when(this.updateCustomerUseCase.execute(command)).thenReturn(response);
+        when(this.updateCustomerUseCase.execute(command)).thenReturn(id);
 
         super.executePutAuthenticated(CustomerController.ENDPOINT + "/" + id, command)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.name").value("Maria Silva"));
+                .andExpect(jsonPath("$").value(id.toString()))
+                .andExpect(header().string("Location", containsString(id.toString())));
 
         verify(this.updateCustomerUseCase).execute(command);
     }
@@ -199,7 +197,7 @@ class CustomerControllerTest extends ControllerTestUtils {
         var id = CustomerId.generate();
         var response = new CustomerResponse(id, SANITIZED_DOCUMENT, DocumentType.CPF, "Maria Silva", "11999999999", EMAIL);
 
-        when(this.getCustomerUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
+        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
 
         super.executeGetAuthenticated(CustomerController.ENDPOINT + "/" + id)
                 .andExpect(status().isOk())
@@ -212,7 +210,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     void shouldNotGetNonExistentCustomer() throws Exception {
         var id = CustomerId.generate();
 
-        when(this.getCustomerUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN)))
+        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN)))
                 .thenThrow(new CustomerNotFoundException(id.toString()));
 
         super.executeGetAuthenticated(CustomerController.ENDPOINT + "/" + id)

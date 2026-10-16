@@ -1,38 +1,41 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.mapper;
 
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
-import com.fiap.siaes.vehicle.infrastructure.persistence.entity.VehicleJpa;
+import com.fiap.siaes.vehicle.domain.model.vo.Plate;
+import com.fiap.siaes.vehicle.infrastructure.persistence.entity.VehicleJpaEntity;
+import lombok.experimental.UtilityClass;
 
-public final class VehicleMapper {
+import static java.util.Objects.isNull;
 
-    private VehicleMapper() {
+@UtilityClass
+public class VehicleMapper {
+
+    public static VehicleJpaEntity toEntity(Vehicle vehicle) {
+        if (isNull(vehicle))
+            return null;
+
+        return VehicleJpaEntity.builder()
+                .id(vehicle.getId())
+                .customerId(vehicle.getCustomerId())
+                .plate(vehicle.getPlate().getValue())
+                .brand(vehicle.getBrand())
+                .model(vehicle.getModel())
+                .year(vehicle.getYear())
+                .build();
+
     }
 
-    public static VehicleJpa toEntity(Vehicle vehicle) {
-        if (vehicle == null) {
+    public static Vehicle toDomain(VehicleJpaEntity vehicle) {
+        if (isNull(vehicle))
             return null;
-        }
-        return new VehicleJpa(
-                vehicle.getId(),
-                vehicle.getOwnerId(),
-                vehicle.getPlate(),
-                vehicle.getBrand(),
-                vehicle.getModel(),
-                vehicle.getYear()
-        );
-    }
 
-    public static Vehicle toDomain(VehicleJpa entity) {
-        if (entity == null) {
-            return null;
-        }
-        return Vehicle.builder()
-                .id(entity.getId())
-                .ownerId(entity.getOwnerId())
-                .plate(entity.getPlate())
-                .brand(entity.getBrand())
-                .model(entity.getModel())
-                .year(entity.getYear())
+        return Vehicle.recreate()
+                .id(vehicle.getId())
+                .customerId(vehicle.getCustomerId())
+                .plate(Plate.recreate(vehicle.getPlate()))
+                .brand(vehicle.getBrand())
+                .model(vehicle.getModel())
+                .year(vehicle.getYear())
                 .build();
     }
 }
