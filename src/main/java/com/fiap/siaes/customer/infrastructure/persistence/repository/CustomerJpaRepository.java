@@ -19,7 +19,6 @@ public interface CustomerJpaRepository extends JpaRepository<CustomerJpa, Custom
 
     boolean existsByDocumentAndIdNot(String document, CustomerId id);
 
-
     @Query(value = """
             SELECT id, document, name, phone, email
             FROM {h-schema} customers

@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 public @interface Authentication {
 
     UserRole minimumRole() default UserRole.ADMIN;
+
+    UserRole[] deniedRoles() default {};
 }

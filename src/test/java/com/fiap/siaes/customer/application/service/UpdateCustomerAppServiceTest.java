@@ -1,16 +1,13 @@
 package com.fiap.siaes.customer.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
-import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase.UpdateCustomerCommand;
 import com.fiap.siaes.customer.domain.exception.CustomerDocumentAlreadyExistsException;
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
 import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;
+import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.user.UserTestFactory;
-import com.fiap.siaes.user.domain.model.enums.UserRole;
-import com.fiap.siaes.user.domain.model.vo.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
+import static com.fiap.siaes.utils.TestUtils.captureSave;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,9 +28,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnitTest - App Service - Update Customer")
 class UpdateCustomerAppServiceTest {
-
-    private static final AuthenticatedUser MANAGER =
-            new AuthenticatedUser(UserId.generate(), null, "manager@email.com", UserRole.MANAGER);
 
     @Mock
     private CustomerRepository customerRepository;
@@ -46,7 +41,7 @@ class UpdateCustomerAppServiceTest {
         var customer = createCustomer();
         var command = UpdateCustomerCommand.builder()
                 .id(customer.getId())
-                .authenticatedUser(MANAGER)
+                .authenticatedUser(UserTestFactory.authenticatedUserManager())
                 .name("Maria Atualizada")
                 .phone("11988887777")
                 .email("maria.atualizada@email.com")
@@ -55,13 +50,16 @@ class UpdateCustomerAppServiceTest {
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        CustomerResponse response = this.updateCustomerAppService.execute(command);
+        var id = this.updateCustomerAppService.execute(command);
 
-        assertEquals(customer.getId(), response.id());
-        assertEquals("Maria Atualizada", response.name());
-        assertEquals("11988887777", response.phone());
-        assertEquals("maria.atualizada@email.com", response.email());
-        assertEquals("52998224725", response.document());
+        Customer savedCustomer = captureSave(this.customerRepository, Customer.class);
+
+        assertEquals(customer.getId(), id);
+        assertEquals("Maria Atualizada", savedCustomer.getName());
+        assertEquals("11988887777", savedCustomer.getPhone());
+        assertEquals("maria.atualizada@email.com", savedCustomer.getEmail());
+        assertEquals("52998224725", savedCustomer.getDocument().getValue());
+
         verify(this.customerRepository).save(customer);
     }
 
@@ -81,9 +79,9 @@ class UpdateCustomerAppServiceTest {
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        CustomerResponse response = this.updateCustomerAppService.execute(command);
+        this.updateCustomerAppService.execute(command);
 
-        assertEquals("Maria Atualizada", response.name());
+        assertEquals("Maria Atualizada", customer.getName());
         verify(this.customerRepository).save(customer);
     }
 
@@ -115,7 +113,7 @@ class UpdateCustomerAppServiceTest {
         var id = CustomerId.generate();
         var command = UpdateCustomerCommand.builder()
                 .id(id)
-                .authenticatedUser(MANAGER)
+                .authenticatedUser(UserTestFactory.authenticatedUserManager())
                 .name("Maria Silva")
                 .email("maria@email.com")
                 .document("529.982.247-25")
@@ -132,12 +130,34 @@ class UpdateCustomerAppServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando o cliente vinculado ao usuário CUSTOMER não existir")
+    void shouldThrowWhenLinkedCustomerDoesNotExist() {
+        var customerId = CustomerId.generate();
+        var command = UpdateCustomerCommand.builder()
+                .id(CustomerId.generate())
+                .authenticatedUser(UserTestFactory.authenticatedUserCustomer(customerId))
+                .name("Maria Silva")
+                .email("maria@email.com")
+                .document("529.982.247-25")
+                .build();
+
+        when(this.customerRepository.findByIdOrThrowNotFound(customerId))
+                .thenThrow(new CustomerNotFoundException(customerId.toString()));
+
+        var exception = assertThrows(CustomerNotFoundException.class,
+                () -> this.updateCustomerAppService.execute(command));
+
+        assertExceptionParameters(exception, customerId.toString());
+        verify(this.customerRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("Não deve atualizar quando o e-mail já pertencer a outro cliente")
     void shouldNotUpdateWhenEmailAlreadyBelongsToAnotherCustomer() {
         var customer = createCustomer();
         var command = UpdateCustomerCommand.builder()
                 .id(customer.getId())
-                .authenticatedUser(MANAGER)
+                .authenticatedUser(UserTestFactory.authenticatedUserManager())
                 .name("Maria Silva")
                 .email("outro@email.com")
                 .document("529.982.247-25")
@@ -159,7 +179,7 @@ class UpdateCustomerAppServiceTest {
         var customer = createCustomer();
         var command = UpdateCustomerCommand.builder()
                 .id(customer.getId())
-                .authenticatedUser(MANAGER)
+                .authenticatedUser(UserTestFactory.authenticatedUserManager())
                 .name("Maria Silva")
                 .email("maria@email.com")
                 .document("52998224725")

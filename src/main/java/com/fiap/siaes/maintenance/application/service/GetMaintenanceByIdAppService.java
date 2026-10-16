@@ -1,6 +1,6 @@
 package com.fiap.siaes.maintenance.application.service;
 
-import com.fiap.siaes.maintenance.application.usecase.GetMaintenanceUseCase;
+import com.fiap.siaes.maintenance.application.usecase.GetMaintenanceByIdUseCase;
 import com.fiap.siaes.maintenance.domain.model.Maintenance;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import com.fiap.siaes.maintenance.domain.repository.MaintenanceRepository;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GetMaintenanceAppService implements GetMaintenanceUseCase {
+public class GetMaintenanceByIdAppService implements GetMaintenanceByIdUseCase {
 
     private final MaintenanceRepository maintenanceRepository;
 

@@ -21,7 +21,7 @@ public class CustomerTestFactory {
                 .document(Document.recreate(Faker.instance().number().digits(11)))
                 .phone(Faker.instance().phoneNumber().cellPhone())
                 .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
-                .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
+                .updatedAt(Instant.now().minus(1, ChronoUnit.DAYS))
                 .build();
     }
 
@@ -33,7 +33,7 @@ public class CustomerTestFactory {
                 .document(Faker.instance().number().digits(11))
                 .phone(Faker.instance().phoneNumber().cellPhone())
                 .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
-                .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
+                .updatedAt(Instant.now().minus(1, ChronoUnit.DAYS))
                 .build();
     }
 

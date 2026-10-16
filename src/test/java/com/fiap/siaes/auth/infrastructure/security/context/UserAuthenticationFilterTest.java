@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
+import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
 import com.fiap.siaes.auth.domain.security.TokenBlacklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
@@ -166,6 +167,40 @@ class UserAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Deve rejeitar com 403 quando a role do usuário está na lista de roles negadas")
+    void shouldRejectWithForbiddenWhenRoleIsDenied() throws Exception {
+        String token = this.jwtTokenIssuer.issueAccessToken(USER_ID, UserRole.MECHANIC);
+
+        this.mockHandlerMethod(DeniedRoleController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.MECHANIC);
+        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.handlerExceptionResolver)
+                .resolveException(eq(this.request), eq(this.response), isNull(), isA(RoleNotAllowedException.class));
+        verify(this.filterChain, never()).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve seguir a cadeia quando a role do usuário atinge o mínimo e não está na lista de negadas")
+    void shouldContinueTheChainWhenRoleIsNotDenied() throws Exception {
+        String token = this.jwtTokenIssuer.issueAccessToken(USER_ID, UserRole.CUSTOMER);
+
+        this.mockHandlerMethod(DeniedRoleController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(this.userAuthenticationProjection.getId()).thenReturn(USER_ID.id());
+        when(this.userAuthenticationProjection.getEmail()).thenReturn("joao@email.com");
+        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.CUSTOMER);
+        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.filterChain).doFilter(this.request, this.response);
+    }
+
+    @Test
     @DisplayName("Deve rejeitar com 401 quando nenhum token é informado em endpoint protegido")
     void shouldRejectWithUnauthorizedWhenTokenIsMissingOnProtectedEndpoint() throws Exception {
         this.mockHandlerMethod(ClassLevelController.class, "handle");
@@ -222,6 +257,11 @@ class UserAuthenticationFilterTest {
     @Authentication(minimumRole = UserRole.ADMIN)
     static class MethodOverridesClassController {
         @Authentication(minimumRole = UserRole.MANAGER)
+        public void handle() {}
+    }
+
+    @Authentication(minimumRole = UserRole.CUSTOMER, deniedRoles = {UserRole.MECHANIC})
+    static class DeniedRoleController {
         public void handle() {}
     }
 }

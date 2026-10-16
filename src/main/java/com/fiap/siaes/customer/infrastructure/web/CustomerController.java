@@ -7,8 +7,8 @@ import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
-import com.fiap.siaes.customer.application.usecase.GetCustomerUseCase;
-import com.fiap.siaes.customer.application.usecase.GetCustomerUseCase.GetCustomerByIdCommand;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase.ListCustomersCommand;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.fiap.siaes.sk.util.ControllerUtils.createdResponse;
+import static com.fiap.siaes.sk.util.ControllerUtils.updatedResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +47,7 @@ public class CustomerController implements CustomerControllerOpenApi {
 
     private final CreateCustomerUseCase createCustomerUseCase;
     private final UpdateCustomerUseCase updateCustomerUseCase;
-    private final GetCustomerUseCase getCustomerUseCase;
+    private final GetCustomerByIdUseCase getCustomerByIdUseCase;
     private final ListCustomersUseCase listCustomersUseCase;
     private final DeleteCustomerUseCase deleteCustomerUseCase;
 
@@ -60,10 +61,11 @@ public class CustomerController implements CustomerControllerOpenApi {
     @Override
     @PutMapping("/{id}")
     @Authentication(minimumRole = UserRole.CUSTOMER)
-    public CustomerResponse update(@PathVariable CustomerId id,
-                                   @Valid @RequestBody UpdateCustomerCommand command,
-                                   @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return this.updateCustomerUseCase.execute(command.with(id, authenticatedUser));
+    public ResponseEntity<CustomerId> update(@PathVariable CustomerId id,
+                                             @Valid @RequestBody UpdateCustomerCommand command,
+                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        CustomerId updatedId = this.updateCustomerUseCase.execute(command.with(id, authenticatedUser));
+        return updatedResponse(ENDPOINT, updatedId);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class CustomerController implements CustomerControllerOpenApi {
     @Authentication(minimumRole = UserRole.CUSTOMER)
     public CustomerResponse getById(@PathVariable CustomerId id,
                                     @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return this.getCustomerUseCase.execute(GetCustomerByIdCommand.from(id, authenticatedUser));
+        return this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, authenticatedUser));
     }
 
     @Override

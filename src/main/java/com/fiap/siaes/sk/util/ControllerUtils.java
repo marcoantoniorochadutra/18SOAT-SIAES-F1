@@ -14,6 +14,12 @@ public class ControllerUtils {
         return ResponseEntity.created(URI.create(buildUrl(endpoint, value.id().toString()))).build();
     }
 
+    public static <T extends UUIDWrapper> ResponseEntity<T> updatedResponse(String endpoint, T value) {
+        return ResponseEntity.ok()
+                .location(URI.create(buildUrl(endpoint, value.id().toString())))
+                .body(value);
+    }
+
     public static String buildUrl(String... paths) {
         if (paths == null || paths.length == 0) {
             return "";

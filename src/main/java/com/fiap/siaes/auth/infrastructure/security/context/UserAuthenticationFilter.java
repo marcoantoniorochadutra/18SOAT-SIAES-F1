@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
+import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
 import com.fiap.siaes.auth.domain.security.TokenBlacklist;
 import com.fiap.siaes.auth.domain.security.TokenIssuer.UserClaim;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
@@ -34,6 +34,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import static com.fiap.siaes.auth.domain.security.TokenIssuer.USER_DATA_CLAIM;
@@ -69,7 +70,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            UserAuthenticationProjection user = this.authenticate(token, requiredAuthentication.minimumRole());
+            UserAuthenticationProjection user = this.authenticate(token, requiredAuthentication);
 
             this.setAuthenticatedUserContext(user);
 
@@ -88,15 +89,19 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private UserAuthenticationProjection authenticate(String token, UserRole minimumRole) {
+    private UserAuthenticationProjection authenticate(String token, Authentication requiredAuthentication) {
         if (isNull(token)) {
             throw new InvalidTokenException();
         }
 
         UserAuthenticationProjection user = this.findUserFromToken(token);
 
-        if (user.getUserRole().lacksAccessTo(minimumRole)) {
-            throw new InsufficientRoleException(minimumRole);
+        if (user.getUserRole().lacksAccessTo(requiredAuthentication.minimumRole())) {
+            throw new InsufficientRoleException(requiredAuthentication.minimumRole());
+        }
+
+        if (Arrays.asList(requiredAuthentication.deniedRoles()).contains(user.getUserRole())) {
+            throw new RoleNotAllowedException(user.getUserRole());
         }
 
         return user;

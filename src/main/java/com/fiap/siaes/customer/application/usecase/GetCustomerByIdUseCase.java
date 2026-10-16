@@ -4,7 +4,7 @@ import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 
-public interface GetCustomerUseCase {
+public interface GetCustomerByIdUseCase {
 
     CustomerResponse execute(GetCustomerByIdCommand id);
 

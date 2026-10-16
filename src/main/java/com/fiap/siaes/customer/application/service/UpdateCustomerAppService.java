@@ -1,11 +1,11 @@
 package com.fiap.siaes.customer.application.service;
 
 import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
-import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
 import com.fiap.siaes.customer.domain.exception.CustomerDocumentAlreadyExistsException;
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
 import com.fiap.siaes.customer.domain.model.Customer;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class UpdateCustomerAppService implements UpdateCustomerUseCase {
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public CustomerResponse execute(UpdateCustomerCommand command) {
+    public CustomerId execute(UpdateCustomerCommand command) {
         Customer customer = this.findCustomerToUpdate(command);
 
         this.validateCustomer(command);
@@ -29,13 +29,13 @@ public class UpdateCustomerAppService implements UpdateCustomerUseCase {
 
         this.customerRepository.save(customer);
 
-        return CustomerResponse.from(customer);
+        return customer.getId();
     }
 
     private Customer findCustomerToUpdate(UpdateCustomerCommand command) {
         AuthenticatedUser authenticatedUser = command.authenticatedUser();
 
-        if (authenticatedUser.userRole().isCustomer()) {
+        if (authenticatedUser.isCustomer()) {
             return this.customerRepository.findByIdOrThrowNotFound(authenticatedUser.customerId());
         }
 

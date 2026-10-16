@@ -52,6 +52,11 @@ public class CustomerRepositoryAdapter implements CustomerRepository {
     }
 
     @Override
+    public boolean existsById(CustomerId id) {
+        return this.customerJpaRepository.existsById(id);
+    }
+
+    @Override
     public boolean existsByDocument(Document document) {
         return this.customerJpaRepository.existsByDocument(document.getValue());
     }
