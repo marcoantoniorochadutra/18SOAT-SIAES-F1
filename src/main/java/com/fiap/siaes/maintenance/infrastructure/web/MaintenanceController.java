@@ -1,22 +1,29 @@
 package com.fiap.siaes.maintenance.infrastructure.web;
 
-import com.fiap.siaes.maintenance.application.usecase.CreateMaintenanceUseCase;
+import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
+import com.fiap.siaes.maintenance.application.dto.MaintenanceFilter;
+import com.fiap.siaes.maintenance.application.dto.MaintenanceResponse;
+import com.fiap.siaes.maintenance.application.usecase.ActivateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.CreateMaintenanceUseCase.CreateMaintenanceCommand;
-import com.fiap.siaes.maintenance.application.usecase.DeleteMaintenanceUseCase;
+import com.fiap.siaes.maintenance.application.usecase.CreateMaintenanceUseCase;
+import com.fiap.siaes.maintenance.application.usecase.DeactivateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.GetMaintenanceByIdUseCase;
+import com.fiap.siaes.maintenance.application.usecase.ListMaintenancesUseCase.ListMaintenancesCommand;
 import com.fiap.siaes.maintenance.application.usecase.ListMaintenancesUseCase;
-import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase.UpdateMaintenanceCommand;
-import com.fiap.siaes.maintenance.domain.model.Maintenance;
+import com.fiap.siaes.maintenance.application.usecase.UpdateMaintenanceUseCase;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.fiap.siaes.maintenance.infrastructure.web.openapi.MaintenanceControllerOpenApi;
+import com.fiap.siaes.user.domain.model.enums.UserRole;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,15 +32,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import static com.fiap.siaes.sk.util.ControllerUtils.createdResponse;
+import static com.fiap.siaes.sk.util.ControllerUtils.updatedResponse;
 
-@Tag(name = "Services", description = "Gestão do catálogo de serviços")
 @RestController
 @RequestMapping(MaintenanceController.ENDPOINT)
 @RequiredArgsConstructor
-public class MaintenanceController {
+@Authentication(minimumRole = UserRole.MANAGER)
+public class MaintenanceController implements MaintenanceControllerOpenApi {
 
     public static final String ENDPOINT = "/api/v1/services";
 
@@ -41,38 +47,48 @@ public class MaintenanceController {
     private final UpdateMaintenanceUseCase updateMaintenanceUseCase;
     private final GetMaintenanceByIdUseCase getMaintenanceByIdUseCase;
     private final ListMaintenancesUseCase listMaintenancesUseCase;
-    private final DeleteMaintenanceUseCase deleteMaintenanceUseCase;
+    private final DeactivateMaintenanceUseCase deactivateMaintenanceUseCase;
+    private final ActivateMaintenanceUseCase activateMaintenanceUseCase;
 
-    @Operation(summary = "Cadastra um novo serviço no catálogo")
-    @ApiResponse(responseCode = "201", description = "Serviço cadastrado")
+    @Override
     @PostMapping
-    public ResponseEntity<MaintenanceId> create(@RequestBody CreateMaintenanceCommand command) {
+    public ResponseEntity<MaintenanceId> create(@Valid @RequestBody CreateMaintenanceCommand command) {
         MaintenanceId id = this.createMaintenanceUseCase.execute(command);
         return createdResponse(ENDPOINT, id);
     }
 
-    @Operation(summary = "Atualiza um serviço do catálogo")
+    @Override
     @PutMapping("/{id}")
-    public Maintenance update(@PathVariable MaintenanceId id, @RequestBody UpdateMaintenanceCommand command) {
-        return this.updateMaintenanceUseCase.execute(id, command);
+    public ResponseEntity<MaintenanceId> update(@PathVariable MaintenanceId id,
+                                             @Valid @RequestBody UpdateMaintenanceCommand command) {
+        MaintenanceId updatedId = this.updateMaintenanceUseCase.execute(command.with(id));
+        return updatedResponse(ENDPOINT, updatedId);
     }
 
-    @Operation(summary = "Busca um serviço pelo id")
+    @Override
     @GetMapping("/{id}")
-    public Maintenance get(@PathVariable MaintenanceId id) {
+    public MaintenanceResponse getById(@PathVariable MaintenanceId id) {
         return this.getMaintenanceByIdUseCase.execute(id);
     }
 
-    @Operation(summary = "Lista todos os serviços do catálogo")
+    @Override
     @GetMapping
-    public List<Maintenance> list() {
-        return this.listMaintenancesUseCase.execute();
+    public PageResponse<MaintenanceResponse> list(@ParameterObject MaintenanceFilter filter,
+                                               @Valid @ParameterObject PageQuery pageQuery) {
+        return this.listMaintenancesUseCase.execute(ListMaintenancesCommand.from(filter, pageQuery));
     }
 
-    @Operation(summary = "Remove um serviço do catálogo")
-    @DeleteMapping("/{id}")
+    @Override
+    @PatchMapping("/{id}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable MaintenanceId id) {
-        this.deleteMaintenanceUseCase.execute(id);
+    public void deactivate(@PathVariable MaintenanceId id) {
+        this.deactivateMaintenanceUseCase.execute(id);
+    }
+
+    @Override
+    @PatchMapping("/{id}/activate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void activate(@PathVariable MaintenanceId id) {
+        this.activateMaintenanceUseCase.execute(id);
     }
 }

@@ -20,6 +20,10 @@ public record MaintenanceId(UUID id) implements UUIDWrapper {
         return new MaintenanceId(UUID.randomUUID());
     }
 
+    public static MaintenanceId from(UUID id) {
+        return new MaintenanceId(id);
+    }
+
     @Override
     @JsonValue
     public String toString() {
