@@ -1,14 +1,19 @@
 package com.fiap.siaes.maintenance.domain.repository;
 
-import com.fiap.siaes.maintenance.domain.model.Maintenance;
-import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
-
-import java.util.List;
+import com.fiap.siaes.maintenance.domain.exception.MaintenanceNotFoundException;
+import com.fiap.siaes.maintenance.domain.model.Maintenance;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceCode;
+import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 
 public interface MaintenanceRepository extends RepositoryBase<Maintenance, MaintenanceId> {
 
-    List<Maintenance> findAll();
+    default Maintenance findByIdOrThrowNotFound(MaintenanceId id) {
+        return this.findById(id)
+                .orElseThrow(() -> new MaintenanceNotFoundException(id.toString()));
+    }
 
-    void deleteById(MaintenanceId id);
+    boolean existsByCode(MaintenanceCode code);
+
+    boolean existsByCodeAndIdNot(MaintenanceCode code, MaintenanceId id);
 }

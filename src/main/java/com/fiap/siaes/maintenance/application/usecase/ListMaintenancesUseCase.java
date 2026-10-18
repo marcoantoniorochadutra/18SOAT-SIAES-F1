@@ -1,10 +1,17 @@
 package com.fiap.siaes.maintenance.application.usecase;
 
-import com.fiap.siaes.maintenance.domain.model.Maintenance;
-
-import java.util.List;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
+import com.fiap.siaes.maintenance.application.dto.MaintenanceFilter;
+import com.fiap.siaes.maintenance.application.dto.MaintenanceResponse;
 
 public interface ListMaintenancesUseCase {
 
-    List<Maintenance> execute();
+    PageResponse<MaintenanceResponse> execute(ListMaintenancesCommand command);
+
+    record ListMaintenancesCommand(MaintenanceFilter filter, PageQuery pageQuery) {
+        public static ListMaintenancesCommand from(MaintenanceFilter filter, PageQuery pageQuery) {
+            return new ListMaintenancesCommand(filter, pageQuery);
+        }
+    }
 }
