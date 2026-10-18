@@ -1,9 +1,9 @@
 package com.fiap.siaes.user.infrastructure.web;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.user.UserTestFactory;
-import com.fiap.siaes.user.application.usecase.CreateUserUseCase;
 import com.fiap.siaes.user.application.usecase.CreateUserUseCase.CreateUserCommand;
+import com.fiap.siaes.user.application.usecase.CreateUserUseCase;
 import com.fiap.siaes.user.domain.exception.UserCustomerRelationRequiredException;
 import com.fiap.siaes.user.domain.exception.UserEmailAlreadyExistsException;
 import com.fiap.siaes.user.domain.exception.UserEmailOrCustomerRequiredException;

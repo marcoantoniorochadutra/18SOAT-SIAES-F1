@@ -1,11 +1,11 @@
 package com.fiap.siaes.user.infrastructure.web;
 
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
-import com.fiap.siaes.user.application.usecase.CreateUserUseCase;
 import com.fiap.siaes.user.application.usecase.CreateUserUseCase.CreateUserCommand;
-import com.fiap.siaes.user.domain.model.vo.UserId;
+import com.fiap.siaes.user.application.usecase.CreateUserUseCase;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.web.openapi.UserControllerOpenApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

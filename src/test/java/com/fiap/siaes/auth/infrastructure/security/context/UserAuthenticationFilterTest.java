@@ -1,6 +1,7 @@
 package com.fiap.siaes.auth.infrastructure.security.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
@@ -251,17 +252,17 @@ class UserAuthenticationFilterTest {
 
     @Authentication(minimumRole = UserRole.MANAGER)
     static class ClassLevelController {
-        public void handle() {}
+        public void handle() { /* Teste para validar autenticação por classe */ }
     }
 
     @Authentication(minimumRole = UserRole.ADMIN)
     static class MethodOverridesClassController {
         @Authentication(minimumRole = UserRole.MANAGER)
-        public void handle() {}
+        public void handle() { /* Teste para validar anulação de autenticação por metodo */ }
     }
 
     @Authentication(minimumRole = UserRole.CUSTOMER, deniedRoles = {UserRole.MECHANIC})
     static class DeniedRoleController {
-        public void handle() {}
+        public void handle() { /* Teste para validar negação de papel */ }
     }
 }

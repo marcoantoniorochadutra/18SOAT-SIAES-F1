@@ -10,6 +10,7 @@ import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.vehicle.infrastructure.persistence.entity.VehicleJpaEntity;
+import com.fiap.siaes.vehicle.infrastructure.persistence.mapper.VehicleMapper;
 import com.fiap.siaes.vehicle.infrastructure.persistence.projection.ListVehicleProjection;
 import com.fiap.siaes.vehicle.infrastructure.persistence.repository.VehicleJpaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -162,7 +163,7 @@ class VehicleRepositoryAdapterTest {
 
         PageResponse<VehicleResponse> response = this.vehicleRepositoryAdapter.findAllByFilter(filter, pageQuery);
 
-        assertThat(response.content()).containsExactly(VehicleResponse.from(projection));
+        assertThat(response.content()).containsExactly(VehicleMapper.toResponse(projection));
         assertThat(response.hasNext()).isFalse();
     }
 

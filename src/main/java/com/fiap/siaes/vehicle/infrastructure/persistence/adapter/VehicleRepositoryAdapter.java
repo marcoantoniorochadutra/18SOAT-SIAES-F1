@@ -4,6 +4,7 @@ import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
+import com.fiap.siaes.vehicle.application.port.VehicleQueryPort;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
@@ -22,7 +23,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class VehicleRepositoryAdapter implements VehicleRepository {
+public class VehicleRepositoryAdapter implements VehicleRepository, VehicleQueryPort {
 
     private final VehicleJpaRepository vehicleJpaRepository;
 
@@ -61,7 +62,7 @@ public class VehicleRepositoryAdapter implements VehicleRepository {
         Slice<VehicleResponse> results = this.vehicleJpaRepository.findAllVehicles(filter.plate(), filter.brand(), filter.model(),
                                                                                         filter.year(), filter.customerId(),
                                                                                         PageRequest.of(pageQuery.page(), pageQuery.size()))
-                .map(VehicleResponse::from);
+                .map(VehicleMapper::toResponse);
 
         return PageResponse.from(results);
     }

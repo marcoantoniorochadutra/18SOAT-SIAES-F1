@@ -1,23 +1,29 @@
 package com.fiap.siaes.supplies.infrastructure.web;
 
-import com.fiap.siaes.supplies.application.usecase.AdjustSuppliesStockUseCase;
-import com.fiap.siaes.supplies.application.usecase.AdjustSuppliesStockUseCase.AdjustSuppliesStockCommand;
-import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
+import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
+import com.fiap.siaes.supplies.application.dto.SuppliesFilter;
+import com.fiap.siaes.supplies.application.dto.SuppliesResponse;
+import com.fiap.siaes.supplies.application.usecase.ActivateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase.CreateSuppliesCommand;
-import com.fiap.siaes.supplies.application.usecase.DeleteSuppliesUseCase;
+import com.fiap.siaes.supplies.application.usecase.CreateSuppliesUseCase;
+import com.fiap.siaes.supplies.application.usecase.DeactivateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.GetSuppliesByIdUseCase;
+import com.fiap.siaes.supplies.application.usecase.ListSuppliesUseCase.ListSuppliesCommand;
 import com.fiap.siaes.supplies.application.usecase.ListSuppliesUseCase;
-import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase;
 import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase.UpdateSuppliesCommand;
-import com.fiap.siaes.supplies.domain.model.Supplies;
+import com.fiap.siaes.supplies.application.usecase.UpdateSuppliesUseCase;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.fiap.siaes.supplies.infrastructure.web.openapi.SuppliesControllerOpenApi;
+import com.fiap.siaes.user.domain.model.enums.UserRole;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,61 +34,64 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import static com.fiap.siaes.sk.util.ControllerUtils.createdResponse;
+import static com.fiap.siaes.sk.util.ControllerUtils.updatedResponse;
 
-@Tag(name = "Suppliess", description = "Gestão de peças e insumos, com controle de estoque")
 @RestController
 @RequestMapping(SuppliesController.ENDPOINT)
 @RequiredArgsConstructor
-public class SuppliesController {
+@Authentication(minimumRole = UserRole.MANAGER)
+public class SuppliesController implements SuppliesControllerOpenApi {
 
-    public static final String ENDPOINT = "/api/v1/suppliess";
+    public static final String ENDPOINT = "/api/v1/supplies";
 
     private final CreateSuppliesUseCase createSuppliesUseCase;
     private final UpdateSuppliesUseCase updateSuppliesUseCase;
     private final GetSuppliesByIdUseCase getSuppliesByIdUseCase;
-    private final ListSuppliesUseCase listSuppliessUseCase;
-    private final DeleteSuppliesUseCase deleteSuppliesUseCase;
-    private final AdjustSuppliesStockUseCase adjustSuppliesStockUseCase;
+    private final ListSuppliesUseCase listSuppliesUseCase;
+    private final DeactivateSuppliesUseCase deactivateSuppliesUseCase;
+    private final ActivateSuppliesUseCase activateSuppliesUseCase;
 
-    @Operation(summary = "Cadastra uma nova peça/insumo")
-    @ApiResponse(responseCode = "201", description = "Peça/insumo cadastrado")
+    @Override
     @PostMapping
-    public ResponseEntity<SuppliesId> create(@RequestBody CreateSuppliesCommand command) {
-        SuppliesId id = this.createSuppliesUseCase.execute(command);
+    public ResponseEntity<SuppliesId> create(@Valid @RequestBody CreateSuppliesCommand command,
+                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        SuppliesId id = this.createSuppliesUseCase.execute(command.with(authenticatedUser));
         return createdResponse(ENDPOINT, id);
     }
 
-    @Operation(summary = "Atualiza uma peça/insumo existente")
+    @Override
     @PutMapping("/{id}")
-    public Supplies update(@PathVariable SuppliesId id, @RequestBody UpdateSuppliesCommand command) {
-        return this.updateSuppliesUseCase.execute(id, command);
+    public ResponseEntity<SuppliesId> update(@PathVariable SuppliesId id,
+                                             @Valid @RequestBody UpdateSuppliesCommand command) {
+        SuppliesId updatedId = this.updateSuppliesUseCase.execute(command.with(id));
+        return updatedResponse(ENDPOINT, updatedId);
     }
 
-    @Operation(summary = "Busca uma peça/insumo pelo id")
+    @Override
     @GetMapping("/{id}")
-    public Supplies get(@PathVariable SuppliesId id) {
+    public SuppliesResponse getById(@PathVariable SuppliesId id) {
         return this.getSuppliesByIdUseCase.execute(id);
     }
 
-    @Operation(summary = "Lista todas as peças/insumos")
+    @Override
     @GetMapping
-    public List<Supplies> list() {
-        return this.listSuppliessUseCase.execute();
+    public PageResponse<SuppliesResponse> list(@ParameterObject SuppliesFilter filter,
+                                               @Valid @ParameterObject PageQuery pageQuery) {
+        return this.listSuppliesUseCase.execute(ListSuppliesCommand.from(filter, pageQuery));
     }
 
-    @Operation(summary = "Ajusta o estoque de uma peça/insumo (positivo repõe, negativo baixa)")
-    @PatchMapping("/{id}/stock")
-    public Supplies adjustStock(@PathVariable SuppliesId id, @RequestBody AdjustSuppliesStockCommand command) {
-        return this.adjustSuppliesStockUseCase.execute(id, command);
-    }
-
-    @Operation(summary = "Remove uma peça/insumo")
-    @DeleteMapping("/{id}")
+    @Override
+    @PatchMapping("/{id}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable SuppliesId id) {
-        this.deleteSuppliesUseCase.execute(id);
+    public void deactivate(@PathVariable SuppliesId id) {
+        this.deactivateSuppliesUseCase.execute(id);
+    }
+
+    @Override
+    @PatchMapping("/{id}/activate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void activate(@PathVariable SuppliesId id) {
+        this.activateSuppliesUseCase.execute(id);
     }
 }

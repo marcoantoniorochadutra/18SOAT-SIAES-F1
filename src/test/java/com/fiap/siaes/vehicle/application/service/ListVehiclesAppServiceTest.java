@@ -4,8 +4,8 @@ import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
+import com.fiap.siaes.vehicle.application.port.VehicleQueryPort;
 import com.fiap.siaes.vehicle.application.usecase.ListVehiclesUseCase.ListVehiclesCommand;
-import com.fiap.siaes.vehicle.domain.repository.VehicleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 class ListVehiclesAppServiceTest {
 
     @Mock
-    private VehicleRepository vehicleRepository;
+    private VehicleQueryPort vehicleQueryPort;
 
     @InjectMocks
     private ListVehiclesAppService listVehiclesAppService;
@@ -47,7 +47,7 @@ class ListVehiclesAppServiceTest {
                 VehicleResponse.from(createVehicle()),
                 VehicleResponse.from(createVehicle()));
 
-        when(this.vehicleRepository.findAllByFilter(filter, pageQuery))
+        when(this.vehicleQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(vehicles)));
 
         PageResponse<VehicleResponse> response = this.listVehiclesAppService.execute(ListVehiclesCommand.from(filter, pageQuery));
@@ -66,7 +66,7 @@ class ListVehiclesAppServiceTest {
         var filter = VehicleFilter.builder().model("inexistente").build();
         var pageQuery = new PageQuery(null, null);
 
-        when(this.vehicleRepository.findAllByFilter(filter, pageQuery))
+        when(this.vehicleQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<VehicleResponse> response = this.listVehiclesAppService.execute(ListVehiclesCommand.from(filter, pageQuery));

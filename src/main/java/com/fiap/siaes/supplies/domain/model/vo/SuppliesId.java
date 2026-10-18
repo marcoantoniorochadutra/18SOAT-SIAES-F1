@@ -20,6 +20,10 @@ public record SuppliesId(UUID id) implements UUIDWrapper {
         return new SuppliesId(UUID.randomUUID());
     }
 
+    public static SuppliesId from(UUID id) {
+        return new SuppliesId(id);
+    }
+
     @Override
     @JsonValue
     public String toString() {

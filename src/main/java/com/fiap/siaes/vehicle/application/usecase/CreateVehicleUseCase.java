@@ -1,7 +1,7 @@
 package com.fiap.siaes.vehicle.application.usecase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import jakarta.validation.constraints.Min;

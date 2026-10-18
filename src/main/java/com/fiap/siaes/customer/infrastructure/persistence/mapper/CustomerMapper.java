@@ -1,7 +1,10 @@
 package com.fiap.siaes.customer.infrastructure.persistence.mapper;
 
+import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.domain.model.Customer;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.infrastructure.persistence.entity.CustomerJpa;
+import com.fiap.siaes.customer.infrastructure.persistence.projection.ListCustomerProjection;
 import com.fiap.siaes.sk.document.domain.Document;
 import lombok.experimental.UtilityClass;
 
@@ -38,5 +41,16 @@ public class CustomerMapper {
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
+    }
+
+    public static CustomerResponse toResponse(ListCustomerProjection projection) {
+        Document document = Document.recreate(projection.getDocument());
+        return new CustomerResponse(
+                CustomerId.from(projection.getId()),
+                document.getValue(),
+                document.getDocumentType(),
+                projection.getName(),
+                projection.getPhone(),
+                projection.getEmail());
     }
 }

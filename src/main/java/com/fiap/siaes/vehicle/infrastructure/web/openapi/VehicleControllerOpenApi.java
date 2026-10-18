@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.infrastructure.web.openapi;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;

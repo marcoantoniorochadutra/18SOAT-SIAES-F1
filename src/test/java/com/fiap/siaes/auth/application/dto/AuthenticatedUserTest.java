@@ -1,4 +1,4 @@
-package com.fiap.siaes.auth.infrastructure.security.context;
+package com.fiap.siaes.auth.application.dto;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.UserTestFactory;

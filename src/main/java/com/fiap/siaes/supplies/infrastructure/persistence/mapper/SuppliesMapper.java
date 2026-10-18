@@ -1,29 +1,50 @@
 package com.fiap.siaes.supplies.infrastructure.persistence.mapper;
 
+import com.fiap.siaes.supplies.application.dto.SuppliesResponse;
 import com.fiap.siaes.supplies.domain.model.Supplies;
+import com.fiap.siaes.supplies.domain.model.vo.Sku;
+import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.infrastructure.persistence.entity.SuppliesJpaEntity;
+import com.fiap.siaes.supplies.infrastructure.persistence.projection.ListSuppliesProjection;
+import lombok.experimental.UtilityClass;
 
-public final class SuppliesMapper {
+import static java.util.Objects.isNull;
 
-    private SuppliesMapper() {
-    }
+@UtilityClass
+public class SuppliesMapper {
 
     public static SuppliesJpaEntity toEntity(Supplies supplies) {
-        if (supplies == null) {
+        if (isNull(supplies))
             return null;
-        }
-        return new SuppliesJpaEntity(supplies.getId(), supplies.getDescription(), supplies.getUnitPrice(), supplies.getStockQuantity());
+
+        return SuppliesJpaEntity.builder()
+                .id(supplies.getId())
+                .sku(supplies.getSku().getValue())
+                .description(supplies.getDescription())
+                .unitPrice(supplies.getUnitPrice())
+                .active(supplies.isActive())
+                .build();
     }
 
     public static Supplies toDomain(SuppliesJpaEntity entity) {
-        if (entity == null) {
+        if (isNull(entity))
             return null;
-        }
-        return Supplies.builder()
+
+        return Supplies.recreate()
                 .id(entity.getId())
+                .sku(Sku.recreate(entity.getSku()))
                 .description(entity.getDescription())
                 .unitPrice(entity.getUnitPrice())
-                .stockQuantity(entity.getStockQuantity())
+                .active(entity.isActive())
                 .build();
+    }
+
+    public static SuppliesResponse toResponse(ListSuppliesProjection projection) {
+        return new SuppliesResponse(
+                SuppliesId.from(projection.getId()),
+                projection.getSku(),
+                projection.getDescription(),
+                projection.getUnitPrice(),
+                projection.isActive());
     }
 }

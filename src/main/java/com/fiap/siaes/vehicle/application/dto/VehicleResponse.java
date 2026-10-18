@@ -4,7 +4,6 @@ import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
-import com.fiap.siaes.vehicle.infrastructure.persistence.projection.ListVehicleProjection;
 
 import java.util.UUID;
 
@@ -37,14 +36,5 @@ public record VehicleResponse(
                 vehicle.getModel(),
                 vehicle.getYear(),
                 new VehicleOwnerResponse(customer.getId(), customer.getName()));
-    }
-
-    public static VehicleResponse from(ListVehicleProjection vehicle) {
-        return new VehicleResponse(
-                new VehicleId(vehicle.getId()),
-                vehicle.getPlate(),
-                vehicle.getModel(),
-                vehicle.getYear(),
-                VehicleOwnerResponse.from(vehicle.getCustomerId(), vehicle.getCustomerName()));
     }
 }

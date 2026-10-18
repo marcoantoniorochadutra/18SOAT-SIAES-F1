@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.vehicle.application.usecase.DeleteVehicleUseCase;
 import com.fiap.siaes.vehicle.domain.exception.VehicleNotFoundException;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;

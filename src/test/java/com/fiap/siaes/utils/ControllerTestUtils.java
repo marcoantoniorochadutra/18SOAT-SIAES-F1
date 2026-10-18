@@ -1,7 +1,7 @@
 package com.fiap.siaes.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.infrastructure.security.context.UserAuthenticationFilter;
 import com.fiap.siaes.sk.infraestructure.config.I18nConfig;
 import com.fiap.siaes.user.UserTestFactory;
@@ -31,6 +31,7 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -95,6 +96,12 @@ public abstract class ControllerTestUtils {
 
     public ResultActions executeDelete(String url) throws Exception {
         return this.mockMvc.perform(delete(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(LocaleContextHolder.getLocale()));
+    }
+
+    public ResultActions executePatch(String url) throws Exception {
+        return this.mockMvc.perform(patch(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .locale(LocaleContextHolder.getLocale()));
     }

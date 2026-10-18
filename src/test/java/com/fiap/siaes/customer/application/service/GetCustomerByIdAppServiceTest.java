@@ -1,6 +1,6 @@
 package com.fiap.siaes.customer.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
 import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;

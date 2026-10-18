@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.application.usecase;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 

@@ -10,11 +10,14 @@
 @JavaTypeRegistration(descriptorClass = VehicleIdJavaType.class, javaType = VehicleId.class)
 @JavaTypeRegistration(descriptorClass = MaintenanceIdJavaType.class, javaType = MaintenanceId.class)
 @JavaTypeRegistration(descriptorClass = SuppliesIdJavaType.class, javaType = SuppliesId.class)
+@JavaTypeRegistration(descriptorClass = StockMovementIdJavaType.class, javaType = StockMovementId.class)
 
 package com.fiap.siaes;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId.CustomerIdJavaType;
+import com.fiap.siaes.inventory.domain.model.vo.StockMovementId;
+import com.fiap.siaes.inventory.domain.model.vo.StockMovementId.StockMovementIdJavaType;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId.MaintenanceIdJavaType;
 import com.fiap.siaes.sk.infraestructure.persistence.UUIDWrapperJdbcType;
