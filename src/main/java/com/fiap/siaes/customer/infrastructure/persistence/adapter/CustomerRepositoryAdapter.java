@@ -2,6 +2,7 @@ package com.fiap.siaes.customer.infrastructure.persistence.adapter;
 
 import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
+import com.fiap.siaes.customer.application.port.CustomerQueryPort;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
@@ -22,7 +23,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomerRepositoryAdapter implements CustomerRepository {
+public class CustomerRepositoryAdapter implements CustomerRepository, CustomerQueryPort {
 
     private final CustomerJpaRepository customerJpaRepository;
 
@@ -46,7 +47,7 @@ public class CustomerRepositoryAdapter implements CustomerRepository {
         Slice<CustomerResponse> results = this.customerJpaRepository.findAllCustomers(filter.name(), filter.document(),
                                                                                       filter.email(), filter.phone(),
                                                                                       PageRequest.of(pageQuery.page(), pageQuery.size()))
-                .map(CustomerResponse::from);
+                .map(CustomerMapper::toResponse);
 
         return PageResponse.from(results);
     }

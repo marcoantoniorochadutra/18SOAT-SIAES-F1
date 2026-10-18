@@ -1,6 +1,6 @@
 package com.fiap.siaes.customer.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
 import com.fiap.siaes.customer.domain.exception.CustomerDocumentAlreadyExistsException;
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
@@ -19,7 +19,7 @@ public class UpdateCustomerAppService implements UpdateCustomerUseCase {
     private final CustomerRepository customerRepository;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CustomerId execute(UpdateCustomerCommand command) {
         Customer customer = this.findCustomerToUpdate(command);
 

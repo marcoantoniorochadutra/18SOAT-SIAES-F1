@@ -1,6 +1,6 @@
 package com.fiap.siaes.user.infrastructure.web.openapi;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.user.application.usecase.CreateUserUseCase.CreateUserCommand;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import io.swagger.v3.oas.annotations.Operation;

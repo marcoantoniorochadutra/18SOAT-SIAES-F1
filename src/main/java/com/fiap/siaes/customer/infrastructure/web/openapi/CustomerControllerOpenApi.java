@@ -1,6 +1,6 @@
 package com.fiap.siaes.customer.infrastructure.web.openapi;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;

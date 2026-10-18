@@ -1,8 +1,12 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.mapper;
 
+import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
+import com.fiap.siaes.vehicle.application.dto.VehicleResponse.VehicleOwnerResponse;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
+import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.vehicle.infrastructure.persistence.entity.VehicleJpaEntity;
+import com.fiap.siaes.vehicle.infrastructure.persistence.projection.ListVehicleProjection;
 import lombok.experimental.UtilityClass;
 
 import static java.util.Objects.isNull;
@@ -37,5 +41,14 @@ public class VehicleMapper {
                 .model(vehicle.getModel())
                 .year(vehicle.getYear())
                 .build();
+    }
+
+    public static VehicleResponse toResponse(ListVehicleProjection projection) {
+        return new VehicleResponse(
+                new VehicleId(projection.getId()),
+                projection.getPlate(),
+                projection.getModel(),
+                projection.getYear(),
+                VehicleOwnerResponse.from(projection.getCustomerId(), projection.getCustomerName()));
     }
 }

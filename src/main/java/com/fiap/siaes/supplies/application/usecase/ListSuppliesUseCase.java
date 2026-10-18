@@ -1,10 +1,17 @@
 package com.fiap.siaes.supplies.application.usecase;
 
-import com.fiap.siaes.supplies.domain.model.Supplies;
-
-import java.util.List;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
+import com.fiap.siaes.supplies.application.dto.SuppliesFilter;
+import com.fiap.siaes.supplies.application.dto.SuppliesResponse;
 
 public interface ListSuppliesUseCase {
 
-    List<Supplies> execute();
+    PageResponse<SuppliesResponse> execute(ListSuppliesCommand command);
+
+    record ListSuppliesCommand(SuppliesFilter filter, PageQuery pageQuery) {
+        public static ListSuppliesCommand from(SuppliesFilter filter, PageQuery pageQuery) {
+            return new ListSuppliesCommand(filter, pageQuery);
+        }
+    }
 }

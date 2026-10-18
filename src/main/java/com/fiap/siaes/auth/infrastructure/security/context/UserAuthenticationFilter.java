@@ -1,6 +1,7 @@
 package com.fiap.siaes.auth.infrastructure.security.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
@@ -10,6 +11,7 @@ import com.fiap.siaes.auth.domain.security.TokenIssuer.UserClaim;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.exception.DomainException;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
@@ -82,11 +84,20 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
     private void setAuthenticatedUserContext(UserAuthenticationProjection user) {
         var authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());
-        AuthenticatedUser authenticatedUser = AuthenticatedUser.from(user);
+        AuthenticatedUser authenticatedUser = this.toAuthenticatedUser(user);
 
         var authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, Set.of(authority));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private AuthenticatedUser toAuthenticatedUser(UserAuthenticationProjection user) {
+        return AuthenticatedUser.builder()
+                .id(UserId.from(user.getId()))
+                .customerId(CustomerId.from(user.getCustomerId()))
+                .email(user.getEmail())
+                .userRole(user.getUserRole())
+                .build();
     }
 
     private UserAuthenticationProjection authenticate(String token, Authentication requiredAuthentication) {

@@ -1,18 +1,18 @@
 package com.fiap.siaes.customer.infrastructure.web;
 
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
 import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
-import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;
+import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
-import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
-import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase;
+import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase.ListCustomersCommand;
-import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
+import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase.UpdateCustomerCommand;
+import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.infrastructure.web.openapi.CustomerControllerOpenApi;
 import com.fiap.siaes.sk.pagination.PageQuery;

@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.vehicle.application.usecase.UpdateVehicleUseCase;
 import com.fiap.siaes.vehicle.domain.exception.VehicleNotFoundException;
 import com.fiap.siaes.vehicle.domain.exception.VehiclePlateAlreadyExistsException;
@@ -19,7 +19,7 @@ public class UpdateVehicleAppService implements UpdateVehicleUseCase {
     private final VehicleRepository vehicleRepository;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public VehicleId execute(UpdateVehicleCommand command) {
         Vehicle vehicle = this.findVehicleToUpdate(command);
 

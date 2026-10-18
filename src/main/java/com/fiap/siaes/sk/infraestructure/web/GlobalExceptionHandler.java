@@ -3,6 +3,7 @@ package com.fiap.siaes.sk.infraestructure.web;
 import com.fiap.siaes.sk.domain.exception.DomainException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -33,6 +34,15 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ProblemDetail handleOptimisticLockingFailure(Locale locale) {
+        String context = OptimisticLockingFailureException.class.getSimpleName();
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle(this.translate(context + ".message", null, locale));
+        problemDetail.setDetail(this.translate(context + ".detail", null, locale));
+        return problemDetail;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException exception, Locale locale) {
@@ -50,9 +60,6 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    /**
-     * {@code code} is the violated constraint (e.g. NotBlank, Size); {@code message} is already translated by the validator.
-     */
     private FieldErrorResponse toFieldErrorResponse(FieldError fieldError) {
         return FieldErrorResponse.builder()
                 .field(fieldError.getField())

@@ -1,7 +1,7 @@
 package com.fiap.siaes.customer.application.usecase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

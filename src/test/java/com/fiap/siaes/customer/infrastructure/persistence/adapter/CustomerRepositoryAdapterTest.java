@@ -6,6 +6,7 @@ import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.infrastructure.persistence.entity.CustomerJpa;
+import com.fiap.siaes.customer.infrastructure.persistence.mapper.CustomerMapper;
 import com.fiap.siaes.customer.infrastructure.persistence.projection.ListCustomerProjection;
 import com.fiap.siaes.customer.infrastructure.persistence.repository.CustomerJpaRepository;
 import com.fiap.siaes.sk.document.domain.Document;
@@ -138,7 +139,7 @@ class CustomerRepositoryAdapterTest {
 
         PageResponse<CustomerResponse> response = this.customerRepositoryAdapter.findAllByFilter(filter, pageQuery);
 
-        assertThat(response.content()).containsExactly(CustomerResponse.from(summary));
+        assertThat(response.content()).containsExactly(CustomerMapper.toResponse(summary));
         assertThat(response.hasNext()).isFalse();
     }
 

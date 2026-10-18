@@ -1,6 +1,6 @@
 package com.fiap.siaes.vehicle.application.service;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;

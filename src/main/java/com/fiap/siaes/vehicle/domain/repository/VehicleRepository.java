@@ -1,10 +1,6 @@
 package com.fiap.siaes.vehicle.domain.repository;
 
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
-import com.fiap.siaes.sk.pagination.PageQuery;
-import com.fiap.siaes.sk.pagination.PageResponse;
-import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
-import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
 import com.fiap.siaes.vehicle.domain.exception.VehicleNotFoundException;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
@@ -30,6 +26,4 @@ public interface VehicleRepository extends RepositoryBase<Vehicle, VehicleId> {
     boolean existsByPlateAndIdNot(Plate plate, VehicleId id);
 
     void deleteById(VehicleId id);
-
-    PageResponse<VehicleResponse> findAllByFilter(VehicleFilter filter, PageQuery pageQuery);
 }

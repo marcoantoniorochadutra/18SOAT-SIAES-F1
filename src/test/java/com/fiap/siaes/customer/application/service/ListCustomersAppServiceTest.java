@@ -2,8 +2,8 @@ package com.fiap.siaes.customer.application.service;
 
 import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
+import com.fiap.siaes.customer.application.port.CustomerQueryPort;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase.ListCustomersCommand;
-import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 class ListCustomersAppServiceTest {
 
     @Mock
-    private CustomerRepository customerRepository;
+    private CustomerQueryPort customerQueryPort;
 
     @InjectMocks
     private ListCustomersAppService listCustomersAppService;
@@ -46,7 +46,7 @@ class ListCustomersAppServiceTest {
                 CustomerResponse.from(createCustomer()),
                 CustomerResponse.from(createCustomer()));
 
-        when(this.customerRepository.findAllByFilter(filter, pageQuery))
+        when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(customers)));
 
         PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(new ListCustomersCommand(filter, pageQuery));
@@ -63,7 +63,7 @@ class ListCustomersAppServiceTest {
     void shouldReturnEmptyPageWhenNoCustomerMatches() {
         var filter = new CustomerFilter("inexistente", null, null, null);
         var pageQuery = new PageQuery(null, null);
-        when(this.customerRepository.findAllByFilter(filter, pageQuery))
+        when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(new ListCustomersCommand(filter, pageQuery));

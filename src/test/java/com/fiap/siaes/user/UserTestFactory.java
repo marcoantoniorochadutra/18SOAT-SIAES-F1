@@ -1,6 +1,6 @@
 package com.fiap.siaes.user;
 
-import com.fiap.siaes.auth.infrastructure.security.context.AuthenticatedUser;
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.User;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
