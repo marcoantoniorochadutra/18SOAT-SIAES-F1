@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS stock_movements (
     reason VARCHAR(255),
     reference_id UUID,
     performed_by UUID,
+    performed_by_name VARCHAR(150),
     occurred_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_stock_movements_supplies_id FOREIGN KEY (supplies_id) REFERENCES stock_items(supplies_id),
     CONSTRAINT fk_stock_movements_performed_by FOREIGN KEY (performed_by) REFERENCES users(id)

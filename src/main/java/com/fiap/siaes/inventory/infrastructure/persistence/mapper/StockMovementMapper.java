@@ -23,6 +23,7 @@ public class StockMovementMapper {
                 .reason(stockMovement.getReason())
                 .referenceId(stockMovement.getReferenceId())
                 .performedBy(stockMovement.getPerformedBy())
+                .performedByName(stockMovement.getPerformedByName())
                 .occurredAt(stockMovement.getOccurredAt())
                 .build();
     }
@@ -41,6 +42,7 @@ public class StockMovementMapper {
                 .reason(entity.getReason())
                 .referenceId(entity.getReferenceId())
                 .performedBy(entity.getPerformedBy())
+                .performedByName(entity.getPerformedByName())
                 .occurredAt(entity.getOccurredAt())
                 .build();
     }

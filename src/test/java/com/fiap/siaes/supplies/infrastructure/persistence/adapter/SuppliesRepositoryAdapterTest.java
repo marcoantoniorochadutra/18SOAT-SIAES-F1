@@ -131,11 +131,8 @@ class SuppliesRepositoryAdapterTest {
     @Test
     @DisplayName("Deve listar as peças/insumos da página com os filtros informados")
     void shouldFindAllByFilter() {
-        var filter = SuppliesFilter.builder()
-                .sku("flt-oleo-001")
-                .description(DESCRIPTION)
-                .build();
-        var pageQuery = PageQuery.builder().page(0).size(10).build();
+        var filter = SuppliesFilter.of("flt-oleo-001", DESCRIPTION, null);
+        var pageQuery = PageQuery.of(0, 10);
 
         ListSuppliesProjection projection = this.createListSuppliesProjection();
 

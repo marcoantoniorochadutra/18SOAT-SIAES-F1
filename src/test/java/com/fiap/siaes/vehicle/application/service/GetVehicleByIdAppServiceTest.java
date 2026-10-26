@@ -48,7 +48,7 @@ class GetVehicleByIdAppServiceTest {
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        var command = GetVehicleByIdCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserManager());
+        var command = GetVehicleByIdCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserManager());
         VehicleResponse response = this.getVehicleByIdAppService.execute(command);
 
         assertEquals(vehicle.getId(), response.id());
@@ -68,7 +68,7 @@ class GetVehicleByIdAppServiceTest {
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        var command = GetVehicleByIdCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(customer.getId()));
+        var command = GetVehicleByIdCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(customer.getId()));
         VehicleResponse response = this.getVehicleByIdAppService.execute(command);
 
         assertEquals(vehicle.getId(), response.id());
@@ -81,7 +81,7 @@ class GetVehicleByIdAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
 
-        var command = GetVehicleByIdCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(CustomerId.generate()));
+        var command = GetVehicleByIdCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(CustomerId.generate()));
         var exception = assertThrows(VehicleNotFoundException.class,
                 () -> this.getVehicleByIdAppService.execute(command));
 
@@ -96,7 +96,7 @@ class GetVehicleByIdAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
 
-        var command = GetVehicleByIdCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserCustomer());
+        var command = GetVehicleByIdCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserCustomer());
 
         assertThrows(VehicleNotFoundException.class, () -> this.getVehicleByIdAppService.execute(command));
         verify(this.customerRepository, never()).findByIdOrThrowNotFound(any());
@@ -109,7 +109,7 @@ class GetVehicleByIdAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(id)).thenThrow(new VehicleNotFoundException(id.toString()));
 
-        var command = GetVehicleByIdCommand.from(id, UserTestFactory.authenticatedUserManager());
+        var command = GetVehicleByIdCommand.of(id, UserTestFactory.authenticatedUserManager());
         var exception = assertThrows(VehicleNotFoundException.class,
                 () -> this.getVehicleByIdAppService.execute(command));
 
@@ -126,7 +126,7 @@ class GetVehicleByIdAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(customerId))
                 .thenThrow(new CustomerNotFoundException(customerId.toString()));
 
-        var command = GetVehicleByIdCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserManager());
+        var command = GetVehicleByIdCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserManager());
         var exception = assertThrows(CustomerNotFoundException.class,
                 () -> this.getVehicleByIdAppService.execute(command));
 

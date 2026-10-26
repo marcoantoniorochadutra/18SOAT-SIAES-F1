@@ -1,5 +1,6 @@
 package com.fiap.siaes.vehicle.domain.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 import com.fiap.siaes.vehicle.domain.exception.VehicleNotFoundException;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
@@ -20,6 +21,8 @@ public interface VehicleRepository extends RepositoryBase<Vehicle, VehicleId> {
             throw new VehicleNotFoundException(id.toString());
         }
     }
+
+    boolean existsByIdAndCustomerId(VehicleId id, CustomerId customerId);
 
     boolean existsByPlate(Plate plate);
 

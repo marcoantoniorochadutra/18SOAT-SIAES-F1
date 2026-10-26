@@ -4,13 +4,11 @@ import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 public interface CreateCustomerUseCase {
 
     CustomerId execute(CreateCustomerCommand command);
 
-    @Builder
     public record CreateCustomerCommand(
             @NotBlank(message = "{CustomerCommand.document.notBlank}")
             String document,
@@ -26,5 +24,8 @@ public interface CreateCustomerUseCase {
             @Size(message = "{CustomerCommand.email.size.max}", max = 150)
             String email) {
 
+        public static CreateCustomerCommand of(String document, String name, String phone, String email) {
+            return new CreateCustomerCommand(document, name, phone, email);
+        }
     }
 }

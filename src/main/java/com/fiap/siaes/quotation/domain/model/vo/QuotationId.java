@@ -20,6 +20,10 @@ public record QuotationId(UUID id) implements UUIDWrapper {
         return new QuotationId(UUID.randomUUID());
     }
 
+    public static QuotationId from(UUID id) {
+        return new QuotationId(id);
+    }
+
     @Override
     @JsonValue
     public String toString() {

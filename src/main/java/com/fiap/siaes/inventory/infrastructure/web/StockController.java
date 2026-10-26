@@ -64,6 +64,6 @@ public class StockController implements StockControllerOpenApi {
     @GetMapping("/movements")
     public PageResponse<StockMovementResponse> listMovements(@PathVariable SuppliesId suppliesId,
                                                              @Valid @ParameterObject PageQuery pageQuery) {
-        return this.listStockMovementsUseCase.execute(ListStockMovementsCommand.from(suppliesId, pageQuery));
+        return this.listStockMovementsUseCase.execute(ListStockMovementsCommand.of(suppliesId, pageQuery));
     }
 }

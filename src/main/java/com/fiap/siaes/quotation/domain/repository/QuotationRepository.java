@@ -1,19 +1,23 @@
 package com.fiap.siaes.quotation.domain.repository;
 
-import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.quotation.domain.exception.QuotationNotFoundException;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface QuotationRepository extends RepositoryBase<Quotation, QuotationId> {
 
-    List<Quotation> findAll();
+    default Quotation findByIdOrThrowNotFound(QuotationId id) {
+        return this.findById(id)
+                .orElseThrow(() -> new QuotationNotFoundException(id.toString()));
+    }
 
-    List<Quotation> findByOwnerId(CustomerId ownerId);
+    boolean existsOpenByWorkOrderId(WorkOrderId workOrderId);
 
-    boolean existsByPlate(String plate);
+    boolean existsAwaitingApprovalByWorkOrderId(WorkOrderId workOrderId);
 
-    void deleteById(QuotationId id);
+    Optional<Quotation> findDraftByWorkOrderId(WorkOrderId workOrderId);
 }

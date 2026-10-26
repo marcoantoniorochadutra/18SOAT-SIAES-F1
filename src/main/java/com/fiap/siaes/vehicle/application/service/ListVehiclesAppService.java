@@ -1,6 +1,8 @@
 package com.fiap.siaes.vehicle.application.service;
 
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.sk.pagination.PageResponse;
+import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
 import com.fiap.siaes.vehicle.application.port.VehicleQueryPort;
 import com.fiap.siaes.vehicle.application.usecase.ListVehiclesUseCase;
@@ -18,6 +20,9 @@ public class ListVehiclesAppService implements ListVehiclesUseCase {
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     public PageResponse<VehicleResponse> execute(ListVehiclesCommand command) {
-        return this.vehicleQueryPort.findAllByFilter(command.filter(), command.pageQuery());
+        AuthenticatedUser authenticatedUser = command.authenticatedUser();
+        VehicleFilter filter = authenticatedUser.isCustomer() ? command.filter().withCustomerId(authenticatedUser.customerId()) : command.filter();
+
+        return this.vehicleQueryPort.findAllByFilter(filter, command.pageQuery());
     }
 }

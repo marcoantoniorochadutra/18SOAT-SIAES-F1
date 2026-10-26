@@ -78,7 +78,7 @@ public class SuppliesController implements SuppliesControllerOpenApi {
     @GetMapping
     public PageResponse<SuppliesResponse> list(@ParameterObject SuppliesFilter filter,
                                                @Valid @ParameterObject PageQuery pageQuery) {
-        return this.listSuppliesUseCase.execute(ListSuppliesCommand.from(filter, pageQuery));
+        return this.listSuppliesUseCase.execute(ListSuppliesCommand.of(filter, pageQuery));
     }
 
     @Override

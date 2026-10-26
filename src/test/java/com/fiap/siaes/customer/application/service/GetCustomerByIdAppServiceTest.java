@@ -42,7 +42,7 @@ class GetCustomerByIdAppServiceTest {
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        var command = GetCustomerByIdCommand.from(customer.getId(), AUTHENTICATED_USER);
+        var command = GetCustomerByIdCommand.of(customer.getId(), AUTHENTICATED_USER);
         CustomerResponse response = this.getCustomerByIdAppService.execute(command);
 
         assertEquals(customer.getId(), response.id());
@@ -59,7 +59,7 @@ class GetCustomerByIdAppServiceTest {
         var id = CustomerId.generate();
         when(this.customerRepository.findByIdOrThrowNotFound(id)).thenThrow(new CustomerNotFoundException(id.toString()));
 
-        var command = GetCustomerByIdCommand.from(id, AUTHENTICATED_USER);
+        var command = GetCustomerByIdCommand.of(id, AUTHENTICATED_USER);
         var exception = assertThrows(CustomerNotFoundException.class, () -> this.getCustomerByIdAppService.execute(command));
 
         assertExceptionParameters(exception, id.toString());
@@ -73,7 +73,7 @@ class GetCustomerByIdAppServiceTest {
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        var command = GetCustomerByIdCommand.from(CustomerId.generate(), authenticatedCustomer);
+        var command = GetCustomerByIdCommand.of(CustomerId.generate(), authenticatedCustomer);
         CustomerResponse response = this.getCustomerByIdAppService.execute(command);
 
         assertEquals(customer.getId(), response.id());
@@ -89,7 +89,7 @@ class GetCustomerByIdAppServiceTest {
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
 
-        var command = GetCustomerByIdCommand.from(requestedId, authenticatedCustomer);
+        var command = GetCustomerByIdCommand.of(requestedId, authenticatedCustomer);
         this.getCustomerByIdAppService.execute(command);
 
         verify(this.customerRepository, never()).findByIdOrThrowNotFound(requestedId);
@@ -104,7 +104,7 @@ class GetCustomerByIdAppServiceTest {
         when(this.customerRepository.findByIdOrThrowNotFound(customerId))
                 .thenThrow(new CustomerNotFoundException(customerId.toString()));
 
-        var command = GetCustomerByIdCommand.from(CustomerId.generate(), authenticatedCustomer);
+        var command = GetCustomerByIdCommand.of(CustomerId.generate(), authenticatedCustomer);
 
         assertThrows(CustomerNotFoundException.class, () -> this.getCustomerByIdAppService.execute(command));
     }

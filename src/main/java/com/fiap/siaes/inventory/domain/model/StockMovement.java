@@ -23,12 +23,13 @@ public class StockMovement {
     private final String reason;
     private final UUID referenceId;
     private final UserId performedBy;
+    private final String performedByName;
     private final Instant occurredAt;
 
     @Builder(builderMethodName = "recreate", builderClassName = "RecreateBuilder")
     public StockMovement(StockMovementId id, SuppliesId suppliesId, StockMovementType type, int quantity,
                          int stockAfter, int reservedAfter, String reason, UUID referenceId,
-                         UserId performedBy, Instant occurredAt) {
+                         UserId performedBy, String performedByName, Instant occurredAt) {
         this.id = id;
         this.suppliesId = suppliesId;
         this.type = type;
@@ -38,6 +39,7 @@ public class StockMovement {
         this.reason = reason;
         this.referenceId = referenceId;
         this.performedBy = performedBy;
+        this.performedByName = performedByName;
         this.occurredAt = occurredAt;
     }
 
@@ -52,6 +54,7 @@ public class StockMovement {
                 event.reason(),
                 event.referenceId(),
                 event.performedBy(),
+                event.performedByName(),
                 event.occurredAt());
     }
 }

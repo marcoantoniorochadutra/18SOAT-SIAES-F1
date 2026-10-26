@@ -10,7 +10,7 @@ public interface ListSuppliesUseCase {
     PageResponse<SuppliesResponse> execute(ListSuppliesCommand command);
 
     record ListSuppliesCommand(SuppliesFilter filter, PageQuery pageQuery) {
-        public static ListSuppliesCommand from(SuppliesFilter filter, PageQuery pageQuery) {
+        public static ListSuppliesCommand of(SuppliesFilter filter, PageQuery pageQuery) {
             return new ListSuppliesCommand(filter, pageQuery);
         }
     }

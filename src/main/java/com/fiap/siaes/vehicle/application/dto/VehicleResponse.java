@@ -1,40 +1,27 @@
 package com.fiap.siaes.vehicle.application.dto;
 
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.Customer;
-import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 
-import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record VehicleResponse(
         VehicleId id,
         String plate,
         String model,
         int year,
-        VehicleOwnerResponse owner) {
-
-    public record VehicleOwnerResponse(CustomerId id, String name) {
-        public static VehicleOwnerResponse from(UUID id, String name) {
-            return new VehicleOwnerResponse(CustomerId.from(id), name);
-        }
-    }
-
-    public static VehicleResponse from(Vehicle vehicle) {
-        return new VehicleResponse(
-                vehicle.getId(),
-                vehicle.getPlate().getValue(),
-                vehicle.getModel(),
-                vehicle.getYear(),
-                new VehicleOwnerResponse(vehicle.getCustomerId(), null));
-    }
+        CustomerReferenceResponse owner) {
 
     public static VehicleResponse from(Vehicle vehicle, Customer customer) {
-        return new VehicleResponse(
-                vehicle.getId(),
-                vehicle.getPlate().getValue(),
-                vehicle.getModel(),
-                vehicle.getYear(),
-                new VehicleOwnerResponse(customer.getId(), customer.getName()));
+        return VehicleResponse.builder()
+                .id(vehicle.getId())
+                .plate(vehicle.getPlate().getValue())
+                .model(vehicle.getModel())
+                .year(vehicle.getYear())
+                .owner(CustomerReferenceResponse.from(customer))
+                .build();
     }
 }

@@ -28,7 +28,7 @@ class LogoutUserAppServiceTest {
     @Test
     @DisplayName("Deve adicionar o token informado na blocklist")
     void shouldBlockTheGivenToken() {
-        var command = new LogoutUserCommand(TOKEN);
+        var command = LogoutUserCommand.of(TOKEN);
 
         this.logoutAppService.execute(command);
 
@@ -38,7 +38,7 @@ class LogoutUserAppServiceTest {
     @Test
     @DisplayName("Não deve bloquear quando nenhum token é informado")
     void shouldNotBlockWhenTokenIsMissing() {
-        var command = new LogoutUserCommand(null);
+        var command = LogoutUserCommand.of(null);
 
         assertThrows(MissingBearerTokenException.class, () -> this.logoutAppService.execute(command));
     }

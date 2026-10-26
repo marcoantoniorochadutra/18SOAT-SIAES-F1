@@ -36,12 +36,9 @@ class ListCustomersAppServiceTest {
     @Test
     @DisplayName("Deve listar os clientes da página com os filtros informados")
     void shouldListCustomersPageWithFilter() {
-        var filter = CustomerFilter.builder()
-                .name("silva")
-                .document("12.6")
-                .build();
+        var filter = CustomerFilter.of("silva", "12.6", null, null);
 
-        var pageQuery = new PageQuery(1, 2);
+        var pageQuery = PageQuery.of(1, 2);
         var customers = List.of(
                 CustomerResponse.from(createCustomer()),
                 CustomerResponse.from(createCustomer()));
@@ -49,7 +46,7 @@ class ListCustomersAppServiceTest {
         when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(customers)));
 
-        PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(new ListCustomersCommand(filter, pageQuery));
+        PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(ListCustomersCommand.of(filter, pageQuery));
 
         assertEquals(customers, response.content());
         assertEquals("126", filter.document());
@@ -61,12 +58,12 @@ class ListCustomersAppServiceTest {
     @Test
     @DisplayName("Deve retornar página vazia quando nenhum cliente atender aos filtros")
     void shouldReturnEmptyPageWhenNoCustomerMatches() {
-        var filter = new CustomerFilter("inexistente", null, null, null);
-        var pageQuery = new PageQuery(null, null);
+        var filter = CustomerFilter.of("inexistente", null, null, null);
+        var pageQuery = PageQuery.of(null, null);
         when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
-        PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(new ListCustomersCommand(filter, pageQuery));
+        PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(ListCustomersCommand.of(filter, pageQuery));
 
         assertTrue(response.content().isEmpty());
         assertEquals(PageQuery.DEFAULT_PAGE, response.page());

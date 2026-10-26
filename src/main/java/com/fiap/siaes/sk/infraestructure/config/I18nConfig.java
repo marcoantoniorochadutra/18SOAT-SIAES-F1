@@ -16,6 +16,7 @@ public class I18nConfig {
     private static final String SWAGGER_MESSAGE_FILEPATH = "messages/swagger/messages";
     private static final String EXCEPTION_MESSAGE_FILEPATH = "messages/exception/messages";
     private static final String VALIDATION_MESSAGE_FILEPATH = "messages/validation/messages";
+    private static final String NOTIFICATION_MESSAGE_FILEPATH = "messages/notification/messages";
 
     @Bean
     public MessageSource i18nSwaggerMessageSource() {
@@ -32,6 +33,11 @@ public class I18nConfig {
         ResourceBundleMessageSource messageSource = this.createMessageMessageSource(VALIDATION_MESSAGE_FILEPATH);
         messageSource.setUseCodeAsDefaultMessage(false);
         return messageSource;
+    }
+
+    @Bean
+    public MessageSource i18nNotificationMessageSource() {
+        return this.createMessageMessageSource(NOTIFICATION_MESSAGE_FILEPATH);
     }
 
     @Bean

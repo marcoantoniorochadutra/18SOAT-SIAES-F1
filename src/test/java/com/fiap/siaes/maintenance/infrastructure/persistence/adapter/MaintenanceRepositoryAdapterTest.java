@@ -133,11 +133,8 @@ class MaintenanceRepositoryAdapterTest {
     @Test
     @DisplayName("Deve listar os serviços da página com os filtros informados")
     void shouldFindAllByFilter() {
-        var filter = MaintenanceFilter.builder()
-                .code("troca-oleo")
-                .description(DESCRIPTION)
-                .build();
-        var pageQuery = PageQuery.builder().page(0).size(10).build();
+        var filter = MaintenanceFilter.of("troca-oleo", DESCRIPTION, null);
+        var pageQuery = PageQuery.of(0, 10);
 
         ListMaintenanceProjection projection = this.createListMaintenanceProjection();
 

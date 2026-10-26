@@ -66,7 +66,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[201] Deve criar serviço com sucesso")
     void shouldCreateMaintenance() throws Exception {
-        var command = this.createCommandBuilder().build();
+        var command = CreateMaintenanceCommand.of(CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
         var maintenanceId = MaintenanceId.generate();
 
         when(this.createMaintenanceUseCase.execute(command)).thenReturn(maintenanceId);
@@ -81,7 +81,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço com código em branco")
     void shouldNotCreateMaintenanceWhenCodeIsBlank() throws Exception {
-        var command = this.createCommandBuilder().code(" ").build();
+        var command = CreateMaintenanceCommand.of(" ", DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -93,7 +93,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço com código acima do tamanho máximo")
     void shouldNotCreateMaintenanceWhenCodeExceedsMaxSize() throws Exception {
-        var command = this.createCommandBuilder().code("S".repeat(51)).build();
+        var command = CreateMaintenanceCommand.of("S".repeat(51), DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -104,7 +104,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço com descrição em branco")
     void shouldNotCreateMaintenanceWhenDescriptionIsBlank() throws Exception {
-        var command = this.createCommandBuilder().description(" ").build();
+        var command = CreateMaintenanceCommand.of(CODE, " ", PRICE, ESTIMATED_DURATION_MINUTES);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -114,7 +114,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço sem preço")
     void shouldNotCreateMaintenanceWhenPriceIsNull() throws Exception {
-        var command = this.createCommandBuilder().price(null).build();
+        var command = CreateMaintenanceCommand.of(CODE, DESCRIPTION, null, ESTIMATED_DURATION_MINUTES);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -124,7 +124,11 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço com preço negativo")
     void shouldNotCreateMaintenanceWhenPriceIsNegative() throws Exception {
-        var command = this.createCommandBuilder().price(new BigDecimal("-1.00")).build();
+        var command = CreateMaintenanceCommand.of(
+                CODE,
+                DESCRIPTION,
+                new BigDecimal("-1.00"),
+                ESTIMATED_DURATION_MINUTES);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -134,7 +138,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar serviço com duração estimada zerada")
     void shouldNotCreateMaintenanceWhenEstimatedDurationIsZero() throws Exception {
-        var command = this.createCommandBuilder().estimatedDurationMinutes(0).build();
+        var command = CreateMaintenanceCommand.of(CODE, DESCRIPTION, PRICE, 0);
 
         super.executePost(MaintenanceController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -144,7 +148,7 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[409] Não deve criar serviço com código já cadastrado")
     void shouldNotCreateMaintenanceWhenCodeAlreadyExists() throws Exception {
-        var command = this.createCommandBuilder().build();
+        var command = CreateMaintenanceCommand.of(CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         when(this.createMaintenanceUseCase.execute(command))
                 .thenThrow(new MaintenanceCodeAlreadyExistsException(CODE));
@@ -215,7 +219,14 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @DisplayName("[200] Deve buscar serviço pelo id com sucesso")
     void shouldGetMaintenanceById() throws Exception {
         var id = MaintenanceId.generate();
-        var response = new MaintenanceResponse(id, CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES, true);
+        var response = MaintenanceResponse.builder()
+                .id(id)
+                .code(CODE)
+                .description(DESCRIPTION)
+                .price(PRICE)
+                .estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES)
+                .active(true)
+                .build();
 
         when(this.getMaintenanceByIdUseCase.execute(id)).thenReturn(response);
 
@@ -244,7 +255,14 @@ class MaintenanceControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[200] Deve listar serviços com sucesso")
     void shouldListMaintenances() throws Exception {
-        var response = new MaintenanceResponse(MaintenanceId.generate(), CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES, true);
+        var response = MaintenanceResponse.builder()
+                .id(MaintenanceId.generate())
+                .code(CODE)
+                .description(DESCRIPTION)
+                .price(PRICE)
+                .estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES)
+                .active(true)
+                .build();
         var page = new PageResponse<>(List.of(response), false, 0, 20);
 
         when(this.listMaintenancesUseCase.execute(any())).thenReturn(page);
@@ -334,14 +352,6 @@ class MaintenanceControllerTest extends ControllerTestUtils {
         super.executePatch(MaintenanceController.ENDPOINT + "/" + id + "/activate")
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Serviço já ativo"));
-    }
-
-    private CreateMaintenanceCommand.CreateMaintenanceCommandBuilder createCommandBuilder() {
-        return CreateMaintenanceCommand.builder()
-                .code(CODE)
-                .description(DESCRIPTION)
-                .price(PRICE)
-                .estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
     }
 
     private UpdateMaintenanceCommand.UpdateMaintenanceCommandBuilder updateCommandBuilder() {

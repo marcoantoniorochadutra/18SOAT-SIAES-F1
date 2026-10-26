@@ -10,7 +10,7 @@ public interface ListMaintenancesUseCase {
     PageResponse<MaintenanceResponse> execute(ListMaintenancesCommand command);
 
     record ListMaintenancesCommand(MaintenanceFilter filter, PageQuery pageQuery) {
-        public static ListMaintenancesCommand from(MaintenanceFilter filter, PageQuery pageQuery) {
+        public static ListMaintenancesCommand of(MaintenanceFilter filter, PageQuery pageQuery) {
             return new ListMaintenancesCommand(filter, pageQuery);
         }
     }

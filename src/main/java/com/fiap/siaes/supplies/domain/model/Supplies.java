@@ -69,6 +69,10 @@ public class Supplies extends AggregateRoot {
         this.active = true;
     }
 
+    public boolean isDeactivated() {
+        return !this.active;
+    }
+
     private BigDecimal validateUnitPrice(BigDecimal unitPrice) {
         if (isNull(unitPrice) || unitPrice.signum() < 0) {
             throw new SuppliesUnitPriceInvalidException();
@@ -79,11 +83,6 @@ public class Supplies extends AggregateRoot {
 
     private void registerCreatedEvent(int initialStock, UserId createdBy) {
         this.registerEvent(
-                SuppliesCreatedEvent.builder()
-                        .suppliesId(this.id)
-                        .initialStock(initialStock)
-                        .createdBy(createdBy)
-                        .occurredAt(Instant.now())
-                        .build());
+                SuppliesCreatedEvent.of(this.id, initialStock, createdBy, Instant.now()));
     }
 }

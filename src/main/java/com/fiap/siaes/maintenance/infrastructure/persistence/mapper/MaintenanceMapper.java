@@ -42,12 +42,13 @@ public class MaintenanceMapper {
     }
 
     public static MaintenanceResponse toResponse(ListMaintenanceProjection projection) {
-        return new MaintenanceResponse(
-                MaintenanceId.from(projection.getId()),
-                projection.getCode(),
-                projection.getDescription(),
-                projection.getPrice(),
-                projection.getEstimatedDurationMinutes(),
-                projection.isActive());
+        return MaintenanceResponse.builder()
+                .id(MaintenanceId.from(projection.getId()))
+                .code(projection.getCode())
+                .description(projection.getDescription())
+                .price(projection.getPrice())
+                .estimatedDurationMinutes(projection.getEstimatedDurationMinutes())
+                .active(projection.isActive())
+                .build();
     }
 }

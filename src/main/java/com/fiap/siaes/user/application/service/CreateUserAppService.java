@@ -65,7 +65,7 @@ public class CreateUserAppService implements CreateUserUseCase {
             return this.requireContactFromCommand(command);
 
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(command.customerId());
-        return new UserContact(customer.getName(), customer.getEmail());
+        return UserContact.of(customer.getName(), customer.getEmail());
     }
 
     private UserContact requireContactFromCommand(CreateUserCommand command) {
@@ -77,7 +77,7 @@ public class CreateUserAppService implements CreateUserUseCase {
             throw new UserEmailOrCustomerRequiredException();
         }
 
-        return new UserContact(command.name(), command.email());
+        return UserContact.of(command.name(), command.email());
     }
 
     private User createUser(CreateUserCommand command, UserContact contact) {

@@ -11,6 +11,7 @@ public interface ReleaseStockReservationUseCase {
     void execute(ReleaseStockReservationCommand command);
 
     @Builder
-    record ReleaseStockReservationCommand(SuppliesId suppliesId, int quantity, UUID referenceId, UserId performedBy) {
+    record ReleaseStockReservationCommand(SuppliesId suppliesId, int quantity, UUID referenceId, UserId performedBy,
+            String performedByName) {
     }
 }

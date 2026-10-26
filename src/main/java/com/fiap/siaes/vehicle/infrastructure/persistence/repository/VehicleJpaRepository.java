@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface VehicleJpaRepository extends JpaRepository<VehicleJpaEntity, VehicleId> {
 
-    List<VehicleJpaEntity> findByCustomerId(CustomerId customerId);
+    boolean existsByIdAndCustomerId(VehicleId id, CustomerId customerId);
 
     boolean existsByPlate(String plate);
 

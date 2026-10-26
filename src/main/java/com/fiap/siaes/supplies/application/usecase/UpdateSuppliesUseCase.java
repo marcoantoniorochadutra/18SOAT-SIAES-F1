@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.math.BigDecimal;
 
@@ -15,7 +14,6 @@ public interface UpdateSuppliesUseCase {
 
     SuppliesId execute(UpdateSuppliesCommand command);
 
-    @Builder(toBuilder = true)
     record UpdateSuppliesCommand(
             @JsonIgnore SuppliesId id,
 
@@ -32,10 +30,12 @@ public interface UpdateSuppliesUseCase {
             @Digits(message = "{SuppliesCommand.unitPrice.digits}", integer = 10, fraction = 2)
             BigDecimal unitPrice) {
 
+        public static UpdateSuppliesCommand of(SuppliesId id, String sku, String description, BigDecimal unitPrice) {
+            return new UpdateSuppliesCommand(id, sku, description, unitPrice);
+        }
+
         public UpdateSuppliesCommand with(SuppliesId id) {
-            return this.toBuilder()
-                    .id(id)
-                    .build();
+            return of(id, this.sku, this.description, this.unitPrice);
         }
     }
 }

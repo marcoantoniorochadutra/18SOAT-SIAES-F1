@@ -1,5 +1,6 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
@@ -45,6 +46,11 @@ public class VehicleRepositoryAdapter implements VehicleRepository, VehicleQuery
     @Override
     public boolean existsById(VehicleId id) {
         return this.vehicleJpaRepository.existsById(id);
+    }
+
+    @Override
+    public boolean existsByIdAndCustomerId(VehicleId id, CustomerId customerId) {
+        return this.vehicleJpaRepository.existsByIdAndCustomerId(id, customerId);
     }
 
     @Override

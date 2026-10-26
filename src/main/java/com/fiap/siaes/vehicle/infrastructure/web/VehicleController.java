@@ -74,22 +74,22 @@ public class VehicleController implements VehicleControllerOpenApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable VehicleId id,
                        @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        this.deleteVehicleUseCase.execute(DeleteVehicleCommand.from(id, authenticatedUser));
+        this.deleteVehicleUseCase.execute(DeleteVehicleCommand.of(id, authenticatedUser));
     }
 
     @Override
     @GetMapping("/{id}")
     public VehicleResponse getById(@PathVariable VehicleId id,
                                    @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.from(id, authenticatedUser));
+        return this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.of(id, authenticatedUser));
     }
 
     @Override
     @GetMapping
-    @Authentication(minimumRole = UserRole.MANAGER)
     public PageResponse<VehicleResponse> list(@ParameterObject VehicleFilter filter,
-                                              @Valid @ParameterObject PageQuery pageQuery) {
-        return this.listVehiclesUseCase.execute(ListVehiclesCommand.from(filter, pageQuery));
+                                              @Valid @ParameterObject PageQuery pageQuery,
+                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return this.listVehiclesUseCase.execute(ListVehiclesCommand.of(filter, pageQuery, authenticatedUser));
     }
 
 }

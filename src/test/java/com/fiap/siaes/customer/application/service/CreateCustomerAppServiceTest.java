@@ -45,12 +45,7 @@ class CreateCustomerAppServiceTest {
     @DisplayName("Deve criar um cliente com sucesso")
     void shouldCreateCustomerSuccessfully() {
 
-        var command = CreateCustomerCommand.builder()
-                .document(VALID_DOCUMENT)
-                .name("Maria Silva")
-                .phone("11999999999")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(VALID_DOCUMENT, "Maria Silva", "11999999999", EMAIL);
 
         CustomerId customerId = this.createCustomerAppService.execute(command);
 
@@ -69,12 +64,7 @@ class CreateCustomerAppServiceTest {
     @Test
     @DisplayName("Não deve criar cliente quando o e-mail já estiver cadastrado")
     void shouldNotCreateCustomerWhenEmailAlreadyExists() {
-        var command = CreateCustomerCommand.builder()
-                .document(VALID_DOCUMENT)
-                .name("Maria Silva")
-                .phone("11999999999")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(VALID_DOCUMENT, "Maria Silva", "11999999999", EMAIL);
 
         when(this.customerRepository.existsByEmail(EMAIL)).thenReturn(true);
 
@@ -88,12 +78,7 @@ class CreateCustomerAppServiceTest {
     @Test
     @DisplayName("Não deve criar cliente quando o documento já estiver cadastrado")
     void shouldNotCreateCustomerWhenDocumentAlreadyExists() {
-        var command = CreateCustomerCommand.builder()
-                .document(VALID_DOCUMENT)
-                .name("Maria Silva")
-                .phone("11999999999")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(VALID_DOCUMENT, "Maria Silva", "11999999999", EMAIL);
 
         when(this.customerRepository.existsByDocument(Document.recreate(SANITIZED_DOCUMENT))).thenReturn(true);
 
@@ -107,11 +92,7 @@ class CreateCustomerAppServiceTest {
     @Test
     @DisplayName("Não deve criar cliente com documento inválido")
     void shouldNotCreateCustomerWithInvalidDocument() {
-        var command = CreateCustomerCommand.builder()
-                .document("111.111.111-12")
-                .name("Maria Silva")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of("111.111.111-12", "Maria Silva", null, EMAIL);
 
         assertThrows(InvalidDocumentException.class,
                 () -> this.createCustomerAppService.execute(command));

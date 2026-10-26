@@ -53,8 +53,8 @@ class AuthenticateUserAppServiceTest {
     @Test
     @DisplayName("Deve autenticar com sucesso e emitir os tokens de acesso e de atualização")
     void shouldAuthenticateSuccessfullyAndIssueTokens() {
-        var command = new AuthenticateUserCommand(EMAIL, RAW_PASSWORD);
-        var userId = new UserId(USER_ID);
+        var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
+        var userId = UserId.from(USER_ID);
 
         when(this.userRepository.findByEmail(EMAIL)).thenReturn(this.userAuthenticationProjection);
         doCallRealMethod().when(this.userRepository).findByEmailOrThrowNotFound(EMAIL);
@@ -74,7 +74,7 @@ class AuthenticateUserAppServiceTest {
     @Test
     @DisplayName("Não deve autenticar quando a senha informada não corresponde ao hash cadastrado")
     void shouldNotAuthenticateWhenPasswordDoesNotMatch() {
-        var command = new AuthenticateUserCommand(EMAIL, RAW_PASSWORD);
+        var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
 
         when(this.userRepository.findByEmailOrThrowNotFound(EMAIL)).thenReturn(this.userAuthenticationProjection);
         when(this.userAuthenticationProjection.getPassword()).thenReturn(HASHED_PASSWORD);
@@ -86,7 +86,7 @@ class AuthenticateUserAppServiceTest {
     @Test
     @DisplayName("Não deve autenticar quando o email informada não existe")
     void shouldNotAuthenticateWhenEmailDoesNotExist() {
-        var command = new AuthenticateUserCommand(EMAIL, RAW_PASSWORD);
+        var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
 
         when(this.userRepository.findByEmail(EMAIL)).thenReturn(null);
         doCallRealMethod().when(this.userRepository).findByEmailOrThrowNotFound(EMAIL);

@@ -45,12 +45,13 @@ public class CustomerMapper {
 
     public static CustomerResponse toResponse(ListCustomerProjection projection) {
         Document document = Document.recreate(projection.getDocument());
-        return new CustomerResponse(
-                CustomerId.from(projection.getId()),
-                document.getValue(),
-                document.getDocumentType(),
-                projection.getName(),
-                projection.getPhone(),
-                projection.getEmail());
+        return CustomerResponse.builder()
+                .id(CustomerId.from(projection.getId()))
+                .document(document.getValue())
+                .documentType(document.getDocumentType())
+                .name(projection.getName())
+                .phone(projection.getPhone())
+                .email(projection.getEmail())
+                .build();
     }
 }

@@ -26,7 +26,7 @@ public final class Document {
             throw new DocumentValueIsNullException();
         }
 
-        this.value = this.sanitizeDocument(value);
+        this.value = sanitize(value);
         this.documentType = DocumentType.fromDigits(this.value);
         this.validateDocument();
     }
@@ -37,6 +37,10 @@ public final class Document {
 
     public static Document recreate(String value) {
         return new Document(value, DocumentType.fromDigits(value));
+    }
+
+    public boolean endsWith(String lastDigits) {
+        return !isBlank(lastDigits) && this.value.endsWith(sanitize(lastDigits));
     }
 
     private void validateDocument() {
@@ -52,7 +56,7 @@ public final class Document {
         }
     }
 
-    private String sanitizeDocument(String value) {
-        return value.replaceAll("\\D", "");
+    public static String sanitize(String value) {
+        return isBlank(value) ? null : value.replaceAll("\\D", "");
     }
 }

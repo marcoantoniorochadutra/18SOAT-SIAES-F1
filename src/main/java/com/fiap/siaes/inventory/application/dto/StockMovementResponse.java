@@ -7,7 +7,9 @@ import com.fiap.siaes.user.domain.model.vo.UserId;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record StockMovementResponse(
         StockMovementId id,
         StockMovementType type,
@@ -17,18 +19,21 @@ public record StockMovementResponse(
         String reason,
         UUID referenceId,
         UserId performedBy,
+        String performedByName,
         Instant occurredAt) {
 
     public static StockMovementResponse from(StockMovement stockMovement) {
-        return new StockMovementResponse(
-                stockMovement.getId(),
-                stockMovement.getType(),
-                stockMovement.getQuantity(),
-                stockMovement.getStockAfter(),
-                stockMovement.getReservedAfter(),
-                stockMovement.getReason(),
-                stockMovement.getReferenceId(),
-                stockMovement.getPerformedBy(),
-                stockMovement.getOccurredAt());
+        return StockMovementResponse.builder()
+                .id(stockMovement.getId())
+                .type(stockMovement.getType())
+                .quantity(stockMovement.getQuantity())
+                .stockAfter(stockMovement.getStockAfter())
+                .reservedAfter(stockMovement.getReservedAfter())
+                .reason(stockMovement.getReason())
+                .referenceId(stockMovement.getReferenceId())
+                .performedBy(stockMovement.getPerformedBy())
+                .performedByName(stockMovement.getPerformedByName())
+                .occurredAt(stockMovement.getOccurredAt())
+                .build();
     }
 }
