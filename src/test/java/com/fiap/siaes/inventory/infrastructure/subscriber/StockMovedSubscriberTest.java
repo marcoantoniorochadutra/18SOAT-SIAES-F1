@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.fiap.siaes.inventory.InventoryTestFactory.createStockMovedEvent;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -35,13 +35,13 @@ class StockMovedSubscriberTest {
     }
 
     @Test
-    @DisplayName("Não deve propagar falha na gravação, pois a movimentação de estoque já foi efetivada")
-    void shouldNotPropagateFailure() {
+    @DisplayName("Deve propagar falha na gravação para desfazer a movimentação de estoque na mesma transação")
+    void shouldPropagateFailure() {
         var event = createStockMovedEvent();
 
         doThrow(new IllegalStateException("database down"))
                 .when(this.recordStockMovementUseCase).execute(RecordStockMovementCommand.of(event));
 
-        assertDoesNotThrow(() -> this.stockMovedSubscriber.on(event));
+        assertThrows(IllegalStateException.class, () -> this.stockMovedSubscriber.on(event));
     }
 }

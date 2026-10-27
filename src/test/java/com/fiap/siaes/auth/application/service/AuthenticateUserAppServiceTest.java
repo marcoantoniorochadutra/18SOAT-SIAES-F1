@@ -5,13 +5,12 @@ import com.fiap.siaes.auth.application.usecase.AuthenticateUserUseCase.Authentic
 import com.fiap.siaes.auth.domain.exception.InvalidCredentialsException;
 import com.fiap.siaes.auth.domain.security.RefreshToken;
 import com.fiap.siaes.auth.domain.security.TokenIssuer;
-import com.fiap.siaes.user.domain.exception.UserNotFoundException;
 import com.fiap.siaes.user.domain.model.User;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
 import com.fiap.siaes.user.domain.security.PasswordHasher;
-import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -52,9 +50,6 @@ class AuthenticateUserAppServiceTest {
     @Mock
     private TokenIssuer tokenIssuer;
 
-    @Mock
-    private UserAuthenticationProjection userAuthenticationProjection;
-
     @InjectMocks
     private AuthenticateUserAppService authenticateUserAppService;
 
@@ -64,10 +59,7 @@ class AuthenticateUserAppServiceTest {
         var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
         var userId = UserId.from(USER_ID);
 
-        when(this.userRepository.findByEmail(EMAIL)).thenReturn(this.userAuthenticationProjection);
-        doCallRealMethod().when(this.userRepository).findByEmailOrThrowNotFound(EMAIL);
-        when(this.userAuthenticationProjection.getPassword()).thenReturn(HASHED_PASSWORD);
-        when(this.userAuthenticationProjection.getId()).thenReturn(USER_ID);
+        when(this.userRepository.findCredentialsByEmail(EMAIL)).thenReturn(Optional.of(credentials()));
         when(this.passwordHasher.matches(RAW_PASSWORD, HASHED_PASSWORD)).thenReturn(true);
         User user = User.recreate().id(userId).email(EMAIL).role(UserRole.MANAGER).build();
         RefreshToken refreshToken = RefreshToken.of("refresh-token", "refresh-token-hash", Instant.now().plusSeconds(3600));
@@ -90,8 +82,7 @@ class AuthenticateUserAppServiceTest {
     void shouldNotAuthenticateWhenPasswordDoesNotMatch() {
         var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
 
-        when(this.userRepository.findByEmailOrThrowNotFound(EMAIL)).thenReturn(this.userAuthenticationProjection);
-        when(this.userAuthenticationProjection.getPassword()).thenReturn(HASHED_PASSWORD);
+        when(this.userRepository.findCredentialsByEmail(EMAIL)).thenReturn(Optional.of(credentials()));
         when(this.passwordHasher.matches(RAW_PASSWORD, HASHED_PASSWORD)).thenReturn(false);
 
         assertThrows(InvalidCredentialsException.class, () -> this.authenticateUserAppService.execute(command));
@@ -101,13 +92,24 @@ class AuthenticateUserAppServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve autenticar quando o email informada não existe")
+    @DisplayName("Deve responder credenciais inválidas quando o e-mail informado não existe, sem revelar o cadastro")
     void shouldNotAuthenticateWhenEmailDoesNotExist() {
         var command = AuthenticateUserCommand.of(EMAIL, RAW_PASSWORD);
 
-        when(this.userRepository.findByEmail(EMAIL)).thenReturn(null);
-        doCallRealMethod().when(this.userRepository).findByEmailOrThrowNotFound(EMAIL);
+        when(this.userRepository.findCredentialsByEmail(EMAIL)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> this.authenticateUserAppService.execute(command));
+        assertThrows(InvalidCredentialsException.class, () -> this.authenticateUserAppService.execute(command));
+
+        verify(this.userRepository, never()).save(any());
+        verifyNoInteractions(this.passwordHasher, this.tokenIssuer);
+    }
+
+    private UserCredentials credentials() {
+        return UserCredentials.builder()
+                .id(UserId.from(USER_ID))
+                .email(EMAIL)
+                .password(HASHED_PASSWORD)
+                .role(UserRole.MANAGER)
+                .build();
     }
 }

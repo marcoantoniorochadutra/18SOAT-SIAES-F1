@@ -47,6 +47,18 @@ class QuotationMapperTest {
     }
 
     @Test
+    @DisplayName("Deve preservar a versão do orçamento para o controle de concorrência")
+    void shouldKeepVersion() {
+        QuotationJpaEntity entity = QuotationMapper.toEntity(createQuotation());
+        entity.setVersion(3L);
+
+        Quotation mapped = QuotationMapper.toDomain(entity);
+
+        assertEquals(3L, mapped.getVersion());
+        assertEquals(3L, QuotationMapper.toEntity(mapped).getVersion());
+    }
+
+    @Test
     @DisplayName("Deve retornar nulo quando a entrada for nula")
     void shouldReturnNullWhenInputIsNull() {
         assertNull(QuotationMapper.toEntity(null));

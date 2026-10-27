@@ -20,7 +20,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
         FROM {h-schema} users u
         WHERE u.id = :userId
     """, nativeQuery = true)
-    UserAuthenticationProjection findUserAuthById(UserId userId);
+    Optional<UserAuthenticationProjection> findUserAuthById(UserId userId);
 
     @Query(value = """
         SELECT u.id AS id,
@@ -31,7 +31,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
         FROM {h-schema} users u
         WHERE u.email = :email
     """, nativeQuery = true)
-    UserAuthenticationProjection findByEmail(String email);
+    Optional<UserAuthenticationProjection> findUserAuthByEmail(String email);
 
     @Query(value = """
         SELECT EXISTS (

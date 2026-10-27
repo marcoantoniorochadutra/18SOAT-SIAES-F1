@@ -6,17 +6,17 @@ import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
 import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
+import com.fiap.siaes.auth.domain.exception.UndeclaredEndpointAccessException;
 import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
 import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer.UserClaim;
-import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.exception.DomainException;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
-import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -75,7 +75,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         Authentication requiredAuthentication = this.resolveAuthenticationAnnotation(handlerMethod);
 
         try {
-            UserAuthenticationProjection user = this.authenticate(token, requiredAuthentication);
+            UserCredentials user = this.authenticate(token, requiredAuthentication);
 
             this.setAuthenticatedUserContext(user);
 
@@ -85,8 +85,8 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void setAuthenticatedUserContext(UserAuthenticationProjection user) {
-        var authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());
+    private void setAuthenticatedUserContext(UserCredentials user) {
+        var authority = new SimpleGrantedAuthority("ROLE_" + user.role().name());
         AuthenticatedUser authenticatedUser = this.toAuthenticatedUser(user);
 
         var authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, Set.of(authority));
@@ -94,41 +94,37 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private AuthenticatedUser toAuthenticatedUser(UserAuthenticationProjection user) {
-        return AuthenticatedUser.of(
-                UserId.from(user.getId()),
-                CustomerId.from(user.getCustomerId()),
-                user.getEmail(),
-                user.getUserRole());
+    private AuthenticatedUser toAuthenticatedUser(UserCredentials user) {
+        return AuthenticatedUser.of(user.id(), user.customerId(), user.email(), user.role());
     }
 
-    private UserAuthenticationProjection authenticate(String token, Authentication requiredAuthentication) {
+    private UserCredentials authenticate(String token, Authentication requiredAuthentication) {
+        if (isNull(requiredAuthentication)) {
+            throw new UndeclaredEndpointAccessException();
+        }
+
         if (isNull(token)) {
             throw new InvalidTokenException();
         }
 
-        UserAuthenticationProjection user = this.findUserFromToken(token);
+        UserCredentials user = this.findUserFromToken(token);
 
-        if (user.getUserRole().lacksAccessTo(requiredAuthentication.minimumRole())) {
+        if (user.role().lacksAccessTo(requiredAuthentication.minimumRole())) {
             throw new InsufficientRoleException(requiredAuthentication.minimumRole());
         }
 
-        if (Arrays.asList(requiredAuthentication.deniedRoles()).contains(user.getUserRole())) {
-            throw new RoleNotAllowedException(user.getUserRole());
+        if (Arrays.asList(requiredAuthentication.deniedRoles()).contains(user.role())) {
+            throw new RoleNotAllowedException(user.role());
         }
 
         return user;
     }
 
-    private UserAuthenticationProjection findUserFromToken(String token) {
+    private UserCredentials findUserFromToken(String token) {
         UserId userId = this.extractUserId(token);
 
-        var authUser = this.userRepository.findUserAuthById(userId);
-
-        if (isNull(authUser))
-            throw new InvalidTokenException();
-
-        return authUser;
+        return this.userRepository.findCredentialsById(userId)
+                .orElseThrow(InvalidTokenException::new);
     }
 
     private UserId extractUserId(String token) {

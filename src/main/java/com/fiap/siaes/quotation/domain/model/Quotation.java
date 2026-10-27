@@ -57,6 +57,7 @@ public class Quotation extends AggregateRoot {
     private String rejectionReason;
 
     private Instant createdAt;
+    private Long version;
 
     @Builder
     public Quotation(WorkOrderId workOrderId, CustomerId customerId, VehicleId vehicleId, String description, long odometer,
@@ -77,7 +78,7 @@ public class Quotation extends AggregateRoot {
                      long odometer, QuotationStatus lastStatus, Set<QuotationStatusHistory> statusHistory,
                      List<QuotationSupplies> supplies, List<QuotationMaintenance> maintenances,
                      QuotationDecisionChannel decisionChannel, UserId decidedBy, Instant decidedAt, String rejectionReason,
-                     Instant createdAt) {
+                     Instant createdAt, Long version) {
         this.id = id;
         this.workOrderId = workOrderId;
         this.customerId = customerId;
@@ -93,6 +94,7 @@ public class Quotation extends AggregateRoot {
         this.decidedAt = decidedAt;
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
+        this.version = version;
     }
 
     public void complete() {
