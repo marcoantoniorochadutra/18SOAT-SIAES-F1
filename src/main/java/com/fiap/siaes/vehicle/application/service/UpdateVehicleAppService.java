@@ -19,7 +19,7 @@ public class UpdateVehicleAppService implements UpdateVehicleUseCase {
     private final VehicleRepository vehicleRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public VehicleId execute(UpdateVehicleCommand command) {
         Vehicle vehicle = this.findVehicleToUpdate(command);
 
@@ -36,7 +36,7 @@ public class UpdateVehicleAppService implements UpdateVehicleUseCase {
         Vehicle vehicle = this.vehicleRepository.findByIdOrThrowNotFound(command.id());
         AuthenticatedUser authenticatedUser = command.authenticatedUser();
 
-        if (authenticatedUser.isCustomer() && authenticatedUser.isDifferentCustomer(vehicle.getCustomerId())) {
+        if (authenticatedUser.isCustomer() && !vehicle.isOwnedBy(authenticatedUser.customerId())) {
             throw new VehicleNotFoundException(command.id().toString());
         }
 

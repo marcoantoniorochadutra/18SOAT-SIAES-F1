@@ -23,6 +23,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class Quotation extends AggregateRoot {
     private String rejectionReason;
 
     private Instant createdAt;
+    private Long version;
 
     @Builder
     public Quotation(WorkOrderId workOrderId, CustomerId customerId, VehicleId vehicleId, String description, long odometer,
@@ -64,7 +66,7 @@ public class Quotation extends AggregateRoot {
         this.workOrderId = workOrderId;
         this.customerId = customerId;
         this.vehicleId = vehicleId;
-        this.description = description;
+        this.description = trimToNull(description);
         this.odometer = this.validateOdometer(odometer);
         this.changeItems(supplies, maintenances);
         this.createdAt = Instant.now();
@@ -76,7 +78,7 @@ public class Quotation extends AggregateRoot {
                      long odometer, QuotationStatus lastStatus, Set<QuotationStatusHistory> statusHistory,
                      List<QuotationSupplies> supplies, List<QuotationMaintenance> maintenances,
                      QuotationDecisionChannel decisionChannel, UserId decidedBy, Instant decidedAt, String rejectionReason,
-                     Instant createdAt) {
+                     Instant createdAt, Long version) {
         this.id = id;
         this.workOrderId = workOrderId;
         this.customerId = customerId;
@@ -92,6 +94,7 @@ public class Quotation extends AggregateRoot {
         this.decidedAt = decidedAt;
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
+        this.version = version;
     }
 
     public void complete() {
@@ -125,7 +128,7 @@ public class Quotation extends AggregateRoot {
         long validOdometer = this.validateOdometer(odometer);
 
         this.changeItems(supplies, maintenances);
-        this.description = description;
+        this.description = trimToNull(description);
         this.odometer = validOdometer;
     }
 
@@ -140,8 +143,25 @@ public class Quotation extends AggregateRoot {
                 .collect(Collectors.toMap(QuotationSupplies::getSuppliesId, QuotationSupplies::getQuantity));
     }
 
+    public boolean isOwnedBy(CustomerId customerId) {
+        return this.customerId.equals(customerId);
+    }
+
     public boolean isDraft() {
         return !this.lastStatus.isNotDraft();
+    }
+
+    public boolean isAwaitingApproval() {
+        return !this.lastStatus.isNotAwaitingApproval();
+    }
+
+    public boolean holdsStockReservation() {
+        return this.isDraft() || this.isAwaitingApproval();
+    }
+
+    public void ensureAwaitingApproval() {
+        if (!this.isAwaitingApproval())
+            throw new QuotationNotAwaitingApprovalException(this.id.toString(), this.lastStatus.name());
     }
 
     private void requireDraft() {
@@ -184,8 +204,7 @@ public class Quotation extends AggregateRoot {
     }
 
     private void decide(QuotationStatus status, QuotationDecisionChannel channel, UserId decidedBy) {
-        if (this.lastStatus.isNotAwaitingApproval())
-            throw new QuotationNotAwaitingApprovalException(this.id.toString(), this.lastStatus.name());
+        this.ensureAwaitingApproval();
 
         this.decisionChannel = channel;
         this.decidedBy = decidedBy;
@@ -200,5 +219,17 @@ public class Quotation extends AggregateRoot {
             this.statusHistory = new HashSet<>();
 
         this.statusHistory.add(QuotationStatusHistory.of(newStatus));
+    }
+
+    public Set<QuotationStatusHistory> getStatusHistory() {
+        return isNull(this.statusHistory) ? Set.of() : Collections.unmodifiableSet(this.statusHistory);
+    }
+
+    public List<QuotationSupplies> getSupplies() {
+        return isNull(this.supplies) ? List.of() : Collections.unmodifiableList(this.supplies);
+    }
+
+    public List<QuotationMaintenance> getMaintenances() {
+        return isNull(this.maintenances) ? List.of() : Collections.unmodifiableList(this.maintenances);
     }
 }

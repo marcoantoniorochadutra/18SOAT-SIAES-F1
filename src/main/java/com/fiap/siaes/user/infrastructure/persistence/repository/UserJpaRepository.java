@@ -1,10 +1,13 @@
 package com.fiap.siaes.user.infrastructure.persistence.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> {
 
@@ -17,7 +20,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
         FROM {h-schema} users u
         WHERE u.id = :userId
     """, nativeQuery = true)
-    UserAuthenticationProjection findUserAuthById(UserId userId);
+    Optional<UserAuthenticationProjection> findUserAuthById(UserId userId);
 
     @Query(value = """
         SELECT u.id AS id,
@@ -28,7 +31,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
         FROM {h-schema} users u
         WHERE u.email = :email
     """, nativeQuery = true)
-    UserAuthenticationProjection findByEmail(String email);
+    Optional<UserAuthenticationProjection> findUserAuthByEmail(String email);
 
     @Query(value = """
         SELECT EXISTS (
@@ -38,4 +41,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
     """, nativeQuery = true)
     boolean existsByEmail(String email);
 
+    Optional<UserJpaEntity> findByRefreshToken(String refreshToken);
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

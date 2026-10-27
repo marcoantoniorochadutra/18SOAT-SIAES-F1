@@ -6,6 +6,7 @@ import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
+import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase.DeleteCustomerCommand;
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
@@ -86,7 +87,7 @@ public class CustomerController implements CustomerControllerOpenApi {
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable CustomerId id) {
-        this.deleteCustomerUseCase.execute(id);
+    public void delete(@PathVariable CustomerId id, @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        this.deleteCustomerUseCase.execute(DeleteCustomerCommand.of(id, authenticatedUser));
     }
 }

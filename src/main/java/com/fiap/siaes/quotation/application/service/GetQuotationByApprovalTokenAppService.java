@@ -1,5 +1,6 @@
 package com.fiap.siaes.quotation.application.service;
 
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalResponse;
@@ -10,6 +11,7 @@ import com.fiap.siaes.quotation.domain.exception.QuotationApprovalTokenInvalidEx
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.model.QuotationApprovalToken;
 import com.fiap.siaes.quotation.domain.repository.QuotationRepository;
+import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +34,12 @@ public class GetQuotationByApprovalTokenAppService implements GetQuotationByAppr
         QuotationApprovalToken token = this.quotationApprovalTokenHelper.findActive(command.token());
         Quotation quotation = this.quotationRepository.findByIdOrThrowNotFound(token.getQuotationId());
 
-        if (quotation.getLastStatus().isNotAwaitingApproval())
+        if (!quotation.isAwaitingApproval())
             throw new QuotationApprovalTokenInvalidException();
 
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(quotation.getCustomerId());
         Vehicle vehicle = this.vehicleRepository.findByIdOrThrowNotFound(quotation.getVehicleId());
 
-        return QuotationApprovalResponse.of(QuotationResponse.from(quotation, customer, vehicle), token.getExpiresAt());
+        return QuotationApprovalResponse.of(QuotationResponse.from(quotation, CustomerReferenceResponse.from(customer), VehicleReferenceResponse.from(vehicle)), token.getExpiresAt());
     }
 }

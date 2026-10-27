@@ -1,27 +1,22 @@
 package com.fiap.siaes.user.domain.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
-import com.fiap.siaes.user.domain.exception.UserNotFoundException;
 import com.fiap.siaes.user.domain.model.User;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.vo.UserId;
-import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 
-import static java.util.Objects.isNull;
+import java.util.Optional;
 
 public interface UserRepository extends RepositoryBase<User, UserId> {
 
-    UserAuthenticationProjection findByEmail(String email);
+    Optional<UserCredentials> findCredentialsByEmail(String email);
 
-    default UserAuthenticationProjection findByEmailOrThrowNotFound(String email) {
-        UserAuthenticationProjection user = this.findByEmail(email);
-
-        if (isNull(user))
-            throw new UserNotFoundException(email);
-
-        return user;
-    }
-
-    UserAuthenticationProjection findUserAuthById(UserId userId);
+    Optional<UserCredentials> findCredentialsById(UserId userId);
 
     boolean existsByEmail(String email);
+
+    Optional<User> findByRefreshToken(String refreshTokenHash);
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

@@ -1,5 +1,6 @@
 package com.fiap.siaes.quotation.infrastructure.web;
 
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalResponse;
 import com.fiap.siaes.quotation.application.dto.QuotationResponse;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByTokenUseCase;
@@ -10,6 +11,7 @@ import com.fiap.siaes.quotation.domain.exception.QuotationApprovalDocumentMismat
 import com.fiap.siaes.quotation.domain.exception.QuotationApprovalTokenInvalidException;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationDecision;
 import com.fiap.siaes.utils.ControllerTestUtils;
+import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -47,7 +49,7 @@ class QuotationExternalControllerTest extends ControllerTestUtils {
     void shouldGetQuotationByToken() throws Exception {
         var quotation = createQuotation();
         var customer = createCustomer();
-        var response = QuotationApprovalResponse.of(QuotationResponse.from(quotation, customer, createVehicle()), Instant.now());
+        var response = QuotationApprovalResponse.of(QuotationResponse.from(quotation, CustomerReferenceResponse.from(customer), VehicleReferenceResponse.from(createVehicle())), Instant.now());
 
         when(this.getQuotationByApprovalTokenUseCase.execute(GetQuotationByApprovalTokenCommand.of(TOKEN))).thenReturn(response);
 

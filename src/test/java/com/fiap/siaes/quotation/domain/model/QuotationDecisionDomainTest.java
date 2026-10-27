@@ -9,10 +9,13 @@ import com.fiap.siaes.quotation.domain.model.enums.QuotationStatus;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static com.fiap.siaes.quotation.QuotationTestFactory.createQuotation;
 import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -72,5 +75,28 @@ class QuotationDecisionDomainTest {
         assertExceptionParameters(exception, quotation.getId().toString(), "REJECTED");
         assertEquals(QuotationStatus.REJECTED, quotation.getLastStatus());
         assertTrue(quotation.pullDomainEvents().isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = QuotationStatus.class, names = "AWAITING_APPROVAL", mode = EnumSource.Mode.EXCLUDE)
+    @DisplayName("Deve exigir que o orçamento aguarde aprovação")
+    void shouldEnsureAwaitingApproval(QuotationStatus status) {
+        Quotation quotation = createQuotation(CustomerId.generate(), status);
+
+        assertThrows(QuotationNotAwaitingApprovalException.class, quotation::ensureAwaitingApproval);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = QuotationStatus.class, names = {"DRAFT", "AWAITING_APPROVAL"})
+    @DisplayName("Deve manter reserva de estoque enquanto o orçamento estiver em rascunho ou aguardando aprovação")
+    void shouldHoldStockReservationWhileOpen(QuotationStatus status) {
+        assertTrue(createQuotation(CustomerId.generate(), status).holdsStockReservation());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = QuotationStatus.class, names = {"APPROVED", "REJECTED", "DISCARDED"})
+    @DisplayName("Não deve manter reserva de estoque depois que o orçamento for decidido ou descartado")
+    void shouldNotHoldStockReservationWhenClosed(QuotationStatus status) {
+        assertFalse(createQuotation(CustomerId.generate(), status).holdsStockReservation());
     }
 }

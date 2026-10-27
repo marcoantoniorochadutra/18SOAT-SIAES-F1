@@ -1,9 +1,11 @@
 package com.fiap.siaes.workorder.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
-import com.fiap.siaes.workorder.application.dto.WorkOrderFilter;
 import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
+import com.fiap.siaes.workorder.application.dto.WorkOrderFilter;
 import com.fiap.siaes.workorder.application.port.WorkOrderQueryPort;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
@@ -58,6 +60,12 @@ public class WorkOrderRepositoryAdapter implements WorkOrderRepository, WorkOrde
                                                                                                 PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(WorkOrderMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.workOrderJpaRepository.deleteAllByCustomerId(customerId);
     }
 }

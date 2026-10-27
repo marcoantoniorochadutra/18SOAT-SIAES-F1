@@ -21,7 +21,7 @@ public class CreateVehicleAppService implements CreateVehicleUseCase {
     private final CustomerRepository customerRepository;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public VehicleId execute(CreateVehicleCommand command) {
         CustomerId customerId = this.resolveCustomerId(command);
 

@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.createDiagnosedWorkOrder;
 import static com.fiap.siaes.workorder.WorkOrderTestFactory.createWorkOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,7 +36,7 @@ class RegisterWorkOrderQuotationAppServiceTest {
     @Test
     @DisplayName("Deve registrar o orçamento e deixar a ordem de serviço aguardando aprovação")
     void shouldRegisterWorkOrderQuotation() {
-        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+        WorkOrder workOrder = createDiagnosedWorkOrder();
 
         when(this.workOrderRepository.findByIdOrThrowNotFound(workOrder.getId())).thenReturn(workOrder);
 

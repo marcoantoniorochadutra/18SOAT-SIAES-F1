@@ -7,6 +7,7 @@ import com.fiap.siaes.workorder.application.dto.WorkOrderFilter;
 import com.fiap.siaes.workorder.application.dto.WorkOrderResponse;
 import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.application.usecase.CreateWorkOrderUseCase.CreateWorkOrderCommand;
+import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase.RegisterWorkOrderDiagnosisCommand;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +39,16 @@ public interface WorkOrderControllerOpenApi {
                      @ApiResponse(responseCode = "409", description = "workorder.diagnosis.response.conflict"),
     })
     void startDiagnosis(WorkOrderId id);
+
+    @Operation(summary = "workorder.diagnosis.register.summary", description = "workorder.diagnosis.register.description", method = "PUT",
+               responses = {
+                     @ApiResponse(responseCode = "204", description = "workorder.diagnosis.register.response.success"),
+                     @ApiResponse(responseCode = "400", description = "workorder.diagnosis.register.response.badrequest"),
+                     @ApiResponse(responseCode = "403", description = "workorder.response.forbidden"),
+                     @ApiResponse(responseCode = "404", description = "workorder.response.notfound"),
+                     @ApiResponse(responseCode = "409", description = "workorder.diagnosis.register.response.conflict"),
+    })
+    void registerDiagnosis(WorkOrderId id, RegisterWorkOrderDiagnosisCommand command, AuthenticatedUser authenticatedUser);
 
     @Operation(summary = "workorder.finish.summary", description = "workorder.finish.description", method = "POST",
                responses = {

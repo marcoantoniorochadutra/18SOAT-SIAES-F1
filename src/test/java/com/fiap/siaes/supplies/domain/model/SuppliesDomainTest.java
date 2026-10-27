@@ -4,12 +4,16 @@ import com.fiap.siaes.supplies.domain.event.SuppliesCreatedEvent;
 import com.fiap.siaes.supplies.domain.exception.SkuValueIsNullException;
 import com.fiap.siaes.supplies.domain.exception.SuppliesAlreadyActiveException;
 import com.fiap.siaes.supplies.domain.exception.SuppliesAlreadyInactiveException;
+import com.fiap.siaes.supplies.domain.exception.SuppliesDescriptionRequiredException;
 import com.fiap.siaes.supplies.domain.exception.SuppliesUnitPriceInvalidException;
 import com.fiap.siaes.supplies.domain.model.vo.Sku;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 
@@ -74,8 +78,8 @@ class SuppliesDomainTest {
     @Test
     @DisplayName("Deve gerar um id diferente para cada nova peça/insumo")
     void shouldGenerateDifferentIdForEachNewSupplies() {
-        Supplies first = Supplies.builder().sku(SKU).unitPrice(UNIT_PRICE).build();
-        Supplies second = Supplies.builder().sku(SKU).unitPrice(UNIT_PRICE).build();
+        Supplies first = Supplies.builder().sku(SKU).description(DESCRIPTION).unitPrice(UNIT_PRICE).build();
+        Supplies second = Supplies.builder().sku(SKU).description(DESCRIPTION).unitPrice(UNIT_PRICE).build();
 
         assertNotEquals(first.getId(), second.getId());
     }
@@ -88,10 +92,28 @@ class SuppliesDomainTest {
         assertThrows(SkuValueIsNullException.class, builder::build);
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "\t"})
+    @DisplayName("Não deve criar peça/insumo sem descrição")
+    void shouldNotCreateSuppliesWithoutDescription(String description) {
+        var builder = Supplies.builder().sku(SKU).description(description).unitPrice(UNIT_PRICE);
+
+        assertThrows(SuppliesDescriptionRequiredException.class, builder::build);
+    }
+
+    @Test
+    @DisplayName("Deve remover os espaços das extremidades da descrição da peça/insumo")
+    void shouldTrimSuppliesDescription() {
+        Supplies supplies = Supplies.builder().sku(SKU).description("  " + DESCRIPTION + "  ").unitPrice(UNIT_PRICE).build();
+
+        assertEquals(DESCRIPTION, supplies.getDescription());
+    }
+
     @Test
     @DisplayName("Não deve criar peça/insumo sem preço unitário")
     void shouldNotCreateSuppliesWithoutUnitPrice() {
-        var builder = Supplies.builder().sku(SKU);
+        var builder = Supplies.builder().sku(SKU).description(DESCRIPTION);
 
         assertThrows(SuppliesUnitPriceInvalidException.class, builder::build);
     }
@@ -99,7 +121,7 @@ class SuppliesDomainTest {
     @Test
     @DisplayName("Não deve criar peça/insumo com preço unitário negativo")
     void shouldNotCreateSuppliesWithNegativeUnitPrice() {
-        var builder = Supplies.builder().sku(SKU).unitPrice(new BigDecimal("-0.01"));
+        var builder = Supplies.builder().sku(SKU).description(DESCRIPTION).unitPrice(new BigDecimal("-0.01"));
 
         assertThrows(SuppliesUnitPriceInvalidException.class, builder::build);
     }

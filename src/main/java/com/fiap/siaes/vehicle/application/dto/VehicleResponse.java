@@ -11,6 +11,7 @@ import lombok.Builder;
 public record VehicleResponse(
         VehicleId id,
         String plate,
+        String brand,
         String model,
         int year,
         CustomerReferenceResponse owner) {
@@ -19,6 +20,7 @@ public record VehicleResponse(
         return VehicleResponse.builder()
                 .id(vehicle.getId())
                 .plate(vehicle.getPlate().getValue())
+                .brand(vehicle.getBrand())
                 .model(vehicle.getModel())
                 .year(vehicle.getYear())
                 .owner(CustomerReferenceResponse.from(customer))

@@ -4,14 +4,20 @@ import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.event.WorkOrderCancelledEvent;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisDescriptionRequiredException;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisNotAllowedException;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisRequiredException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderStatusTransitionInvalidException;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.DIAGNOSIS;
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.createDiagnosedWorkOrder;
 import static com.fiap.siaes.workorder.WorkOrderTestFactory.createWorkOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -41,6 +47,15 @@ class WorkOrderDomainTest {
         assertEquals(vehicleId, workOrder.getVehicleId());
         assertEquals(WorkOrderStatus.RECEIVED, workOrder.getLastStatus());
         assertEquals(1, workOrder.getStatusHistory().size());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir alterar o histórico de status por fora do agregado")
+    void shouldNotAllowExternalChangesToStatusHistory() {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.RECEIVED);
+        var history = workOrder.getStatusHistory();
+
+        assertThrows(UnsupportedOperationException.class, history::clear);
     }
 
     @Test
@@ -160,12 +175,73 @@ class WorkOrderDomainTest {
     @Test
     @DisplayName("Deve aguardar aprovação ao registrar o primeiro orçamento durante o diagnóstico")
     void shouldAwaitApprovalWhenRegisteringFirstQuotation() {
-        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+        WorkOrder workOrder = createDiagnosedWorkOrder();
 
         workOrder.registerQuotation();
 
         assertEquals(WorkOrderStatus.AWAITING_APPROVAL, workOrder.getLastStatus());
         assertEquals(2, workOrder.getStatusHistory().size());
+    }
+
+    @Test
+    @DisplayName("Não deve registrar orçamento sem diagnóstico registrado")
+    void shouldNotRegisterQuotationWithoutDiagnosis() {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+
+        var exception = assertThrows(WorkOrderDiagnosisRequiredException.class, workOrder::registerQuotation);
+
+        assertExceptionParameters(exception, workOrder.getId().toString());
+        assertEquals(WorkOrderStatus.IN_DIAGNOSIS, workOrder.getLastStatus());
+    }
+
+    @Test
+    @DisplayName("Deve registrar o diagnóstico durante o diagnóstico")
+    void shouldRegisterDiagnosis() {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+        UserId mechanicId = UserId.generate();
+
+        workOrder.registerDiagnosis("  Vazamento de óleo no cárter  ", mechanicId);
+
+        assertEquals("Vazamento de óleo no cárter", workOrder.getDiagnosis().description());
+        assertEquals(mechanicId, workOrder.getDiagnosis().diagnosedBy());
+        assertNotNull(workOrder.getDiagnosis().diagnosedAt());
+        assertEquals(WorkOrderStatus.IN_DIAGNOSIS, workOrder.getLastStatus());
+    }
+
+    @Test
+    @DisplayName("Deve substituir o diagnóstico quando registrado novamente")
+    void shouldReplaceDiagnosis() {
+        WorkOrder workOrder = createDiagnosedWorkOrder();
+
+        workOrder.registerDiagnosis("Disco de freio empenado", UserId.generate());
+
+        assertEquals("Disco de freio empenado", workOrder.getDiagnosis().description());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = WorkOrderStatus.class, names = "IN_DIAGNOSIS", mode = EnumSource.Mode.EXCLUDE)
+    @DisplayName("Não deve registrar diagnóstico fora do diagnóstico")
+    void shouldNotRegisterDiagnosisOutsideDiagnosis(WorkOrderStatus status) {
+        WorkOrder workOrder = createWorkOrder(status);
+        UserId mechanicId = UserId.generate();
+
+        var exception = assertThrows(WorkOrderDiagnosisNotAllowedException.class,
+                                     () -> workOrder.registerDiagnosis(DIAGNOSIS, mechanicId));
+
+        assertExceptionParameters(exception, workOrder.getId().toString(), status.name());
+        assertNull(workOrder.getDiagnosis());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("Não deve registrar diagnóstico sem descrição")
+    void shouldNotRegisterBlankDiagnosis(String description) {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+        UserId mechanicId = UserId.generate();
+
+        assertThrows(WorkOrderDiagnosisDescriptionRequiredException.class,
+                     () -> workOrder.registerDiagnosis(description, mechanicId));
+        assertNull(workOrder.getDiagnosis());
     }
 
     @Test

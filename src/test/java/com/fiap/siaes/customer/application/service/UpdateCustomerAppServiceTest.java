@@ -7,6 +7,7 @@ import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
+import com.fiap.siaes.sk.document.domain.Document;
 import com.fiap.siaes.user.UserTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,8 +87,8 @@ class UpdateCustomerAppServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve considerar o id da requisição quando o usuário autenticado é CUSTOMER")
-    void shouldIgnoreRequestedIdWhenAuthenticatedUserIsCustomer() {
+    @DisplayName("Não deve permitir que um CUSTOMER atualize outro cliente")
+    void shouldNotUpdateAnotherCustomerWhenAuthenticatedUserIsCustomer() {
         var customer = createCustomer();
         var requestedId = CustomerId.generate();
         var authenticatedCustomer = UserTestFactory.authenticatedUserCustomer(customer.getId());
@@ -100,11 +101,11 @@ class UpdateCustomerAppServiceTest {
                 .document("529.982.247-25")
                 .build();
 
-        when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
+        var exception = assertThrows(CustomerNotFoundException.class,
+                () -> this.updateCustomerAppService.execute(command));
 
-        this.updateCustomerAppService.execute(command);
-
-        verify(this.customerRepository, never()).findByIdOrThrowNotFound(requestedId);
+        assertExceptionParameters(exception, requestedId.toString());
+        verify(this.customerRepository, never()).save(any());
     }
 
     @Test
@@ -134,7 +135,7 @@ class UpdateCustomerAppServiceTest {
     void shouldThrowWhenLinkedCustomerDoesNotExist() {
         var customerId = CustomerId.generate();
         var command = UpdateCustomerCommand.builder()
-                .id(CustomerId.generate())
+                .id(customerId)
                 .authenticatedUser(UserTestFactory.authenticatedUserCustomer(customerId))
                 .name("Maria Silva")
                 .email("maria@email.com")
@@ -186,7 +187,7 @@ class UpdateCustomerAppServiceTest {
                 .build();
 
         when(this.customerRepository.findByIdOrThrowNotFound(customer.getId())).thenReturn(customer);
-        when(this.customerRepository.existsByDocumentAndIdNot("52998224725", customer.getId())).thenReturn(true);
+        when(this.customerRepository.existsByDocumentAndIdNot(Document.create("52998224725"), customer.getId())).thenReturn(true);
 
         var exception = assertThrows(CustomerDocumentAlreadyExistsException.class,
                 () -> this.updateCustomerAppService.execute(command));

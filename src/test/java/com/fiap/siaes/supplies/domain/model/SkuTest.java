@@ -28,9 +28,9 @@ class SkuTest {
     }
 
     @Test
-    @DisplayName("Deve recriar o SKU aplicando a mesma sanitização")
-    void shouldRecreateSanitizedSku() {
-        assertEquals("FLT-OLEO-001", Sku.recreate(" flt-oleo-001 ").getValue());
+    @DisplayName("Deve recriar o SKU com o valor persistido, sem revalidar")
+    void shouldRecreateSkuWithPersistedValue() {
+        assertEquals("FLT-OLEO-001", Sku.recreate("FLT-OLEO-001").getValue());
     }
 
     @ParameterizedTest

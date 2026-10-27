@@ -36,7 +36,7 @@ import com.fiap.siaes.quotation.domain.model.vo.QuotationStatusHistoryId;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationStatusHistoryId.QuotationStatusHistoryIdJavaType;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationSuppliesId;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationSuppliesId.QuotationSuppliesIdJavaType;
-import com.fiap.siaes.sk.infraestructure.persistence.UUIDWrapperJdbcType;
+import com.fiap.siaes.sk.infrastructure.persistence.UUIDWrapperJdbcType;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId.SuppliesIdJavaType;
 import com.fiap.siaes.user.domain.model.vo.UserId;

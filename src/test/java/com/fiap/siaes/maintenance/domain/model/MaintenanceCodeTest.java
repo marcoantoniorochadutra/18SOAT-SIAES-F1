@@ -28,9 +28,9 @@ class MaintenanceCodeTest {
     }
 
     @Test
-    @DisplayName("Deve recriar o código aplicando a mesma sanitização")
-    void shouldRecreateSanitizedCode() {
-        assertEquals("TROCA-OLEO", MaintenanceCode.recreate(" troca-oleo ").getValue());
+    @DisplayName("Deve recriar o código com o valor persistido, sem revalidar")
+    void shouldRecreateCodeWithPersistedValue() {
+        assertEquals("TROCA-OLEO", MaintenanceCode.recreate("TROCA-OLEO").getValue());
     }
 
     @ParameterizedTest

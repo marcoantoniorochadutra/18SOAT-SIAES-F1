@@ -2,6 +2,7 @@ package com.fiap.siaes.maintenance.domain.model;
 
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceAlreadyActiveException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceAlreadyInactiveException;
+import com.fiap.siaes.maintenance.domain.exception.MaintenanceDescriptionRequiredException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceEstimatedDurationInvalidException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenancePriceInvalidException;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceCode;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Getter
 public class Maintenance {
@@ -27,7 +29,7 @@ public class Maintenance {
     public Maintenance(String code, String description, BigDecimal price, int estimatedDurationMinutes) {
         this.id = MaintenanceId.generate();
         this.code = MaintenanceCode.create(code);
-        this.description = description;
+        this.description = this.validateDescription(description);
         this.price = this.validatePrice(price);
         this.estimatedDurationMinutes = this.validateEstimatedDuration(estimatedDurationMinutes);
         this.active = true;
@@ -45,11 +47,12 @@ public class Maintenance {
     }
 
     public void update(String code, String description, BigDecimal price, int estimatedDurationMinutes) {
+        String validDescription = this.validateDescription(description);
         BigDecimal validPrice = this.validatePrice(price);
         int validEstimatedDuration = this.validateEstimatedDuration(estimatedDurationMinutes);
 
         this.code = MaintenanceCode.create(code);
-        this.description = description;
+        this.description = validDescription;
         this.price = validPrice;
         this.estimatedDurationMinutes = validEstimatedDuration;
     }
@@ -70,6 +73,13 @@ public class Maintenance {
 
     public boolean isDeactivated() {
         return !this.active;
+    }
+
+    private String validateDescription(String description) {
+        if (isBlank(description))
+            throw new MaintenanceDescriptionRequiredException();
+
+        return description.trim();
     }
 
     private BigDecimal validatePrice(BigDecimal price) {

@@ -3,7 +3,7 @@ package com.fiap.siaes.vehicle.domain.model.vo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fiap.siaes.sk.domain.UUIDWrapper;
-import com.fiap.siaes.sk.infraestructure.persistence.UUIDWrapperJavaType;
+import com.fiap.siaes.sk.infrastructure.persistence.UUIDWrapperJavaType;
 
 import java.util.UUID;
 

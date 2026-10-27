@@ -1,6 +1,7 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.adapter;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
@@ -70,12 +71,18 @@ public class VehicleRepositoryAdapter implements VehicleRepository, VehicleQuery
                                                                                         PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(VehicleMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteById(VehicleId id) {
         this.vehicleJpaRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.vehicleJpaRepository.deleteAllByCustomerId(customerId);
     }
 }

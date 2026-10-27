@@ -9,26 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UnitTest - Domain - UserRole")
 class UserRoleTest {
-
-    @ParameterizedTest
-    @EnumSource(UserRole.class)
-    @DisplayName("Deve resolver o UserRole a partir do seu ordinal")
-    void shouldResolveRoleFromOrdinal(UserRole role) {
-        assertEquals(UserRole.fromOrdinal(role.ordinal()), role);
-    }
-
-    @Test
-    @DisplayName("Deve retornar nulo quando o ordinal não corresponde a nenhum perfil")
-    void shouldReturnNullWhenOrdinalDoesNotMatchAnyRole() {
-        assertNull(UserRole.fromOrdinal(99));
-    }
 
     @ParameterizedTest
     @MethodSource("rolesWithoutLessAccess")
@@ -62,14 +47,15 @@ class UserRoleTest {
                 Arguments.of(UserRole.ADMIN, UserRole.MANAGER),
                 Arguments.of(UserRole.MANAGER, UserRole.MANAGER),
                 Arguments.of(UserRole.MECHANIC, UserRole.CUSTOMER),
-                Arguments.of(UserRole.CUSTOMER, UserRole.MECHANIC)
+                Arguments.of(UserRole.CUSTOMER, UserRole.CUSTOMER)
         );
     }
 
     static Stream<Arguments> rolesWithLessAccess() {
         return Stream.of(
                 Arguments.of(UserRole.MANAGER, UserRole.ADMIN),
-                Arguments.of(UserRole.CUSTOMER, UserRole.MANAGER)
+                Arguments.of(UserRole.CUSTOMER, UserRole.MANAGER),
+                Arguments.of(UserRole.CUSTOMER, UserRole.MECHANIC)
         );
     }
 }

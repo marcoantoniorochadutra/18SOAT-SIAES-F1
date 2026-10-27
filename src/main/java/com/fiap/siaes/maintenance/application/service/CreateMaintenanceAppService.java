@@ -17,7 +17,7 @@ public class CreateMaintenanceAppService implements CreateMaintenanceUseCase {
     private final MaintenanceRepository maintenanceRepository;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public MaintenanceId execute(CreateMaintenanceCommand command) {
         Maintenance maintenance = this.createMaintenance(command);
 

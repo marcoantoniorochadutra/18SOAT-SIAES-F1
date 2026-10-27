@@ -55,6 +55,7 @@ public class QuotationMapper {
                 .decidedAt(quotation.getDecidedAt())
                 .rejectionReason(quotation.getRejectionReason())
                 .createdAt(quotation.getCreatedAt())
+                .version(quotation.getVersion())
                 .build();
     }
 
@@ -84,6 +85,7 @@ public class QuotationMapper {
                 .decidedAt(entity.getDecidedAt())
                 .rejectionReason(entity.getRejectionReason())
                 .createdAt(entity.getCreatedAt())
+                .version(entity.getVersion())
                 .build();
     }
 
