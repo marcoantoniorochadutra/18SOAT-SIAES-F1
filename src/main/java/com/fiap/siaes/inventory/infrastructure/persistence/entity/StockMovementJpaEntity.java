@@ -61,6 +61,9 @@ public class StockMovementJpaEntity {
     @Column(name = "performed_by", updatable = false)
     private UserId performedBy;
 
+    @Column(name = "performed_by_name", updatable = false, length = 150)
+    private String performedByName;
+
     @NotNull
     @Column(name = "occurred_at", nullable = false, updatable = false)
     private Instant occurredAt;

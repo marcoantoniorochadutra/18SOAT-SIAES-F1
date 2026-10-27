@@ -10,7 +10,7 @@ public interface ListCustomersUseCase {
     PageResponse<CustomerResponse> execute(ListCustomersCommand command);
 
     record ListCustomersCommand(CustomerFilter filter, PageQuery pageQuery) {
-        public static ListCustomersCommand from(CustomerFilter filter, PageQuery pageQuery) {
+        public static ListCustomersCommand of(CustomerFilter filter, PageQuery pageQuery) {
             return new ListCustomersCommand(filter, pageQuery);
         }
     }

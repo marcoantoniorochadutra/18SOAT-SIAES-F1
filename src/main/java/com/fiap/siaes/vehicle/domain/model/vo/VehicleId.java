@@ -20,6 +20,10 @@ public record VehicleId(UUID id) implements UUIDWrapper {
         return new VehicleId(UUID.randomUUID());
     }
 
+    public static VehicleId from(UUID id) {
+        return new VehicleId(id);
+    }
+
     @Override
     @JsonValue
     public String toString() {

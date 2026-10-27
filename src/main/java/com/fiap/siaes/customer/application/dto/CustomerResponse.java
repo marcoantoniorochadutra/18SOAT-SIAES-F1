@@ -3,7 +3,9 @@ package com.fiap.siaes.customer.application.dto;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.document.domain.enums.DocumentType;
+import lombok.Builder;
 
+@Builder
 public record CustomerResponse(
         CustomerId id,
         String document,
@@ -13,12 +15,13 @@ public record CustomerResponse(
         String email) {
 
     public static CustomerResponse from(Customer customer) {
-        return new CustomerResponse(
-                customer.getId(),
-                customer.getDocument().getValue(),
-                customer.getDocument().getDocumentType(),
-                customer.getName(),
-                customer.getPhone(),
-                customer.getEmail());
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .document(customer.getDocument().getValue())
+                .documentType(customer.getDocument().getDocumentType())
+                .name(customer.getName())
+                .phone(customer.getPhone())
+                .email(customer.getEmail())
+                .build();
     }
 }

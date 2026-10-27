@@ -38,7 +38,7 @@ class DeleteVehicleAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
 
-        this.deleteVehicleAppService.execute(DeleteVehicleCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserManager()));
+        this.deleteVehicleAppService.execute(DeleteVehicleCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserManager()));
 
         verify(this.vehicleRepository).deleteById(vehicle.getId());
     }
@@ -51,7 +51,7 @@ class DeleteVehicleAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
 
-        this.deleteVehicleAppService.execute(DeleteVehicleCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(customerId)));
+        this.deleteVehicleAppService.execute(DeleteVehicleCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(customerId)));
 
         verify(this.vehicleRepository).deleteById(vehicle.getId());
     }
@@ -63,7 +63,7 @@ class DeleteVehicleAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(vehicle.getId())).thenReturn(vehicle);
 
-        var command = DeleteVehicleCommand.from(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(CustomerId.generate()));
+        var command = DeleteVehicleCommand.of(vehicle.getId(), UserTestFactory.authenticatedUserCustomer(CustomerId.generate()));
         var exception = assertThrows(VehicleNotFoundException.class, () -> this.deleteVehicleAppService.execute(command));
 
         assertExceptionParameters(exception, vehicle.getId().toString());
@@ -77,7 +77,7 @@ class DeleteVehicleAppServiceTest {
 
         when(this.vehicleRepository.findByIdOrThrowNotFound(id)).thenThrow(new VehicleNotFoundException(id.toString()));
 
-        var command = DeleteVehicleCommand.from(id, UserTestFactory.authenticatedUserManager());
+        var command = DeleteVehicleCommand.of(id, UserTestFactory.authenticatedUserManager());
         var exception = assertThrows(VehicleNotFoundException.class, () -> this.deleteVehicleAppService.execute(command));
 
         assertExceptionParameters(exception, id.toString());

@@ -73,14 +73,14 @@ public class CustomerController implements CustomerControllerOpenApi {
     @Authentication(minimumRole = UserRole.CUSTOMER)
     public CustomerResponse getById(@PathVariable CustomerId id,
                                     @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, authenticatedUser));
+        return this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.of(id, authenticatedUser));
     }
 
     @Override
     @GetMapping
     public PageResponse<CustomerResponse> listAllCustomer(@ParameterObject CustomerFilter filter,
                                                           @Valid @ParameterObject PageQuery pageQuery) {
-        return this.listCustomersUseCase.execute(ListCustomersCommand.from(filter, pageQuery));
+        return this.listCustomersUseCase.execute(ListCustomersCommand.of(filter, pageQuery));
     }
 
     @Override

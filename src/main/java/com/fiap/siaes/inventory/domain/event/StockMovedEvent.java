@@ -19,5 +19,6 @@ public record StockMovedEvent(
         String reason,
         UUID referenceId,
         UserId performedBy,
+        String performedByName,
         Instant occurredAt) implements DomainEvent {
 }

@@ -10,7 +10,7 @@ public interface ListStockMovementsUseCase {
     PageResponse<StockMovementResponse> execute(ListStockMovementsCommand command);
 
     record ListStockMovementsCommand(SuppliesId suppliesId, PageQuery pageQuery) {
-        public static ListStockMovementsCommand from(SuppliesId suppliesId, PageQuery pageQuery) {
+        public static ListStockMovementsCommand of(SuppliesId suppliesId, PageQuery pageQuery) {
             return new ListStockMovementsCommand(suppliesId, pageQuery);
         }
     }

@@ -8,7 +8,6 @@ import com.fiap.siaes.sk.infraestructure.persistence.UUIDWrapperJavaType;
 import java.util.UUID;
 
 import static com.fiap.siaes.sk.util.FunctionalUtils.getIfNotNullOrDefault;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public record WorkOrderId(UUID id) implements UUIDWrapper {
 
@@ -21,10 +20,14 @@ public record WorkOrderId(UUID id) implements UUIDWrapper {
         return new WorkOrderId(UUID.randomUUID());
     }
 
+    public static WorkOrderId from(UUID id) {
+        return new WorkOrderId(id);
+    }
+
     @Override
     @JsonValue
     public String toString() {
-        return getIfNotNullOrDefault(this.id, UUID::toString, EMPTY);
+        return getIfNotNullOrDefault(this.id, UUID::toString, "");
     }
 
     public static class WorkOrderIdJavaType extends UUIDWrapperJavaType<WorkOrderId> {

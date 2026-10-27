@@ -1,7 +1,8 @@
 package com.fiap.siaes.vehicle.infrastructure.persistence.mapper;
 
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
-import com.fiap.siaes.vehicle.application.dto.VehicleResponse.VehicleOwnerResponse;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
@@ -44,11 +45,12 @@ public class VehicleMapper {
     }
 
     public static VehicleResponse toResponse(ListVehicleProjection projection) {
-        return new VehicleResponse(
-                new VehicleId(projection.getId()),
-                projection.getPlate(),
-                projection.getModel(),
-                projection.getYear(),
-                VehicleOwnerResponse.from(projection.getCustomerId(), projection.getCustomerName()));
+        return VehicleResponse.builder()
+                .id(VehicleId.from(projection.getId()))
+                .plate(projection.getPlate())
+                .model(projection.getModel())
+                .year(projection.getYear())
+                .owner(CustomerReferenceResponse.of(CustomerId.from(projection.getCustomerId()), projection.getCustomerName()))
+                .build();
     }
 }

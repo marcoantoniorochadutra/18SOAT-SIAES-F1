@@ -157,7 +157,7 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @DisplayName("[200] Deve atualizar peça/insumo com sucesso")
     void shouldUpdateSupplies() throws Exception {
         var id = SuppliesId.generate();
-        var command = this.updateCommandBuilder().build();
+        var command = UpdateSuppliesCommand.of(null, SKU, DESCRIPTION, UNIT_PRICE);
 
         when(this.updateSuppliesUseCase.execute(command.with(id))).thenReturn(id);
 
@@ -173,7 +173,7 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @DisplayName("[400] Não deve atualizar peça/insumo com SKU em branco")
     void shouldNotUpdateSuppliesWhenSkuIsBlank() throws Exception {
         var id = SuppliesId.generate();
-        var command = this.updateCommandBuilder().sku(" ").build();
+        var command = UpdateSuppliesCommand.of(null, " ", DESCRIPTION, UNIT_PRICE);
 
         super.executePut(SuppliesController.ENDPOINT + "/" + id, command)
                 .andExpect(status().isBadRequest())
@@ -186,7 +186,7 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @DisplayName("[404] Não deve atualizar peça/insumo inexistente")
     void shouldNotUpdateNonExistentSupplies() throws Exception {
         var id = SuppliesId.generate();
-        var command = this.updateCommandBuilder().build();
+        var command = UpdateSuppliesCommand.of(null, SKU, DESCRIPTION, UNIT_PRICE);
 
         when(this.updateSuppliesUseCase.execute(command.with(id)))
                 .thenThrow(new SuppliesNotFoundException(id.toString()));
@@ -200,7 +200,7 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @DisplayName("[409] Não deve atualizar peça/insumo com SKU já cadastrado")
     void shouldNotUpdateSuppliesWhenSkuAlreadyExists() throws Exception {
         var id = SuppliesId.generate();
-        var command = this.updateCommandBuilder().build();
+        var command = UpdateSuppliesCommand.of(null, SKU, DESCRIPTION, UNIT_PRICE);
 
         when(this.updateSuppliesUseCase.execute(command.with(id)))
                 .thenThrow(new SuppliesSkuAlreadyExistsException(SKU));
@@ -214,7 +214,13 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @DisplayName("[200] Deve buscar peça/insumo pelo id com sucesso")
     void shouldGetSuppliesById() throws Exception {
         var id = SuppliesId.generate();
-        var response = new SuppliesResponse(id, SKU, DESCRIPTION, UNIT_PRICE, true);
+        var response = SuppliesResponse.builder()
+                .id(id)
+                .sku(SKU)
+                .description(DESCRIPTION)
+                .unitPrice(UNIT_PRICE)
+                .active(true)
+                .build();
 
         when(this.getSuppliesByIdUseCase.execute(id)).thenReturn(response);
 
@@ -242,7 +248,13 @@ class SuppliesControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[200] Deve listar peças/insumos com sucesso")
     void shouldListSupplies() throws Exception {
-        var response = new SuppliesResponse(SuppliesId.generate(), SKU, DESCRIPTION, UNIT_PRICE, true);
+        var response = SuppliesResponse.builder()
+                .id(SuppliesId.generate())
+                .sku(SKU)
+                .description(DESCRIPTION)
+                .unitPrice(UNIT_PRICE)
+                .active(true)
+                .build();
         var page = new PageResponse<>(List.of(response), false, 0, 20);
 
         when(this.listSuppliesUseCase.execute(any())).thenReturn(page);
@@ -342,10 +354,4 @@ class SuppliesControllerTest extends ControllerTestUtils {
                 .initialStock(10);
     }
 
-    private UpdateSuppliesCommand.UpdateSuppliesCommandBuilder updateCommandBuilder() {
-        return UpdateSuppliesCommand.builder()
-                .sku(SKU)
-                .description(DESCRIPTION)
-                .unitPrice(UNIT_PRICE);
-    }
 }

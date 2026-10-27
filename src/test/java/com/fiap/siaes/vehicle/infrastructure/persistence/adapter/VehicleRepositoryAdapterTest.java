@@ -153,7 +153,7 @@ class VehicleRepositoryAdapterTest {
                 .year(2020)
                 .customerId(customerId)
                 .build();
-        var pageQuery = PageQuery.builder().page(0).size(10).build();
+        var pageQuery = PageQuery.of(0, 10);
 
         ListVehicleProjection projection = this.createListVehicleProjection(customerId);
 

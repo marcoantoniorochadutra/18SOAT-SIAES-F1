@@ -14,19 +14,11 @@ import lombok.experimental.UtilityClass;
 public class UserTestFactory {
 
     public static AuthenticatedUser authenticatedUserAdmin() {
-        return AuthenticatedUser.builder()
-                .id(UserId.generate())
-                .email("admin@email.com")
-                .userRole(UserRole.ADMIN)
-                .build();
+        return AuthenticatedUser.of(UserId.generate(), null, "admin@email.com", UserRole.ADMIN);
     }
 
     public static AuthenticatedUser authenticatedUserManager() {
-        return AuthenticatedUser.builder()
-                .id(UserId.generate())
-                .email("manager@email.com")
-                .userRole(UserRole.MANAGER)
-                .build();
+        return AuthenticatedUser.of(UserId.generate(), null, "manager@email.com", UserRole.MANAGER);
     }
 
     public static AuthenticatedUser authenticatedUserCustomer() {
@@ -34,12 +26,7 @@ public class UserTestFactory {
     }
 
     public static AuthenticatedUser authenticatedUserCustomer(CustomerId customerId) {
-        return AuthenticatedUser.builder()
-                .id(UserId.generate())
-                .customerId(customerId)
-                .email("customer@email.com")
-                .userRole(UserRole.CUSTOMER)
-                .build();
+        return AuthenticatedUser.of(UserId.generate(), customerId, "customer@email.com", UserRole.CUSTOMER);
     }
 
     public static User createUser() {

@@ -18,11 +18,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.method.HandlerMethod;
@@ -46,6 +47,7 @@ class UserAuthenticationFilterTest {
 
     private static final String TOKEN = "access-token";
     private static final UserId USER_ID = UserId.generate();
+    private static final JwtProperties JWT_PROPERTIES = new JwtProperties("test-secret-key-at-least-32-bytes-long!!", 1, 1);
 
     @Mock
     private TokenBlacklist tokenBlocklist;
@@ -71,18 +73,16 @@ class UserAuthenticationFilterTest {
     @Mock
     private FilterChain filterChain;
 
-    private JwtTokenIssuer jwtTokenIssuer;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Spy
+    private JwtProperties jwtProperties = JWT_PROPERTIES;
+
+    @InjectMocks
     private UserAuthenticationFilter userAuthenticationFilter;
 
-    @BeforeEach
-    void setUp() {
-        var jwtProperties = new JwtProperties("test-secret-key-at-least-32-bytes-long!!", 1, 1);
-        this.jwtTokenIssuer = new JwtTokenIssuer(jwtProperties, new SecureRandom());
-        this.userAuthenticationFilter = new UserAuthenticationFilter(
-                this.tokenBlocklist, new ObjectMapper(), jwtProperties,
-                this.userRepository, this.requestMappingHandlerMapping, this.handlerExceptionResolver);
-    }
+    private final JwtTokenIssuer jwtTokenIssuer = new JwtTokenIssuer(JWT_PROPERTIES, new SecureRandom());
 
     @AfterEach
     void clearSecurityContext() {

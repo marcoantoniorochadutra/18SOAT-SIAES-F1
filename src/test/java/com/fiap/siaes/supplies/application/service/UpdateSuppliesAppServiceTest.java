@@ -90,11 +90,6 @@ class UpdateSuppliesAppServiceTest {
     }
 
     private UpdateSuppliesCommand command(SuppliesId id) {
-        return UpdateSuppliesCommand.builder()
-                .id(id)
-                .sku("flt-ar-002")
-                .description("Filtro de ar")
-                .unitPrice(NEW_UNIT_PRICE)
-                .build();
+        return UpdateSuppliesCommand.of(id, "flt-ar-002", "Filtro de ar", NEW_UNIT_PRICE);
     }
 }

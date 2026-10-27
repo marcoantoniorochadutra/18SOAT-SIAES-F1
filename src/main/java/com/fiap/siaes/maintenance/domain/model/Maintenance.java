@@ -68,6 +68,10 @@ public class Maintenance {
         this.active = true;
     }
 
+    public boolean isDeactivated() {
+        return !this.active;
+    }
+
     private BigDecimal validatePrice(BigDecimal price) {
         if (isNull(price) || price.signum() < 0) {
             throw new MaintenancePriceInvalidException();

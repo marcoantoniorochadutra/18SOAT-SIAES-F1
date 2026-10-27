@@ -1,6 +1,8 @@
 package com.fiap.siaes.sk.infraestructure.web;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
+import com.fiap.siaes.sk.domain.exception.InternalException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -17,6 +19,7 @@ import java.util.Locale;
 import static com.fiap.siaes.sk.util.FunctionalUtils.nullSafeStream;
 import static java.util.Comparator.comparing;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -31,6 +34,18 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(exception.getStatus());
         problemDetail.setTitle(this.translate(exception.getMessageKey(), exception.getParameters(), locale));
         problemDetail.setDetail(this.translate(exception.getDetailKey(), exception.getParameters(), locale));
+        return problemDetail;
+    }
+
+    @ExceptionHandler(InternalException.class)
+    public ProblemDetail handleInternalException(InternalException exception, Locale locale) {
+        log.error(exception.getMessage(), exception);
+
+        String context = InternalException.class.getSimpleName();
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle(this.translate(context + ".message", null, locale));
+        problemDetail.setDetail(this.translate(context + ".detail", null, locale));
         return problemDetail;
     }
 

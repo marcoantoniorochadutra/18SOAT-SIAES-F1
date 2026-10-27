@@ -40,11 +40,12 @@ public class SuppliesMapper {
     }
 
     public static SuppliesResponse toResponse(ListSuppliesProjection projection) {
-        return new SuppliesResponse(
-                SuppliesId.from(projection.getId()),
-                projection.getSku(),
-                projection.getDescription(),
-                projection.getUnitPrice(),
-                projection.isActive());
+        return SuppliesResponse.builder()
+                .id(SuppliesId.from(projection.getId()))
+                .sku(projection.getSku())
+                .description(projection.getDescription())
+                .unitPrice(projection.getUnitPrice())
+                .active(projection.isActive())
+                .build();
     }
 }

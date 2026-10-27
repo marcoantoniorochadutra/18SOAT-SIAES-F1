@@ -5,7 +5,7 @@ import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.user.UserTestFactory;
 import com.fiap.siaes.utils.ControllerTestUtils;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
-import com.fiap.siaes.vehicle.application.dto.VehicleResponse.VehicleOwnerResponse;
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.vehicle.application.usecase.CreateVehicleUseCase;
 import com.fiap.siaes.vehicle.application.usecase.CreateVehicleUseCase.CreateVehicleCommand;
 import com.fiap.siaes.vehicle.application.usecase.DeleteVehicleUseCase;
@@ -240,9 +240,15 @@ class VehicleControllerTest extends ControllerTestUtils {
     void shouldGetVehicleById() throws Exception {
         var id = VehicleId.generate();
         var customerId = CustomerId.generate();
-        var response = new VehicleResponse(id, PLATE, "Uno", 2020, new VehicleOwnerResponse(customerId, "Maria Silva"));
+        var response = VehicleResponse.builder()
+                .id(id)
+                .plate(PLATE)
+                .model("Uno")
+                .year(2020)
+                .owner(CustomerReferenceResponse.of(customerId, "Maria Silva"))
+                .build();
 
-        when(this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.from(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
+        when(this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.of(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
 
         super.executeGetAuthenticated(VehicleController.ENDPOINT + "/" + id)
                 .andExpect(status().isOk())
@@ -259,7 +265,7 @@ class VehicleControllerTest extends ControllerTestUtils {
     void shouldNotGetNonExistentVehicle() throws Exception {
         var id = VehicleId.generate();
 
-        when(this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.from(id, AUTHENTICATED_USER_ADMIN)))
+        when(this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.of(id, AUTHENTICATED_USER_ADMIN)))
                 .thenThrow(new VehicleNotFoundException(id.toString()));
 
         super.executeGetAuthenticated(VehicleController.ENDPOINT + "/" + id)
@@ -270,8 +276,13 @@ class VehicleControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[200] Deve listar veículos com sucesso")
     void shouldListVehicles() throws Exception {
-        var response = new VehicleResponse(
-                VehicleId.generate(), PLATE, "Uno", 2020, new VehicleOwnerResponse(CustomerId.generate(), "Maria Silva"));
+        var response = VehicleResponse.builder()
+                .id(VehicleId.generate())
+                .plate(PLATE)
+                .model("Uno")
+                .year(2020)
+                .owner(CustomerReferenceResponse.of(CustomerId.generate(), "Maria Silva"))
+                .build();
         var page = new PageResponse<>(List.of(response), false, 0, 20);
 
         when(this.listVehiclesUseCase.execute(any())).thenReturn(page);
@@ -302,14 +313,14 @@ class VehicleControllerTest extends ControllerTestUtils {
         super.executeDelete(VehicleController.ENDPOINT + "/" + id)
                 .andExpect(status().isNoContent());
 
-        verify(this.deleteVehicleUseCase).execute(DeleteVehicleCommand.from(id, AUTHENTICATED_USER_ADMIN));
+        verify(this.deleteVehicleUseCase).execute(DeleteVehicleCommand.of(id, AUTHENTICATED_USER_ADMIN));
     }
 
     @Test
     @DisplayName("[404] Não deve remover veículo inexistente")
     void shouldNotDeleteNonExistentVehicle() throws Exception {
         var id = VehicleId.generate();
-        var command = DeleteVehicleCommand.from(id, AUTHENTICATED_USER_ADMIN);
+        var command = DeleteVehicleCommand.of(id, AUTHENTICATED_USER_ADMIN);
 
         doThrow(new VehicleNotFoundException(id.toString())).when(this.deleteVehicleUseCase).execute(command);
 

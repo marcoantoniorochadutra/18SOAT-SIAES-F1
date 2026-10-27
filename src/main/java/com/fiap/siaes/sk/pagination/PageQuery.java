@@ -2,7 +2,6 @@ package com.fiap.siaes.sk.pagination;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 
 import static java.util.Objects.requireNonNullElse;
 
@@ -19,9 +18,12 @@ public record PageQuery(
     public static final int DEFAULT_SIZE = 20;
     public static final int MAX_SIZE = 100;
 
-    @Builder
     public PageQuery {
         page = requireNonNullElse(page, DEFAULT_PAGE);
         size = requireNonNullElse(size, DEFAULT_SIZE);
+    }
+
+    public static PageQuery of(Integer page, Integer size) {
+        return new PageQuery(page, size);
     }
 }

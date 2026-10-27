@@ -9,7 +9,7 @@ public interface GetVehicleByIdUseCase {
     VehicleResponse execute(GetVehicleByIdCommand command);
 
     record GetVehicleByIdCommand(VehicleId id, AuthenticatedUser authenticatedUser) {
-        public static GetVehicleByIdCommand from(VehicleId id, AuthenticatedUser authenticatedUser) {
+        public static GetVehicleByIdCommand of(VehicleId id, AuthenticatedUser authenticatedUser) {
             return new GetVehicleByIdCommand(id, authenticatedUser);
         }
     }

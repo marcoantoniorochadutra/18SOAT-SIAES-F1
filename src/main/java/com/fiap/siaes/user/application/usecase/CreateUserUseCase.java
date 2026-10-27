@@ -41,5 +41,9 @@ public interface CreateUserUseCase {
 
 
     record UserContact(String name, String email) {
+
+        public static UserContact of(String name, String email) {
+            return new UserContact(name, email);
+        }
     }
 }

@@ -14,4 +14,8 @@ public record VehicleFilter(String plate, String brand, String model, Integer ye
         brand = trimToNull(brand);
         model = trimToNull(model);
     }
+
+    public VehicleFilter withCustomerId(CustomerId customerId) {
+        return new VehicleFilter(this.plate, this.brand, this.model, this.year, customerId);
+    }
 }

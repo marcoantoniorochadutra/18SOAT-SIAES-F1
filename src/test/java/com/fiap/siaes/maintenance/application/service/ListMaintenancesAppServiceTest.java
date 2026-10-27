@@ -38,12 +38,9 @@ class ListMaintenancesAppServiceTest {
     @Test
     @DisplayName("Deve listar os serviços da página com os filtros informados")
     void shouldListMaintenancesPageWithFilter() {
-        var filter = MaintenanceFilter.builder()
-                .code(" troca-oleo ")
-                .description("  " + DESCRIPTION + " ")
-                .build();
+        var filter = MaintenanceFilter.of(" troca-oleo ", "  " + DESCRIPTION + " ", null);
 
-        var pageQuery = new PageQuery(1, 2);
+        var pageQuery = PageQuery.of(1, 2);
         var maintenance = List.of(
                 MaintenanceResponse.from(createMaintenance()),
                 MaintenanceResponse.from(createMaintenance()));
@@ -51,7 +48,7 @@ class ListMaintenancesAppServiceTest {
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(maintenance)));
 
-        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.from(filter, pageQuery));
+        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 
         assertEquals(maintenance, response.content());
         assertEquals(CODE, filter.code());
@@ -65,14 +62,14 @@ class ListMaintenancesAppServiceTest {
     @Test
     @DisplayName("Deve listar os serviços inativos quando solicitado")
     void shouldListInactiveMaintenanceWhenRequested() {
-        var filter = MaintenanceFilter.builder().active(false).build();
-        var pageQuery = new PageQuery(null, null);
+        var filter = MaintenanceFilter.of(null, null, false);
+        var pageQuery = PageQuery.of(null, null);
         var maintenance = List.of(MaintenanceResponse.from(createMaintenance(false)));
 
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(maintenance)));
 
-        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.from(filter, pageQuery));
+        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 
         assertEquals(maintenance, response.content());
         assertFalse(filter.active());
@@ -81,13 +78,13 @@ class ListMaintenancesAppServiceTest {
     @Test
     @DisplayName("Deve retornar página vazia quando nenhum serviço atender aos filtros")
     void shouldReturnEmptyPageWhenNoMaintenanceMatches() {
-        var filter = MaintenanceFilter.builder().description("inexistente").build();
-        var pageQuery = new PageQuery(null, null);
+        var filter = MaintenanceFilter.of(null, "inexistente", null);
+        var pageQuery = PageQuery.of(null, null);
 
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
-        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.from(filter, pageQuery));
+        PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 
         assertTrue(response.content().isEmpty());
         assertEquals(PageQuery.DEFAULT_PAGE, response.page());

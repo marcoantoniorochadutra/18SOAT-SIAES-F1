@@ -38,12 +38,9 @@ class ListSuppliesAppServiceTest {
     @Test
     @DisplayName("Deve listar as peças/insumos da página com os filtros informados")
     void shouldListSuppliesPageWithFilter() {
-        var filter = SuppliesFilter.builder()
-                .sku(" flt-oleo-001 ")
-                .description("  " + DESCRIPTION + " ")
-                .build();
+        var filter = SuppliesFilter.of(" flt-oleo-001 ", "  " + DESCRIPTION + " ", null);
 
-        var pageQuery = new PageQuery(1, 2);
+        var pageQuery = PageQuery.of(1, 2);
         var supplies = List.of(
                 SuppliesResponse.from(createSupplies()),
                 SuppliesResponse.from(createSupplies()));
@@ -51,7 +48,7 @@ class ListSuppliesAppServiceTest {
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(supplies)));
 
-        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.from(filter, pageQuery));
+        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 
         assertEquals(supplies, response.content());
         assertEquals(SKU, filter.sku());
@@ -65,14 +62,14 @@ class ListSuppliesAppServiceTest {
     @Test
     @DisplayName("Deve listar as peças/insumos inativas quando solicitado")
     void shouldListInactiveSuppliesWhenRequested() {
-        var filter = SuppliesFilter.builder().active(false).build();
-        var pageQuery = new PageQuery(null, null);
+        var filter = SuppliesFilter.of(null, null, false);
+        var pageQuery = PageQuery.of(null, null);
         var supplies = List.of(SuppliesResponse.from(createSupplies(false)));
 
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(supplies)));
 
-        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.from(filter, pageQuery));
+        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 
         assertEquals(supplies, response.content());
         assertFalse(filter.active());
@@ -81,13 +78,13 @@ class ListSuppliesAppServiceTest {
     @Test
     @DisplayName("Deve retornar página vazia quando nenhuma peça/insumo atender aos filtros")
     void shouldReturnEmptyPageWhenNoSuppliesMatches() {
-        var filter = SuppliesFilter.builder().description("inexistente").build();
-        var pageQuery = new PageQuery(null, null);
+        var filter = SuppliesFilter.of(null, "inexistente", null);
+        var pageQuery = PageQuery.of(null, null);
 
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
                 .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
-        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.from(filter, pageQuery));
+        PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 
         assertTrue(response.content().isEmpty());
         assertEquals(PageQuery.DEFAULT_PAGE, response.page());

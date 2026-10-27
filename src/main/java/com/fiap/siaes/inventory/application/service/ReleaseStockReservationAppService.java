@@ -21,7 +21,8 @@ public class ReleaseStockReservationAppService implements ReleaseStockReservatio
     public void execute(ReleaseStockReservationCommand command) {
         StockItem stockItem = this.stockItemRepository.findByIdOrThrowNotFound(command.suppliesId());
 
-        stockItem.releaseReservation(command.quantity(), command.referenceId(), command.performedBy());
+        stockItem.releaseReservation(command.quantity(), command.referenceId(), command.performedBy(),
+                                     command.performedByName());
 
         this.stockItemRepository.save(stockItem);
 

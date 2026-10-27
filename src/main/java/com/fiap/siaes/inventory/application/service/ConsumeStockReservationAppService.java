@@ -21,7 +21,8 @@ public class ConsumeStockReservationAppService implements ConsumeStockReservatio
     public void execute(ConsumeStockReservationCommand command) {
         StockItem stockItem = this.stockItemRepository.findByIdOrThrowNotFound(command.suppliesId());
 
-        stockItem.consumeReservation(command.quantity(), command.referenceId(), command.performedBy());
+        stockItem.consumeReservation(command.quantity(), command.referenceId(), command.performedBy(),
+                                     command.performedByName());
 
         this.stockItemRepository.save(stockItem);
 

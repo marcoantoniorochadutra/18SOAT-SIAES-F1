@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.math.BigDecimal;
 
@@ -15,7 +14,6 @@ public interface CreateMaintenanceUseCase {
 
     MaintenanceId execute(CreateMaintenanceCommand command);
 
-    @Builder
     record CreateMaintenanceCommand(
             @NotBlank(message = "{MaintenanceCommand.code.notBlank}")
             @Size(message = "{MaintenanceCommand.code.size.max}", max = 50)
@@ -33,5 +31,10 @@ public interface CreateMaintenanceUseCase {
             @NotNull(message = "{MaintenanceCommand.estimatedDuration.notNull}")
             @Positive(message = "{MaintenanceCommand.estimatedDuration.positive}")
             Integer estimatedDurationMinutes) {
+
+        public static CreateMaintenanceCommand of(String code, String description, BigDecimal price,
+                                                  Integer estimatedDurationMinutes) {
+            return new CreateMaintenanceCommand(code, description, price, estimatedDurationMinutes);
+        }
     }
 }

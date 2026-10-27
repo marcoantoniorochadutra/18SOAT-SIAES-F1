@@ -87,6 +87,18 @@ public abstract class ControllerTestUtils {
         return this.executePut(url, body);
     }
 
+    public ResultActions executePatchAuthenticated(String url, Object body) throws Exception {
+        return this.executePatchAuthenticated(url, body, AUTHENTICATED_USER_ADMIN);
+    }
+
+    public ResultActions executePatchAuthenticated(String url, Object body, AuthenticatedUser authenticatedUser) throws Exception {
+        this.authenticateAs(authenticatedUser);
+        return this.mockMvc.perform(patch(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(LocaleContextHolder.getLocale())
+                .content(this.objectMapper.writeValueAsString(body)));
+    }
+
     public ResultActions executePost(String url, Object body) throws Exception {
         return this.mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON)

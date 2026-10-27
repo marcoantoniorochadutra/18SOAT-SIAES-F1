@@ -128,8 +128,8 @@ class CustomerRepositoryAdapterTest {
     @Test
     @DisplayName("Deve listar os clientes da página com os filtros informados")
     void shouldFindAllByFilter() {
-        var filter = CustomerFilter.builder().name("maria").build();
-        var pageQuery = PageQuery.builder().page(0).size(10).build();
+        var filter = CustomerFilter.of("maria", null, null, null);
+        var pageQuery = PageQuery.of(0, 10);
 
         ListCustomerProjection summary = this.createCustomerSummaryFromCustomer(createCustomer());
 

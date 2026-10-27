@@ -75,7 +75,7 @@ public class MaintenanceController implements MaintenanceControllerOpenApi {
     @GetMapping
     public PageResponse<MaintenanceResponse> list(@ParameterObject MaintenanceFilter filter,
                                                @Valid @ParameterObject PageQuery pageQuery) {
-        return this.listMaintenancesUseCase.execute(ListMaintenancesCommand.from(filter, pageQuery));
+        return this.listMaintenancesUseCase.execute(ListMaintenancesCommand.of(filter, pageQuery));
     }
 
     @Override

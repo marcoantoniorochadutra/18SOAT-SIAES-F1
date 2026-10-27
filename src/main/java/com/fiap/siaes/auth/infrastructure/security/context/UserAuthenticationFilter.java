@@ -92,12 +92,11 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private AuthenticatedUser toAuthenticatedUser(UserAuthenticationProjection user) {
-        return AuthenticatedUser.builder()
-                .id(UserId.from(user.getId()))
-                .customerId(CustomerId.from(user.getCustomerId()))
-                .email(user.getEmail())
-                .userRole(user.getUserRole())
-                .build();
+        return AuthenticatedUser.of(
+                UserId.from(user.getId()),
+                CustomerId.from(user.getCustomerId()),
+                user.getEmail(),
+                user.getUserRole());
     }
 
     private UserAuthenticationProjection authenticate(String token, Authentication requiredAuthentication) {

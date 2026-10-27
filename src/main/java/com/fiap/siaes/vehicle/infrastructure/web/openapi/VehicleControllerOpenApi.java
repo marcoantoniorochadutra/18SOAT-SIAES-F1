@@ -61,7 +61,7 @@ public interface VehicleControllerOpenApi {
                responses = {
                      @ApiResponse(responseCode = "200", description = "vehicle.list.response.success"),
     })
-    PageResponse<VehicleResponse> list(@ParameterObject VehicleFilter filter, @ParameterObject PageQuery pageQuery);
+    PageResponse<VehicleResponse> list(@ParameterObject VehicleFilter filter, @ParameterObject PageQuery pageQuery, AuthenticatedUser authenticatedUser);
 
     @Operation(summary = "vehicle.delete.summary", description = "vehicle.delete.description", method = "DELETE",
                responses = {

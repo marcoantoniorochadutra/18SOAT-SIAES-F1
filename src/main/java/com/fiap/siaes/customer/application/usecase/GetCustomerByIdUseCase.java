@@ -9,7 +9,7 @@ public interface GetCustomerByIdUseCase {
     CustomerResponse execute(GetCustomerByIdCommand id);
 
     record GetCustomerByIdCommand(CustomerId id, AuthenticatedUser authenticatedUser) {
-        public static GetCustomerByIdCommand from(CustomerId id, AuthenticatedUser authenticatedUser) {
+        public static GetCustomerByIdCommand of(CustomerId id, AuthenticatedUser authenticatedUser) {
             return new GetCustomerByIdCommand(id, authenticatedUser);
         }
     }

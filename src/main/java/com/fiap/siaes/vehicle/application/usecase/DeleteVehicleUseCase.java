@@ -8,7 +8,7 @@ public interface DeleteVehicleUseCase {
     void execute(DeleteVehicleCommand command);
 
     record DeleteVehicleCommand(VehicleId id, AuthenticatedUser authenticatedUser) {
-        public static DeleteVehicleCommand from(VehicleId id, AuthenticatedUser authenticatedUser) {
+        public static DeleteVehicleCommand of(VehicleId id, AuthenticatedUser authenticatedUser) {
             return new DeleteVehicleCommand(id, authenticatedUser);
         }
     }

@@ -60,12 +60,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[201] Deve criar cliente com sucesso")
     void shouldCreateCustomer() throws Exception {
-        var command = CreateCustomerCommand.builder()
-                .document(DOCUMENT)
-                .name("Maria Silva")
-                .phone("11999999999")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(DOCUMENT, "Maria Silva", "11999999999", EMAIL);
 
         var customerId = CustomerId.generate();
 
@@ -81,11 +76,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar cliente com documento em branco")
     void shouldNotCreateCustomerWhenDocumentIsBlank() throws Exception {
-        var command = CreateCustomerCommand.builder()
-                .document(" ")
-                .name("Maria Silva")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(" ", "Maria Silva", null, EMAIL);
 
         super.executePost(CustomerController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -95,11 +86,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar cliente com nome em branco")
     void shouldNotCreateCustomerWhenNameIsBlank() throws Exception {
-        var command = CreateCustomerCommand.builder()
-                .document(DOCUMENT)
-                .name(" ")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(DOCUMENT, " ", null, EMAIL);
 
         super.executePost(CustomerController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -109,11 +96,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[400] Não deve criar cliente com e-mail inválido")
     void shouldNotCreateCustomerWhenEmailIsInvalid() throws Exception {
-        var command = CreateCustomerCommand.builder()
-                .document(DOCUMENT)
-                .name("Maria Silva")
-                .email("invalid-email")
-                .build();
+        var command = CreateCustomerCommand.of(DOCUMENT, "Maria Silva", null, "invalid-email");
 
         super.executePost(CustomerController.ENDPOINT, command)
                 .andExpect(status().isBadRequest())
@@ -123,11 +106,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[409] Não deve criar cliente com e-mail já cadastrado")
     void shouldNotCreateCustomerWhenEmailAlreadyExists() throws Exception {
-        var command = CreateCustomerCommand.builder()
-                .document(DOCUMENT)
-                .name("Maria Silva")
-                .email(EMAIL)
-                .build();
+        var command = CreateCustomerCommand.of(DOCUMENT, "Maria Silva", null, EMAIL);
 
         when(this.createCustomerUseCase.execute(command)).thenThrow(new CustomerEmailAlreadyExistsException(EMAIL));
         super.executePost(CustomerController.ENDPOINT, command)
@@ -195,9 +174,16 @@ class CustomerControllerTest extends ControllerTestUtils {
     @DisplayName("[200] Deve buscar cliente pelo id com sucesso")
     void shouldGetCustomerById() throws Exception {
         var id = CustomerId.generate();
-        var response = new CustomerResponse(id, SANITIZED_DOCUMENT, DocumentType.CPF, "Maria Silva", "11999999999", EMAIL);
+        var response = CustomerResponse.builder()
+                .id(id)
+                .document(SANITIZED_DOCUMENT)
+                .documentType(DocumentType.CPF)
+                .name("Maria Silva")
+                .phone("11999999999")
+                .email(EMAIL)
+                .build();
 
-        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
+        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.of(id, AUTHENTICATED_USER_ADMIN))).thenReturn(response);
 
         super.executeGetAuthenticated(CustomerController.ENDPOINT + "/" + id)
                 .andExpect(status().isOk())
@@ -210,7 +196,7 @@ class CustomerControllerTest extends ControllerTestUtils {
     void shouldNotGetNonExistentCustomer() throws Exception {
         var id = CustomerId.generate();
 
-        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.from(id, AUTHENTICATED_USER_ADMIN)))
+        when(this.getCustomerByIdUseCase.execute(GetCustomerByIdCommand.of(id, AUTHENTICATED_USER_ADMIN)))
                 .thenThrow(new CustomerNotFoundException(id.toString()));
 
         super.executeGetAuthenticated(CustomerController.ENDPOINT + "/" + id)
@@ -221,8 +207,14 @@ class CustomerControllerTest extends ControllerTestUtils {
     @Test
     @DisplayName("[200] Deve listar clientes com sucesso")
     void shouldListCustomers() throws Exception {
-        var response = new CustomerResponse(
-                CustomerId.generate(), SANITIZED_DOCUMENT, DocumentType.CPF, "Maria Silva", "11999999999", EMAIL);
+        var response = CustomerResponse.builder()
+                .id(CustomerId.generate())
+                .document(SANITIZED_DOCUMENT)
+                .documentType(DocumentType.CPF)
+                .name("Maria Silva")
+                .phone("11999999999")
+                .email(EMAIL)
+                .build();
         var page = new PageResponse<>(List.of(response), false, 0, 20);
 
         when(this.listCustomersUseCase.execute(any())).thenReturn(page);

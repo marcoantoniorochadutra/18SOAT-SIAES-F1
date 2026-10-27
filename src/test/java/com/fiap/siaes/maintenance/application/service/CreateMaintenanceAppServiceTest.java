@@ -49,7 +49,7 @@ class CreateMaintenanceAppServiceTest {
     @Test
     @DisplayName("Deve criar um serviço com sucesso")
     void shouldCreateMaintenanceSuccessfully() {
-        var command = this.commandBuilder().build();
+        var command = CreateMaintenanceCommand.of(UNSANITIZED_CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         MaintenanceId maintenanceId = this.createMaintenanceAppService.execute(command);
 
@@ -66,7 +66,7 @@ class CreateMaintenanceAppServiceTest {
     @Test
     @DisplayName("Não deve criar serviço quando o código já estiver cadastrado")
     void shouldNotCreateMaintenanceWhenCodeAlreadyExists() {
-        var command = this.commandBuilder().build();
+        var command = CreateMaintenanceCommand.of(UNSANITIZED_CODE, DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         when(this.maintenanceRepository.existsByCode(MaintenanceCode.recreate(CODE))).thenReturn(true);
 
@@ -80,7 +80,7 @@ class CreateMaintenanceAppServiceTest {
     @Test
     @DisplayName("Não deve criar serviço sem código")
     void shouldNotCreateMaintenanceWithoutCode() {
-        var command = this.commandBuilder().code(" ").build();
+        var command = CreateMaintenanceCommand.of(" ", DESCRIPTION, PRICE, ESTIMATED_DURATION_MINUTES);
 
         assertThrows(MaintenanceCodeValueIsNullException.class, () -> this.createMaintenanceAppService.execute(command));
 
@@ -90,7 +90,11 @@ class CreateMaintenanceAppServiceTest {
     @Test
     @DisplayName("Não deve criar serviço com preço negativo")
     void shouldNotCreateMaintenanceWithNegativePrice() {
-        var command = this.commandBuilder().price(new BigDecimal("-1.00")).build();
+        var command = CreateMaintenanceCommand.of(
+                UNSANITIZED_CODE,
+                DESCRIPTION,
+                new BigDecimal("-1.00"),
+                ESTIMATED_DURATION_MINUTES);
 
         assertThrows(MaintenancePriceInvalidException.class, () -> this.createMaintenanceAppService.execute(command));
 
@@ -100,18 +104,11 @@ class CreateMaintenanceAppServiceTest {
     @Test
     @DisplayName("Não deve criar serviço com duração estimada zerada")
     void shouldNotCreateMaintenanceWithZeroEstimatedDuration() {
-        var command = this.commandBuilder().estimatedDurationMinutes(0).build();
+        var command = CreateMaintenanceCommand.of(UNSANITIZED_CODE, DESCRIPTION, PRICE, 0);
 
         assertThrows(MaintenanceEstimatedDurationInvalidException.class, () -> this.createMaintenanceAppService.execute(command));
 
         verifyNoInteractions(this.maintenanceRepository);
     }
 
-    private CreateMaintenanceCommand.CreateMaintenanceCommandBuilder commandBuilder() {
-        return CreateMaintenanceCommand.builder()
-                .code(UNSANITIZED_CODE)
-                .description(DESCRIPTION)
-                .price(PRICE)
-                .estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
-    }
 }

@@ -38,7 +38,7 @@ public class StockItem extends AggregateRoot {
 
         if (initialQuantity > 0) {
             this.quantity = initialQuantity;
-            this.registerMovement(StockMovementType.INITIAL, initialQuantity, null, null, performedBy);
+            this.registerMovement(StockMovementType.INITIAL, initialQuantity, null, null, performedBy, null);
         }
     }
 
@@ -61,7 +61,7 @@ public class StockItem extends AggregateRoot {
             default -> throw new InvalidStockMovementTypeException(this.suppliesId.toString(), type.name());
         }
 
-        this.registerMovement(type, quantity, reason, null, performedBy);
+        this.registerMovement(type, quantity, reason, null, performedBy, null);
     }
 
     public void reserve(int amount, UUID referenceId, UserId performedBy) {
@@ -69,24 +69,24 @@ public class StockItem extends AggregateRoot {
         this.validateAvailable(amount);
         this.reservedQuantity += amount;
 
-        this.registerMovement(StockMovementType.RESERVATION, amount, null, referenceId, performedBy);
+        this.registerMovement(StockMovementType.RESERVATION, amount, null, referenceId, performedBy, null);
     }
 
-    public void releaseReservation(int amount, UUID referenceId, UserId performedBy) {
+    public void releaseReservation(int amount, UUID referenceId, UserId performedBy, String performedByName) {
         this.validatePositive(amount);
         this.validateReserved(amount);
         this.reservedQuantity -= amount;
 
-        this.registerMovement(StockMovementType.RESERVATION_RELEASE, amount, null, referenceId, performedBy);
+        this.registerMovement(StockMovementType.RESERVATION_RELEASE, amount, null, referenceId, performedBy, performedByName);
     }
 
-    public void consumeReservation(int amount, UUID referenceId, UserId performedBy) {
+    public void consumeReservation(int amount, UUID referenceId, UserId performedBy, String performedByName) {
         this.validatePositive(amount);
         this.validateReserved(amount);
         this.reservedQuantity -= amount;
         this.quantity -= amount;
 
-        this.registerMovement(StockMovementType.CONSUMPTION, amount, null, referenceId, performedBy);
+        this.registerMovement(StockMovementType.CONSUMPTION, amount, null, referenceId, performedBy, performedByName);
     }
 
     private void increase(int amount) {
@@ -112,7 +112,8 @@ public class StockItem extends AggregateRoot {
         }
     }
 
-    private void registerMovement(StockMovementType type, int quantity, String reason, UUID referenceId, UserId performedBy) {
+    private void registerMovement(StockMovementType type, int quantity, String reason, UUID referenceId, UserId performedBy,
+                                  String performedByName) {
         this.registerEvent(StockMovedEvent.builder()
                 .suppliesId(this.suppliesId)
                 .type(type)
@@ -122,6 +123,7 @@ public class StockItem extends AggregateRoot {
                 .reason(reason)
                 .referenceId(referenceId)
                 .performedBy(performedBy)
+                .performedByName(performedByName)
                 .occurredAt(Instant.now())
                 .build());
     }
