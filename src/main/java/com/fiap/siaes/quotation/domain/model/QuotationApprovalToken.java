@@ -3,6 +3,7 @@ package com.fiap.siaes.quotation.domain.model;
 import com.fiap.siaes.quotation.domain.exception.QuotationApprovalTokenInvalidException;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationApprovalTokenId;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
+import com.fiap.siaes.sk.document.domain.Document;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -58,6 +59,16 @@ public class QuotationApprovalToken {
     public void use() {
         this.ensureActive();
         this.usedAt = Instant.now();
+    }
+
+    public boolean confirm(Document customerDocument, String documentLastDigits) {
+        if (!customerDocument.endsWith(documentLastDigits)) {
+            this.registerFailedAttempt();
+            return false;
+        }
+
+        this.use();
+        return true;
     }
 
     public void revoke() {

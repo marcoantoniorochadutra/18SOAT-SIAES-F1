@@ -1,5 +1,6 @@
 package com.fiap.siaes.quotation.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
 import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.port.QuotationQueryPort;
@@ -75,5 +76,19 @@ public class QuotationRepositoryAdapter implements QuotationRepository, Quotatio
                 .map(QuotationMapper::toResponse);
 
         return PageResponses.from(results);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    public List<Quotation> findAllByCustomerId(CustomerId customerId) {
+        return this.quotationJpaRepository.findAllByCustomerId(customerId).stream()
+                .map(QuotationMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.quotationJpaRepository.deleteAllByCustomerId(customerId);
     }
 }

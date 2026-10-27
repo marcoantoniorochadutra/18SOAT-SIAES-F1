@@ -171,7 +171,7 @@ class QuotationControllerTest extends ControllerTestUtils {
         var quotation = createQuotation();
 
         when(this.getQuotationByIdUseCase.execute(GetQuotationByIdCommand.of(quotation.getId(), AUTHENTICATED_USER_ADMIN)))
-                .thenReturn(from(quotation, createCustomer(), createVehicle()));
+                .thenReturn(from(quotation, CustomerReferenceResponse.from(createCustomer()), VehicleReferenceResponse.from(createVehicle())));
 
         super.executeGetAuthenticated(QuotationController.ENDPOINT + "/" + quotation.getId())
                 .andExpect(status().isOk())

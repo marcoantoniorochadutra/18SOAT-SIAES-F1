@@ -31,7 +31,7 @@ class UserMapperTest {
                 .id(UserId.generate())
                 .name("Maria Silva")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .lastStatus(UserStatus.ACTIVE)
                 .statusHistory(Set.of(statusHistory))
@@ -98,7 +98,7 @@ class UserMapperTest {
                 .id(UserId.generate())
                 .name("Maria Silva")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .build();
 

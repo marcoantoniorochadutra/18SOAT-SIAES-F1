@@ -47,7 +47,7 @@ import static com.fiap.siaes.sk.util.ControllerUtils.updatedResponse;
 @RestController
 @RequestMapping(QuotationController.ENDPOINT)
 @RequiredArgsConstructor
-@Authentication(minimumRole = UserRole.MECHANIC, deniedRoles = {UserRole.CUSTOMER})
+@Authentication(minimumRole = UserRole.MECHANIC)
 public class QuotationController implements QuotationControllerOpenApi {
 
     public static final String ENDPOINT = "/api/v1/quotations";

@@ -29,7 +29,7 @@ class UserDomainTest {
         User user = User.builder()
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .build();
 
@@ -47,7 +47,7 @@ class UserDomainTest {
         User user = User.builder()
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .build();
 
@@ -63,7 +63,7 @@ class UserDomainTest {
                 .id(id)
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .build();
 
@@ -78,7 +78,7 @@ class UserDomainTest {
         User user = User.builder()
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.CUSTOMER)
                 .customerId(customerId)
                 .build();
@@ -92,7 +92,7 @@ class UserDomainTest {
         assertThrows(UserCustomerRelationRequiredException.class, () -> User.builder()
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.CUSTOMER)
                 .build());
     }
@@ -107,7 +107,7 @@ class UserDomainTest {
                 .id(id)
                 .name("Maria")
                 .email("maria@email.com")
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.CUSTOMER)
                 .lastStatus(UserStatus.INACTIVE)
                 .statusHistory(statusHistory)

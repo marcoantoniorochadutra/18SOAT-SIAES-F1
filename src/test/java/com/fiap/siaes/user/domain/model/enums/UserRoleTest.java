@@ -47,14 +47,15 @@ class UserRoleTest {
                 Arguments.of(UserRole.ADMIN, UserRole.MANAGER),
                 Arguments.of(UserRole.MANAGER, UserRole.MANAGER),
                 Arguments.of(UserRole.MECHANIC, UserRole.CUSTOMER),
-                Arguments.of(UserRole.CUSTOMER, UserRole.MECHANIC)
+                Arguments.of(UserRole.CUSTOMER, UserRole.CUSTOMER)
         );
     }
 
     static Stream<Arguments> rolesWithLessAccess() {
         return Stream.of(
                 Arguments.of(UserRole.MANAGER, UserRole.ADMIN),
-                Arguments.of(UserRole.CUSTOMER, UserRole.MANAGER)
+                Arguments.of(UserRole.CUSTOMER, UserRole.MANAGER),
+                Arguments.of(UserRole.CUSTOMER, UserRole.MECHANIC)
         );
     }
 }

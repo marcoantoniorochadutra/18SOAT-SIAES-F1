@@ -42,4 +42,6 @@ public interface VehicleJpaRepository extends JpaRepository<VehicleJpaEntity, Ve
                                                  @Param("year") Integer year,
                                                  @Param("customerId") CustomerId customerId,
                                                  Pageable pageable);
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

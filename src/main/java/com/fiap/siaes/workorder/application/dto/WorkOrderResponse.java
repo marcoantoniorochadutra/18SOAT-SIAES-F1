@@ -1,9 +1,7 @@
 package com.fiap.siaes.workorder.application.dto;
 
 import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
-import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
-import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.WorkOrderStatusHistory;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
@@ -19,11 +17,11 @@ public record WorkOrderResponse(WorkOrderId id, CustomerReferenceResponse custom
                                 WorkOrderStatus status, List<StatusHistoryResponse> statusHistory, Instant createdAt,
                                 Instant finishedAt) {
 
-    public static WorkOrderResponse from(WorkOrder workOrder, Customer customer, Vehicle vehicle) {
+    public static WorkOrderResponse from(WorkOrder workOrder, CustomerReferenceResponse customer, VehicleReferenceResponse vehicle) {
         return WorkOrderResponse.builder()
                 .id(workOrder.getId())
-                .customer(CustomerReferenceResponse.from(customer))
-                .vehicle(VehicleReferenceResponse.from(vehicle))
+                .customer(customer)
+                .vehicle(vehicle)
                 .status(workOrder.getLastStatus())
                 .statusHistory(workOrder.getStatusHistory().stream()
                         .sorted(Comparator.comparing(WorkOrderStatusHistory::getUpdatedAt))

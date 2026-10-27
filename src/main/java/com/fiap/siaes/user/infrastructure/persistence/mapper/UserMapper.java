@@ -43,7 +43,7 @@ public class UserMapper {
                 .id(entity.getId())
                 .name(entity.getName())
                 .email(entity.getEmail())
-                .password(Password.recreate(entity.getPassword()))
+                .password(Password.fromHash(entity.getPassword()))
                 .role(entity.getRole())
                 .lastStatus(entity.getLastStatus())
                 .statusHistory(toHistoryDomain(entity.getStatusHistory()))

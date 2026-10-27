@@ -1,8 +1,10 @@
 package com.fiap.siaes.workorder.application.service;
 
 import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
+import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.repository.VehicleRepository;
 import com.fiap.siaes.workorder.application.dto.WorkOrderResponse;
@@ -35,6 +37,9 @@ public class GetWorkOrderByIdAppService implements GetWorkOrderByIdUseCase {
 
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(workOrder.getCustomerId());
         Vehicle vehicle = this.vehicleRepository.findByIdOrThrowNotFound(workOrder.getVehicleId());
-        return WorkOrderResponse.from(workOrder, customer, vehicle);
+
+        return WorkOrderResponse.from(workOrder,
+                                      CustomerReferenceResponse.from(customer),
+                                      VehicleReferenceResponse.from(vehicle));
     }
 }

@@ -9,6 +9,7 @@ import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
 import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
+import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer.UserClaim;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
@@ -64,12 +65,14 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        Authentication requiredAuthentication = this.resolveAuthenticationAnnotation(request);
+        HandlerMethod handlerMethod = this.resolveHandlerMethod(request);
 
-        if (isNull(requiredAuthentication)) {
+        if (isNull(handlerMethod) || this.isPublic(handlerMethod)) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        Authentication requiredAuthentication = this.resolveAuthenticationAnnotation(handlerMethod);
 
         try {
             UserAuthenticationProjection user = this.authenticate(token, requiredAuthentication);
@@ -150,13 +153,12 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private Authentication resolveAuthenticationAnnotation(HttpServletRequest request) {
-        HandlerMethod handlerMethod = this.resolveHandlerMethod(request);
+    private boolean isPublic(HandlerMethod handlerMethod) {
+        return handlerMethod.hasMethodAnnotation(PublicEndpoint.class)
+                || handlerMethod.getBeanType().isAnnotationPresent(PublicEndpoint.class);
+    }
 
-        if (isNull(handlerMethod)) {
-            return null;
-        }
-
+    private Authentication resolveAuthenticationAnnotation(HandlerMethod handlerMethod) {
         Authentication methodAuthentication = handlerMethod.getMethodAnnotation(Authentication.class);
 
         if (nonNull(methodAuthentication)) {

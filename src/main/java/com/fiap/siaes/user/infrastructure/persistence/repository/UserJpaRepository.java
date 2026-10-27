@@ -1,5 +1,6 @@
 package com.fiap.siaes.user.infrastructure.persistence.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
@@ -42,4 +43,5 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
 
     Optional<UserJpaEntity> findByRefreshToken(String refreshToken);
 
+    void deleteAllByCustomerId(CustomerId customerId);
 }

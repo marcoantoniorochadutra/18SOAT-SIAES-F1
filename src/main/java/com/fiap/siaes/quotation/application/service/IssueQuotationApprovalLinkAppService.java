@@ -3,7 +3,6 @@ package com.fiap.siaes.quotation.application.service;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalLinkResponse;
 import com.fiap.siaes.quotation.application.service.helper.QuotationApprovalTokenHelper;
 import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase;
-import com.fiap.siaes.quotation.domain.exception.QuotationNotAwaitingApprovalException;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.model.QuotationApprovalToken;
 import com.fiap.siaes.quotation.domain.repository.QuotationRepository;
@@ -24,8 +23,7 @@ public class IssueQuotationApprovalLinkAppService implements IssueQuotationAppro
     public QuotationApprovalLinkResponse execute(IssueQuotationApprovalLinkCommand command) {
         Quotation quotation = this.quotationRepository.findByIdOrThrowNotFound(command.quotationId());
 
-        if (quotation.getLastStatus().isNotAwaitingApproval())
-            throw new QuotationNotAwaitingApprovalException(quotation.getId().toString(), quotation.getLastStatus().name());
+        quotation.ensureAwaitingApproval();
 
         QuotationApprovalToken token = this.quotationApprovalTokenHelper.currentOrIssue(quotation.getId());
 

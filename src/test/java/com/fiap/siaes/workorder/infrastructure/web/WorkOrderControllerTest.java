@@ -199,7 +199,7 @@ class WorkOrderControllerTest extends ControllerTestUtils {
         var workOrder = createWorkOrder();
 
         when(this.getWorkOrderByIdUseCase.execute(GetWorkOrderByIdCommand.of(workOrder.getId(), AUTHENTICATED_USER_ADMIN)))
-                .thenReturn(from(workOrder, createCustomer(), createVehicle()));
+                .thenReturn(from(workOrder, CustomerReferenceResponse.from(createCustomer()), VehicleReferenceResponse.from(createVehicle())));
 
         super.executeGetAuthenticated(WorkOrderController.ENDPOINT + "/" + workOrder.getId())
                 .andExpect(status().isOk())

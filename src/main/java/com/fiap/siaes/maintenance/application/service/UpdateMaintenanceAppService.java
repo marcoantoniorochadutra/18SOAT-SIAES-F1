@@ -17,7 +17,7 @@ public class UpdateMaintenanceAppService implements UpdateMaintenanceUseCase {
     private final MaintenanceRepository maintenanceRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public MaintenanceId execute(UpdateMaintenanceCommand command) {
         Maintenance maintenance = this.maintenanceRepository.findByIdOrThrowNotFound(command.id());
 

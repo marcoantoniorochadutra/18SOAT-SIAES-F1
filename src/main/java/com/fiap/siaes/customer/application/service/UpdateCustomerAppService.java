@@ -4,6 +4,7 @@ import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.customer.application.usecase.UpdateCustomerUseCase;
 import com.fiap.siaes.customer.domain.exception.CustomerDocumentAlreadyExistsException;
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
+import com.fiap.siaes.customer.domain.exception.CustomerNotFoundException;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
@@ -19,13 +20,13 @@ public class UpdateCustomerAppService implements UpdateCustomerUseCase {
     private final CustomerRepository customerRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public CustomerId execute(UpdateCustomerCommand command) {
         Customer customer = this.findCustomerToUpdate(command);
 
-        this.validateCustomer(command);
-
         customer.update(command.name(), command.phone(), command.email(), command.document());
+
+        this.validateCustomer(customer);
 
         this.customerRepository.save(customer);
 
@@ -35,20 +36,20 @@ public class UpdateCustomerAppService implements UpdateCustomerUseCase {
     private Customer findCustomerToUpdate(UpdateCustomerCommand command) {
         AuthenticatedUser authenticatedUser = command.authenticatedUser();
 
-        if (authenticatedUser.isCustomer()) {
-            return this.customerRepository.findByIdOrThrowNotFound(authenticatedUser.customerId());
+        if (authenticatedUser.isCustomer() && authenticatedUser.isDifferentCustomer(command.id())) {
+            throw new CustomerNotFoundException(command.id().toString());
         }
 
         return this.customerRepository.findByIdOrThrowNotFound(command.id());
     }
 
-    private void validateCustomer(UpdateCustomerCommand command) {
-        if (this.customerRepository.existsByEmailAndIdNot(command.email(), command.id())) {
-            throw new CustomerEmailAlreadyExistsException(command.email());
+    private void validateCustomer(Customer customer) {
+        if (this.customerRepository.existsByEmailAndIdNot(customer.getEmail(), customer.getId())) {
+            throw new CustomerEmailAlreadyExistsException(customer.getEmail());
         }
 
-        if (this.customerRepository.existsByDocumentAndIdNot(command.document(), command.id())) {
-            throw new CustomerDocumentAlreadyExistsException(command.document());
+        if (this.customerRepository.existsByDocumentAndIdNot(customer.getDocument(), customer.getId())) {
+            throw new CustomerDocumentAlreadyExistsException(customer.getDocument().getValue());
         }
     }
 }

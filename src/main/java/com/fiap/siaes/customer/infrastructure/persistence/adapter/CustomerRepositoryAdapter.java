@@ -64,8 +64,8 @@ public class CustomerRepositoryAdapter implements CustomerRepository, CustomerQu
     }
 
     @Override
-    public boolean existsByDocumentAndIdNot(String document, CustomerId id) {
-        return this.customerJpaRepository.existsByDocumentAndIdNot(document, id);
+    public boolean existsByDocumentAndIdNot(Document document, CustomerId id) {
+        return this.customerJpaRepository.existsByDocumentAndIdNot(document.getValue(), id);
     }
 
     @Override

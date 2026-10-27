@@ -9,6 +9,8 @@ import com.fiap.siaes.auth.application.usecase.LogoutUserUseCase.LogoutUserComma
 import com.fiap.siaes.auth.application.usecase.RefreshAuthenticationUseCase;
 import com.fiap.siaes.auth.application.usecase.RefreshAuthenticationUseCase.RefreshAuthenticationCommand;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
+import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.auth.infrastructure.web.openapi.AuthenticationControllerOpenApi;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import jakarta.validation.Valid;
@@ -33,12 +35,14 @@ public class AuthenticationController implements AuthenticationControllerOpenApi
     private final LogoutUserUseCase logoutUserUseCase;
 
     @Override
+    @PublicEndpoint
     @PostMapping("/login")
     public AuthenticationWrapper login(@RequestBody AuthenticateUserCommand command) {
         return this.authenticateUserUseCase.execute(command);
     }
 
     @Override
+    @PublicEndpoint
     @PostMapping("/refresh")
     public AuthenticationWrapper refresh(@Valid @RequestBody RefreshAuthenticationCommand command) {
         return this.refreshAuthenticationUseCase.execute(command);
@@ -49,7 +53,7 @@ public class AuthenticationController implements AuthenticationControllerOpenApi
     @Authentication(minimumRole = UserRole.CUSTOMER)
     public void logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                        @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        this.logoutUserUseCase.execute(LogoutUserCommand.of(authorizationHeader, authenticatedUser));
+        this.logoutUserUseCase.execute(LogoutUserCommand.of(BearerTokenExtractor.extract(authorizationHeader), authenticatedUser));
     }
 
 }

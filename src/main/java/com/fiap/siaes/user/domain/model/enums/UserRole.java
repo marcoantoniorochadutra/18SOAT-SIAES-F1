@@ -11,7 +11,7 @@ public enum UserRole {
     ADMIN(1000),
     MANAGER(500),
     MECHANIC(300),
-    CUSTOMER(300);
+    CUSTOMER(100);
 
     private final int hierarchy;
 

@@ -17,7 +17,7 @@ public class DeleteVehicleAppService implements DeleteVehicleUseCase {
     private final VehicleRepository vehicleRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void execute(DeleteVehicleCommand command) {
         Vehicle vehicle = this.findVehicleToDelete(command);
         this.vehicleRepository.deleteById(vehicle.getId());

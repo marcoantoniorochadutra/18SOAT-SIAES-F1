@@ -23,7 +23,7 @@ public interface CustomerRepository extends RepositoryBase<Customer, CustomerId>
 
     boolean existsByDocument(Document document);
 
-    boolean existsByDocumentAndIdNot(String document, CustomerId id);
+    boolean existsByDocumentAndIdNot(Document document, CustomerId id);
 
     boolean existsByEmail(String email);
 

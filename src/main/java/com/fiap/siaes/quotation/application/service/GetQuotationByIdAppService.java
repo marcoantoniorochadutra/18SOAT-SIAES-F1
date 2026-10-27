@@ -1,6 +1,7 @@
 package com.fiap.siaes.quotation.application.service;
 
 import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
+import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.Customer;
 import com.fiap.siaes.customer.domain.repository.CustomerRepository;
 import com.fiap.siaes.quotation.application.dto.QuotationResponse;
@@ -8,6 +9,7 @@ import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase;
 import com.fiap.siaes.quotation.domain.exception.QuotationNotFoundException;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.repository.QuotationRepository;
+import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
 import com.fiap.siaes.vehicle.domain.model.Vehicle;
 import com.fiap.siaes.vehicle.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,6 @@ public class GetQuotationByIdAppService implements GetQuotationByIdUseCase {
 
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(quotation.getCustomerId());
         Vehicle vehicle = this.vehicleRepository.findByIdOrThrowNotFound(quotation.getVehicleId());
-        return QuotationResponse.from(quotation, customer, vehicle);
+        return QuotationResponse.from(quotation, CustomerReferenceResponse.from(customer), VehicleReferenceResponse.from(vehicle));
     }
 }

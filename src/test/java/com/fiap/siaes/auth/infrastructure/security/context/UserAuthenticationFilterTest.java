@@ -8,6 +8,7 @@ import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
 import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
 import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
@@ -90,13 +91,54 @@ class UserAuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("Deve seguir a cadeia de filtros quando o endpoint não exige autenticação")
-    void shouldContinueTheChainWhenEndpointHasNoAuthenticationAnnotation() throws Exception {
+    @DisplayName("Deve seguir a cadeia de filtros quando a requisição não corresponde a um endpoint")
+    void shouldContinueTheChainWhenRequestHasNoHandlerMethod() throws Exception {
         when(this.request.getHeader("Authorization")).thenReturn(null);
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
         verify(this.filterChain).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve seguir a cadeia de filtros quando o endpoint é público")
+    void shouldContinueTheChainWhenEndpointIsPublic() throws Exception {
+        this.mockHandlerMethod(PublicController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn(null);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.filterChain).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve exigir autenticação quando o endpoint não declara nenhuma anotação de acesso")
+    void shouldRequireAuthenticationWhenEndpointHasNoAnnotation() throws Exception {
+        this.mockHandlerMethod(UnannotatedController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn(null);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.handlerExceptionResolver)
+                .resolveException(eq(this.request), eq(this.response), isNull(), isA(InvalidTokenException.class));
+        verify(this.filterChain, never()).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve exigir o perfil ADMIN quando o endpoint não declara nenhuma anotação de acesso")
+    void shouldRequireAdminWhenEndpointHasNoAnnotation() throws Exception {
+        String token = this.jwtTokenIssuer.issueAccessToken(USER_ID, UserRole.MANAGER);
+
+        this.mockHandlerMethod(UnannotatedController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.MANAGER);
+        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.handlerExceptionResolver)
+                .resolveException(eq(this.request), eq(this.response), isNull(), isA(InsufficientRoleException.class));
+        verify(this.filterChain, never()).doFilter(this.request, this.response);
     }
 
     @Test
@@ -248,6 +290,15 @@ class UserAuthenticationFilterTest {
         HandlerMethod handlerMethod = new HandlerMethod(bean, controllerType.getMethod(methodName));
         when(this.requestMappingHandlerMapping.getHandler(this.request))
                 .thenReturn(new HandlerExecutionChain(handlerMethod));
+    }
+
+    @PublicEndpoint
+    static class PublicController {
+        public void handle() { /* Teste para validar endpoint público */ }
+    }
+
+    static class UnannotatedController {
+        public void handle() { /* Teste para validar negação por padrão */ }
     }
 
     @Authentication(minimumRole = UserRole.MANAGER)

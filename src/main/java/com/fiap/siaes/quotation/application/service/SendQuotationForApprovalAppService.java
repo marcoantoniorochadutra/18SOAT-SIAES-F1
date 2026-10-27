@@ -35,7 +35,7 @@ public class SendQuotationForApprovalAppService implements SendQuotationForAppro
     public void execute(SendQuotationForApprovalCommand command) {
         Quotation quotation = this.quotationRepository.findByIdOrThrowNotFound(command.quotationId());
 
-        if (quotation.getLastStatus().isNotAwaitingApproval())
+        if (!quotation.isAwaitingApproval())
             return;
 
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(quotation.getCustomerId());

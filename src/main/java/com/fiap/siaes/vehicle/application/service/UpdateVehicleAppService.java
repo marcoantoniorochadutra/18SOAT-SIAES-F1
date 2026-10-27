@@ -19,7 +19,7 @@ public class UpdateVehicleAppService implements UpdateVehicleUseCase {
     private final VehicleRepository vehicleRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public VehicleId execute(UpdateVehicleCommand command) {
         Vehicle vehicle = this.findVehicleToUpdate(command);
 

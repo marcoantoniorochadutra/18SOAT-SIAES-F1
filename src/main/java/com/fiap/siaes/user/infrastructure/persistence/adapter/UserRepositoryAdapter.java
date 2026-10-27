@@ -1,5 +1,6 @@
 package com.fiap.siaes.user.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.User;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
@@ -50,5 +51,11 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public Optional<User> findByRefreshToken(String refreshTokenHash) {
         return this.userJpaRepository.findByRefreshToken(refreshTokenHash).map(UserMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.userJpaRepository.deleteAllByCustomerId(customerId);
     }
 }

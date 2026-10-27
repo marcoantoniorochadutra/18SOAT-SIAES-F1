@@ -17,7 +17,7 @@ public class UpdateSuppliesAppService implements UpdateSuppliesUseCase {
     private final SuppliesRepository suppliesRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public SuppliesId execute(UpdateSuppliesCommand command) {
         Supplies supplies = this.suppliesRepository.findByIdOrThrowNotFound(command.id());
 

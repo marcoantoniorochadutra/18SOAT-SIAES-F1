@@ -1,5 +1,6 @@
 package com.fiap.siaes.workorder.domain.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderNotFoundException;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
@@ -19,4 +20,6 @@ public interface WorkOrderRepository extends RepositoryBase<WorkOrder, WorkOrder
             throw new WorkOrderNotFoundException(id.toString());
         }
     }
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

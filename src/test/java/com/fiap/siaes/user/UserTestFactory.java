@@ -34,7 +34,7 @@ public class UserTestFactory {
                 .id(UserId.generate())
                 .name(Faker.instance().name().fullName())
                 .email(Faker.instance().internet().emailAddress())
-                .password(Password.recreate("hashed-password"))
+                .password(Password.fromHash("hashed-password"))
                 .role(UserRole.MANAGER)
                 .build();
     }

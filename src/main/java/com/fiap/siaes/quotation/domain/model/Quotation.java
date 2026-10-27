@@ -149,6 +149,19 @@ public class Quotation extends AggregateRoot {
         return !this.lastStatus.isNotDraft();
     }
 
+    public boolean isAwaitingApproval() {
+        return !this.lastStatus.isNotAwaitingApproval();
+    }
+
+    public boolean holdsStockReservation() {
+        return this.isDraft() || this.isAwaitingApproval();
+    }
+
+    public void ensureAwaitingApproval() {
+        if (!this.isAwaitingApproval())
+            throw new QuotationNotAwaitingApprovalException(this.id.toString(), this.lastStatus.name());
+    }
+
     private void requireDraft() {
         if (this.lastStatus.isNotDraft())
             throw new QuotationNotEditableException(this.id.toString(), this.lastStatus.name());
@@ -189,8 +202,7 @@ public class Quotation extends AggregateRoot {
     }
 
     private void decide(QuotationStatus status, QuotationDecisionChannel channel, UserId decidedBy) {
-        if (this.lastStatus.isNotAwaitingApproval())
-            throw new QuotationNotAwaitingApprovalException(this.id.toString(), this.lastStatus.name());
+        this.ensureAwaitingApproval();
 
         this.decisionChannel = channel;
         this.decidedBy = decidedBy;

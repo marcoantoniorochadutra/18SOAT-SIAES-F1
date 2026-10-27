@@ -3,6 +3,7 @@ package com.fiap.siaes.quotation.domain.model;
 import com.fiap.siaes.quotation.domain.exception.QuotationApprovalTokenInvalidException;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationApprovalTokenId;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
+import com.fiap.siaes.sk.document.domain.Document;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -99,5 +100,33 @@ class QuotationApprovalTokenDomainTest {
                 .revokedAt(revokedAt)
                 .createdAt(Instant.now().minusSeconds(120))
                 .build();
+    }
+
+    @Test
+    @DisplayName("Deve usar o token quando os dígitos finais conferem com o documento do cliente")
+    void shouldUseTokenWhenDocumentMatches() {
+        QuotationApprovalToken token = QuotationApprovalToken.builder()
+                .quotationId(QuotationId.generate())
+                .timeToLive(Duration.ofHours(72))
+                .build();
+
+        assertTrue(token.confirm(Document.create("529.982.247-25"), "4725"));
+
+        assertNotNull(token.getUsedAt());
+        assertEquals(0, token.getFailedAttempts());
+    }
+
+    @Test
+    @DisplayName("Deve registrar tentativa falha quando os dígitos finais não conferem com o documento do cliente")
+    void shouldRegisterFailedAttemptWhenDocumentDoesNotMatch() {
+        QuotationApprovalToken token = QuotationApprovalToken.builder()
+                .quotationId(QuotationId.generate())
+                .timeToLive(Duration.ofHours(72))
+                .build();
+
+        assertFalse(token.confirm(Document.create("529.982.247-25"), "0000"));
+
+        assertNull(token.getUsedAt());
+        assertEquals(1, token.getFailedAttempts());
     }
 }

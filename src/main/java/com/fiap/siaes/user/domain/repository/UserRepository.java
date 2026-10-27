@@ -1,5 +1,6 @@
 package com.fiap.siaes.user.domain.repository;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.repository.RepositoryBase;
 import com.fiap.siaes.user.domain.exception.UserNotFoundException;
 import com.fiap.siaes.user.domain.model.User;
@@ -28,4 +29,6 @@ public interface UserRepository extends RepositoryBase<User, UserId> {
     boolean existsByEmail(String email);
 
     Optional<User> findByRefreshToken(String refreshTokenHash);
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

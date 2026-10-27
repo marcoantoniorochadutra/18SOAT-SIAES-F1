@@ -79,4 +79,10 @@ public class VehicleRepositoryAdapter implements VehicleRepository, VehicleQuery
     public void deleteById(VehicleId id) {
         this.vehicleJpaRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.vehicleJpaRepository.deleteAllByCustomerId(customerId);
+    }
 }
