@@ -20,6 +20,8 @@ import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase.GetWorkOrderByIdCommand;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase.ListWorkOrdersCommand;
+import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase;
+import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase.RegisterWorkOrderDiagnosisCommand;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase.StartWorkOrderDiagnosisCommand;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
@@ -33,6 +35,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -50,6 +53,7 @@ public class WorkOrderController implements WorkOrderControllerOpenApi {
 
     private final CreateWorkOrderUseCase createWorkOrderUseCase;
     private final StartWorkOrderDiagnosisUseCase startWorkOrderDiagnosisUseCase;
+    private final RegisterWorkOrderDiagnosisUseCase registerWorkOrderDiagnosisUseCase;
     private final FinishWorkOrderUseCase finishWorkOrderUseCase;
     private final DeliverWorkOrderUseCase deliverWorkOrderUseCase;
     private final CancelWorkOrderUseCase cancelWorkOrderUseCase;
@@ -68,6 +72,15 @@ public class WorkOrderController implements WorkOrderControllerOpenApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void startDiagnosis(@PathVariable WorkOrderId id) {
         this.startWorkOrderDiagnosisUseCase.execute(StartWorkOrderDiagnosisCommand.of(id));
+    }
+
+    @Override
+    @PutMapping("/{id}/diagnosis")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void registerDiagnosis(@PathVariable WorkOrderId id,
+                                  @Valid @RequestBody RegisterWorkOrderDiagnosisCommand command,
+                                  @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        this.registerWorkOrderDiagnosisUseCase.execute(command.with(id, authenticatedUser));
     }
 
     @Override

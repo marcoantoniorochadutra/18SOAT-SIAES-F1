@@ -5,6 +5,7 @@ import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.createDiagnosedWorkOrder;
 import static com.fiap.siaes.workorder.WorkOrderTestFactory.createWorkOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,6 +29,24 @@ class WorkOrderMapperTest {
         assertEquals(workOrder.getCreatedAt(), mapped.getCreatedAt());
         assertEquals(workOrder.getFinishedAt(), mapped.getFinishedAt());
         assertEquals(workOrder.getVersion(), mapped.getVersion());
+    }
+
+    @Test
+    @DisplayName("Deve preservar o diagnóstico ao converter para entidade e de volta")
+    void shouldKeepDiagnosis() {
+        WorkOrder workOrder = createDiagnosedWorkOrder();
+
+        WorkOrder mapped = WorkOrderMapper.toDomain(WorkOrderMapper.toEntity(workOrder));
+
+        assertEquals(workOrder.getDiagnosis(), mapped.getDiagnosis());
+    }
+
+    @Test
+    @DisplayName("Deve manter o diagnóstico nulo quando não registrado")
+    void shouldKeepNullDiagnosis() {
+        WorkOrder mapped = WorkOrderMapper.toDomain(WorkOrderMapper.toEntity(createWorkOrder()));
+
+        assertNull(mapped.getDiagnosis());
     }
 
     @Test

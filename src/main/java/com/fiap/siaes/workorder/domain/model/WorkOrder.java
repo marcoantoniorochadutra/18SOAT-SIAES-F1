@@ -5,8 +5,11 @@ import com.fiap.siaes.sk.domain.model.AggregateRoot;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.event.WorkOrderCancelledEvent;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisNotAllowedException;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisRequiredException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderStatusTransitionInvalidException;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.Diagnosis;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +30,7 @@ public class WorkOrder extends AggregateRoot {
 
     private WorkOrderStatus lastStatus;
     private Set<WorkOrderStatusHistory> statusHistory;
+    private Diagnosis diagnosis;
 
     private Instant createdAt;
     private Instant finishedAt;
@@ -43,12 +47,14 @@ public class WorkOrder extends AggregateRoot {
 
     @Builder(builderMethodName = "recreate", builderClassName = "RecreateBuilder")
     public WorkOrder(WorkOrderId id, CustomerId customerId, VehicleId vehicleId, WorkOrderStatus lastStatus,
-                     Set<WorkOrderStatusHistory> statusHistory, Instant createdAt, Instant finishedAt, Long version) {
+                     Set<WorkOrderStatusHistory> statusHistory, Diagnosis diagnosis, Instant createdAt, Instant finishedAt,
+                     Long version) {
         this.id = id;
         this.customerId = customerId;
         this.vehicleId = vehicleId;
         this.lastStatus = lastStatus;
         this.statusHistory = statusHistory;
+        this.diagnosis = diagnosis;
         this.createdAt = createdAt;
         this.finishedAt = finishedAt;
         this.version = version;
@@ -62,9 +68,19 @@ public class WorkOrder extends AggregateRoot {
         this.transitionTo(WorkOrderStatus.IN_DIAGNOSIS);
     }
 
+    public void registerDiagnosis(String description, UserId diagnosedBy) {
+        if (!WorkOrderStatus.IN_DIAGNOSIS.equals(this.lastStatus))
+            throw new WorkOrderDiagnosisNotAllowedException(this.id.toString(), this.lastStatus.name());
+
+        this.diagnosis = Diagnosis.of(description, diagnosedBy, Instant.now());
+    }
+
     public void registerQuotation() {
         if (WorkOrderStatus.AWAITING_APPROVAL.equals(this.lastStatus))
             return;
+
+        if (WorkOrderStatus.IN_DIAGNOSIS.equals(this.lastStatus) && isNull(this.diagnosis))
+            throw new WorkOrderDiagnosisRequiredException(this.id.toString());
 
         this.transitionTo(WorkOrderStatus.AWAITING_APPROVAL);
     }

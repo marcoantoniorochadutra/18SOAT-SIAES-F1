@@ -18,8 +18,11 @@ import com.fiap.siaes.workorder.application.usecase.FinishWorkOrderUseCase.Finis
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase.GetWorkOrderByIdCommand;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase;
+import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase.RegisterWorkOrderDiagnosisCommand;
+import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase.StartWorkOrderDiagnosisCommand;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisNotAllowedException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderOpenQuotationException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderStatusTransitionInvalidException;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
@@ -36,6 +39,7 @@ import java.util.List;
 import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.vehicle.VehicleTestFactory.PLATE;
 import static com.fiap.siaes.vehicle.VehicleTestFactory.createVehicle;
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.DIAGNOSIS;
 import static com.fiap.siaes.workorder.WorkOrderTestFactory.createWorkOrder;
 import static com.fiap.siaes.workorder.application.dto.WorkOrderResponse.from;
 import static org.hamcrest.Matchers.containsString;
@@ -58,6 +62,9 @@ class WorkOrderControllerTest extends ControllerTestUtils {
 
     @MockitoBean
     private StartWorkOrderDiagnosisUseCase startWorkOrderDiagnosisUseCase;
+
+    @MockitoBean
+    private RegisterWorkOrderDiagnosisUseCase registerWorkOrderDiagnosisUseCase;
 
     @MockitoBean
     private FinishWorkOrderUseCase finishWorkOrderUseCase;
@@ -121,6 +128,52 @@ class WorkOrderControllerTest extends ControllerTestUtils {
                 .when(this.startWorkOrderDiagnosisUseCase).execute(StartWorkOrderDiagnosisCommand.of(id));
 
         super.executePostAuthenticated(WorkOrderController.ENDPOINT + "/" + id + "/diagnosis", null)
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("[204] Deve registrar o diagnóstico da ordem de serviço")
+    void shouldRegisterDiagnosis() throws Exception {
+        var id = WorkOrderId.generate();
+        var command = RegisterWorkOrderDiagnosisCommand.builder()
+                .id(id)
+                .authenticatedUser(AUTHENTICATED_USER_ADMIN)
+                .description(DIAGNOSIS)
+                .build();
+
+        super.executePutAuthenticated(WorkOrderController.ENDPOINT + "/" + id + "/diagnosis", command)
+                .andExpect(status().isNoContent());
+
+        verify(this.registerWorkOrderDiagnosisUseCase).execute(command);
+    }
+
+    @Test
+    @DisplayName("[400] Não deve registrar diagnóstico sem descrição")
+    void shouldNotRegisterDiagnosisWithoutDescription() throws Exception {
+        var id = WorkOrderId.generate();
+        var command = RegisterWorkOrderDiagnosisCommand.builder().description(" ").build();
+
+        super.executePutAuthenticated(WorkOrderController.ENDPOINT + "/" + id + "/diagnosis", command)
+                .andExpect(status().isBadRequest())
+                .andExpect(super.matchValidationMessage("WorkOrderDiagnosisCommand.description.notBlank"));
+
+        verifyNoInteractions(this.registerWorkOrderDiagnosisUseCase);
+    }
+
+    @Test
+    @DisplayName("[409] Não deve registrar diagnóstico fora do diagnóstico")
+    void shouldNotRegisterDiagnosisOutsideDiagnosis() throws Exception {
+        var id = WorkOrderId.generate();
+        var command = RegisterWorkOrderDiagnosisCommand.builder()
+                .id(id)
+                .authenticatedUser(AUTHENTICATED_USER_ADMIN)
+                .description(DIAGNOSIS)
+                .build();
+
+        doThrow(new WorkOrderDiagnosisNotAllowedException(id.toString(), "RECEIVED"))
+                .when(this.registerWorkOrderDiagnosisUseCase).execute(command);
+
+        super.executePutAuthenticated(WorkOrderController.ENDPOINT + "/" + id + "/diagnosis", command)
                 .andExpect(status().isConflict());
     }
 

@@ -1,6 +1,7 @@
 package com.fiap.siaes.workorder;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.WorkOrderStatusHistory;
@@ -16,12 +17,20 @@ import java.util.Set;
 @UtilityClass
 public class WorkOrderTestFactory {
 
+    public static final String DIAGNOSIS = "Pastilhas de freio dianteiras gastas";
+
     public static WorkOrder createWorkOrder() {
         return createWorkOrder(CustomerId.generate(), WorkOrderStatus.RECEIVED);
     }
 
     public static WorkOrder createWorkOrder(WorkOrderStatus status) {
         return createWorkOrder(CustomerId.generate(), status);
+    }
+
+    public static WorkOrder createDiagnosedWorkOrder() {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
+        workOrder.registerDiagnosis(DIAGNOSIS, UserId.generate());
+        return workOrder;
     }
 
     public static WorkOrder createWorkOrder(CustomerId customerId, WorkOrderStatus status) {
