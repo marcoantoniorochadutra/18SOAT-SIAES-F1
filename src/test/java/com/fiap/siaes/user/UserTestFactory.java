@@ -50,6 +50,7 @@ public class UserTestFactory {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 

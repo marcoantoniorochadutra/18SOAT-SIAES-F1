@@ -2,10 +2,13 @@ package com.fiap.siaes.auth.application.service;
 
 import com.fiap.siaes.auth.application.usecase.LogoutUserUseCase;
 import com.fiap.siaes.auth.domain.exception.MissingBearerTokenException;
-import com.fiap.siaes.auth.domain.security.TokenBlacklist;
+import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
+import com.fiap.siaes.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.Objects.isNull;
 
@@ -13,9 +16,11 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class LogoutUserAppService implements LogoutUserUseCase {
 
-    private final TokenBlacklist tokenBlocklist;
+    private final TokenBlocklist tokenBlocklist;
+    private final UserRepository userRepository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void execute(LogoutUserCommand command) {
         String tokenSanitizado = BearerTokenExtractor.extract(command.token());
 
@@ -24,5 +29,10 @@ public class LogoutUserAppService implements LogoutUserUseCase {
         }
 
         this.tokenBlocklist.block(tokenSanitizado);
+
+        this.userRepository.findById(command.authenticatedUser().id()).ifPresent(user -> {
+            user.endSession();
+            this.userRepository.save(user);
+        });
     }
 }

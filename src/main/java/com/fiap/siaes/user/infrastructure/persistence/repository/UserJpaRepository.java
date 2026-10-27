@@ -6,6 +6,8 @@ import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticat
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> {
 
     @Query(value = """
@@ -37,5 +39,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> 
            WHERE u.email = :email)
     """, nativeQuery = true)
     boolean existsByEmail(String email);
+
+    Optional<UserJpaEntity> findByRefreshToken(String refreshToken);
 
 }

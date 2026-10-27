@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.web;
+package com.fiap.siaes.sk.infrastructure.web;
 
 
 import lombok.AllArgsConstructor;

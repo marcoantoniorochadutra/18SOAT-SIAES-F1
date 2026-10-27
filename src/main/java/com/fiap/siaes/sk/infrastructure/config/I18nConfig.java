@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.config;
+package com.fiap.siaes.sk.infrastructure.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

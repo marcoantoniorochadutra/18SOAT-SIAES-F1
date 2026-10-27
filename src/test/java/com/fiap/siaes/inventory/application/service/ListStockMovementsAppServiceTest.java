@@ -5,6 +5,7 @@ import com.fiap.siaes.inventory.application.usecase.ListStockMovementsUseCase.Li
 import com.fiap.siaes.inventory.domain.exception.StockItemNotFoundException;
 import com.fiap.siaes.inventory.domain.repository.StockItemRepository;
 import com.fiap.siaes.inventory.domain.repository.StockMovementRepository;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
@@ -50,7 +51,7 @@ class ListStockMovementsAppServiceTest {
         var movements = List.of(
                 StockMovementResponse.from(createStockMovement()),
                 StockMovementResponse.from(createStockMovement()));
-        var page = PageResponse.from(new SliceImpl<>(movements));
+        var page = PageResponses.from(new SliceImpl<>(movements));
 
         when(this.stockMovementRepository.findAllBySuppliesId(suppliesId, pageQuery)).thenReturn(page);
 

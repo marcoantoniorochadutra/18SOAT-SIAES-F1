@@ -3,7 +3,7 @@ package com.fiap.siaes.quotation.application.service;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalLinkResponse;
 import com.fiap.siaes.quotation.application.service.helper.QuotationApprovalTokenHelper;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationApprovalLinkUseCase.GetQuotationApprovalLinkCommand;
+import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase.IssueQuotationApprovalLinkCommand;
 import com.fiap.siaes.quotation.domain.exception.QuotationNotAwaitingApprovalException;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.model.QuotationApprovalToken;
@@ -24,8 +24,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UnitTest - App Service - Get Quotation Approval Link")
-class GetQuotationApprovalLinkAppServiceTest {
+@DisplayName("UnitTest - App Service - Issue Quotation Approval Link")
+class IssueQuotationApprovalLinkAppServiceTest {
 
     @Mock
     private QuotationRepository quotationRepository;
@@ -34,7 +34,7 @@ class GetQuotationApprovalLinkAppServiceTest {
     private QuotationApprovalTokenHelper quotationApprovalTokenHelper;
 
     @InjectMocks
-    private GetQuotationApprovalLinkAppService getQuotationApprovalLinkAppService;
+    private IssueQuotationApprovalLinkAppService issueQuotationApprovalLinkAppService;
 
     @Test
     @DisplayName("Deve retornar o link do token atual do orçamento")
@@ -46,8 +46,8 @@ class GetQuotationApprovalLinkAppServiceTest {
         when(this.quotationApprovalTokenHelper.currentOrIssue(quotation.getId())).thenReturn(token);
         when(this.quotationApprovalTokenHelper.linkFor(token)).thenReturn("https://siaes.com/quotationApprovals/token");
 
-        QuotationApprovalLinkResponse response = this.getQuotationApprovalLinkAppService.execute(
-                GetQuotationApprovalLinkCommand.of(quotation.getId()));
+        QuotationApprovalLinkResponse response = this.issueQuotationApprovalLinkAppService.execute(
+                IssueQuotationApprovalLinkCommand.of(quotation.getId()));
 
         assertEquals("https://siaes.com/quotationApprovals/token", response.link());
         assertEquals(token.getExpiresAt(), response.expiresAt());
@@ -61,7 +61,7 @@ class GetQuotationApprovalLinkAppServiceTest {
         when(this.quotationRepository.findByIdOrThrowNotFound(quotation.getId())).thenReturn(quotation);
 
         assertThrows(QuotationNotAwaitingApprovalException.class,
-                     () -> this.getQuotationApprovalLinkAppService.execute(GetQuotationApprovalLinkCommand.of(quotation.getId())));
+                     () -> this.issueQuotationApprovalLinkAppService.execute(IssueQuotationApprovalLinkCommand.of(quotation.getId())));
 
         verifyNoInteractions(this.quotationApprovalTokenHelper);
     }

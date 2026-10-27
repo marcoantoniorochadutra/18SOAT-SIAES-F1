@@ -1,7 +1,5 @@
 package com.fiap.siaes.maintenance.infrastructure.persistence.adapter;
 
-import com.fiap.siaes.sk.pagination.PageQuery;
-import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.maintenance.application.dto.MaintenanceFilter;
 import com.fiap.siaes.maintenance.application.dto.MaintenanceResponse;
 import com.fiap.siaes.maintenance.application.port.MaintenanceQueryPort;
@@ -12,6 +10,9 @@ import com.fiap.siaes.maintenance.domain.repository.MaintenanceRepository;
 import com.fiap.siaes.maintenance.infrastructure.persistence.entity.MaintenanceJpaEntity;
 import com.fiap.siaes.maintenance.infrastructure.persistence.mapper.MaintenanceMapper;
 import com.fiap.siaes.maintenance.infrastructure.persistence.repository.MaintenanceJpaRepository;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -59,6 +60,6 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository, Main
                                                                                       PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(MaintenanceMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 }

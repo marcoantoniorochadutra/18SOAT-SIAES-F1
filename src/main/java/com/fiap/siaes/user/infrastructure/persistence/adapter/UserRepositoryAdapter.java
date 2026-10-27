@@ -46,4 +46,9 @@ public class UserRepositoryAdapter implements UserRepository {
     public boolean existsByEmail(String email) {
         return this.userJpaRepository.existsByEmail(email);
     }
+
+    @Override
+    public Optional<User> findByRefreshToken(String refreshTokenHash) {
+        return this.userJpaRepository.findByRefreshToken(refreshTokenHash).map(UserMapper::toDomain);
+    }
 }

@@ -12,9 +12,13 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Set;
 
+import static com.fiap.siaes.user.UserTestFactory.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UnitTest - Domain - User")
 class UserDomainTest {
@@ -97,7 +101,6 @@ class UserDomainTest {
     @DisplayName("Deve reconstruir um usuário com todos os dados persistidos, sem revalidar o vínculo com cliente")
     void shouldRecreateUserWithAllPersistedData() {
         UserId id = UserId.generate();
-        Instant lastLoginAt = Instant.now();
         Set<UserStatusHistory> statusHistory = Set.of(UserStatusHistory.of(UserStatus.INACTIVE));
 
         User user = User.recreate()
@@ -109,8 +112,6 @@ class UserDomainTest {
                 .lastStatus(UserStatus.INACTIVE)
                 .statusHistory(statusHistory)
                 .customerId(null)
-                .lastLoginAt(lastLoginAt)
-                .refreshToken("refresh-token")
                 .build();
 
         assertEquals(id, user.getId());
@@ -121,7 +122,59 @@ class UserDomainTest {
         assertEquals(UserStatus.INACTIVE, user.getLastStatus());
         assertEquals(statusHistory, user.getStatusHistory());
         assertEquals(null, user.getCustomerId());
+    }
+
+    @Test
+    @DisplayName("Deve iniciar a sessão registrando o login e o token de atualização")
+    void shouldStartSession() {
+        User user = createUser();
+        Instant expiresAt = Instant.now().plusSeconds(3600);
+
+        user.startSession("refresh-token-hash", expiresAt);
+
+        assertNotNull(user.getLastLoginAt());
+        assertEquals("refresh-token-hash", user.getRefreshToken());
+        assertEquals(expiresAt, user.getRefreshTokenExpiresAt());
+        assertTrue(user.hasValidRefreshToken(Instant.now()));
+    }
+
+    @Test
+    @DisplayName("Deve rotacionar o token de atualização sem alterar o último login")
+    void shouldRotateRefreshToken() {
+        User user = createUser();
+        user.startSession("old-hash", Instant.now().plusSeconds(60));
+        Instant lastLoginAt = user.getLastLoginAt();
+        Instant expiresAt = Instant.now().plusSeconds(3600);
+
+        user.rotateRefreshToken("new-hash", expiresAt);
+
+        assertEquals("new-hash", user.getRefreshToken());
+        assertEquals(expiresAt, user.getRefreshTokenExpiresAt());
         assertEquals(lastLoginAt, user.getLastLoginAt());
-        assertEquals("refresh-token", user.getRefreshToken());
+    }
+
+    @Test
+    @DisplayName("Deve encerrar a sessão revogando o token de atualização")
+    void shouldEndSession() {
+        User user = createUser();
+        user.startSession("refresh-token-hash", Instant.now().plusSeconds(3600));
+
+        user.endSession();
+
+        assertNull(user.getRefreshToken());
+        assertNull(user.getRefreshTokenExpiresAt());
+        assertFalse(user.hasValidRefreshToken(Instant.now()));
+    }
+
+    @Test
+    @DisplayName("Não deve considerar válido um token de atualização expirado ou ausente")
+    void shouldNotConsiderExpiredOrMissingRefreshTokenValid() {
+        User user = createUser();
+
+        assertFalse(user.hasValidRefreshToken(Instant.now()));
+
+        user.startSession("refresh-token-hash", Instant.now().minusSeconds(1));
+
+        assertFalse(user.hasValidRefreshToken(Instant.now()));
     }
 }

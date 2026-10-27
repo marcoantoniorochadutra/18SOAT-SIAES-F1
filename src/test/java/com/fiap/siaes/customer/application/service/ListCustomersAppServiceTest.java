@@ -4,6 +4,7 @@ import com.fiap.siaes.customer.application.dto.CustomerFilter;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.port.CustomerQueryPort;
 import com.fiap.siaes.customer.application.usecase.ListCustomersUseCase.ListCustomersCommand;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +45,7 @@ class ListCustomersAppServiceTest {
                 CustomerResponse.from(createCustomer()));
 
         when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(customers)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(customers)));
 
         PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(ListCustomersCommand.of(filter, pageQuery));
 
@@ -61,7 +62,7 @@ class ListCustomersAppServiceTest {
         var filter = CustomerFilter.of("inexistente", null, null, null);
         var pageQuery = PageQuery.of(null, null);
         when(this.customerQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<CustomerResponse> response = this.listCustomersAppService.execute(ListCustomersCommand.of(filter, pageQuery));
 

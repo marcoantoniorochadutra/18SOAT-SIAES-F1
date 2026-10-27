@@ -1,10 +1,10 @@
-package com.fiap.siaes.sk.infraestructure.web;
+package com.fiap.siaes.sk.infrastructure.web;
 
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
 import com.fiap.siaes.sk.document.domain.Document;
 import com.fiap.siaes.sk.document.domain.exception.InvalidDocumentException;
 import com.fiap.siaes.sk.domain.exception.InternalException;
-import com.fiap.siaes.sk.infraestructure.config.I18nConfig;
+import com.fiap.siaes.sk.infrastructure.config.I18nConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

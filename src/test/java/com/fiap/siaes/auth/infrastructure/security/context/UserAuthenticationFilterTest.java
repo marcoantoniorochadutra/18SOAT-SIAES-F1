@@ -6,7 +6,7 @@ import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
 import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
-import com.fiap.siaes.auth.domain.security.TokenBlacklist;
+import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer;
@@ -50,7 +50,7 @@ class UserAuthenticationFilterTest {
     private static final JwtProperties JWT_PROPERTIES = new JwtProperties("test-secret-key-at-least-32-bytes-long!!", 1, 1);
 
     @Mock
-    private TokenBlacklist tokenBlocklist;
+    private TokenBlocklist tokenBlocklist;
 
     @Mock
     private UserRepository userRepository;

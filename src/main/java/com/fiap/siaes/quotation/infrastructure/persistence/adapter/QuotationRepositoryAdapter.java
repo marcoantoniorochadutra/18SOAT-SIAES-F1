@@ -1,7 +1,7 @@
 package com.fiap.siaes.quotation.infrastructure.persistence.adapter;
 
-import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
+import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.port.QuotationQueryPort;
 import com.fiap.siaes.quotation.domain.model.Quotation;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationStatus;
@@ -10,6 +10,7 @@ import com.fiap.siaes.quotation.domain.repository.QuotationRepository;
 import com.fiap.siaes.quotation.infrastructure.persistence.entity.QuotationJpaEntity;
 import com.fiap.siaes.quotation.infrastructure.persistence.mapper.QuotationMapper;
 import com.fiap.siaes.quotation.infrastructure.persistence.repository.QuotationJpaRepository;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
@@ -73,6 +74,6 @@ public class QuotationRepositoryAdapter implements QuotationRepository, Quotatio
                                                                                               PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(QuotationMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 }

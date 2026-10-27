@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import static com.fiap.siaes.sk.infraestructure.config.AsyncConfig.DOMAIN_EVENT_EXECUTOR;
+import static com.fiap.siaes.sk.infrastructure.config.AsyncConfig.DOMAIN_EVENT_EXECUTOR;
 
 @Slf4j
 @Component

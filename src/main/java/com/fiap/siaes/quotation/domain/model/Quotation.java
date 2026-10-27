@@ -23,6 +23,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class Quotation extends AggregateRoot {
         this.workOrderId = workOrderId;
         this.customerId = customerId;
         this.vehicleId = vehicleId;
-        this.description = description;
+        this.description = trimToNull(description);
         this.odometer = this.validateOdometer(odometer);
         this.changeItems(supplies, maintenances);
         this.createdAt = Instant.now();
@@ -125,7 +126,7 @@ public class Quotation extends AggregateRoot {
         long validOdometer = this.validateOdometer(odometer);
 
         this.changeItems(supplies, maintenances);
-        this.description = description;
+        this.description = trimToNull(description);
         this.odometer = validOdometer;
     }
 
@@ -138,6 +139,10 @@ public class Quotation extends AggregateRoot {
     public Map<SuppliesId, Integer> getSuppliesQuantities() {
         return this.supplies.stream()
                 .collect(Collectors.toMap(QuotationSupplies::getSuppliesId, QuotationSupplies::getQuantity));
+    }
+
+    public boolean isOwnedBy(CustomerId customerId) {
+        return this.customerId.equals(customerId);
     }
 
     public boolean isDraft() {
@@ -200,5 +205,17 @@ public class Quotation extends AggregateRoot {
             this.statusHistory = new HashSet<>();
 
         this.statusHistory.add(QuotationStatusHistory.of(newStatus));
+    }
+
+    public Set<QuotationStatusHistory> getStatusHistory() {
+        return isNull(this.statusHistory) ? Set.of() : Collections.unmodifiableSet(this.statusHistory);
+    }
+
+    public List<QuotationSupplies> getSupplies() {
+        return isNull(this.supplies) ? List.of() : Collections.unmodifiableList(this.supplies);
+    }
+
+    public List<QuotationMaintenance> getMaintenances() {
+        return isNull(this.maintenances) ? List.of() : Collections.unmodifiableList(this.maintenances);
     }
 }

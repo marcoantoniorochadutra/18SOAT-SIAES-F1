@@ -1,7 +1,9 @@
 package com.fiap.siaes.auth.infrastructure.web.openapi;
 
+import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.application.usecase.AuthenticateUserUseCase.AuthenticateUserCommand;
 import com.fiap.siaes.auth.application.usecase.AuthenticateUserUseCase.AuthenticationWrapper;
+import com.fiap.siaes.auth.application.usecase.RefreshAuthenticationUseCase.RefreshAuthenticationCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,11 +19,19 @@ public interface AuthenticationControllerOpenApi {
     })
     AuthenticationWrapper login(AuthenticateUserCommand command);
 
+    @Operation(summary = "auth.refresh.summary", description = "auth.refresh.description", method = "POST",
+               responses = {
+                     @ApiResponse(responseCode = "200", description = "auth.refresh.response.success"),
+                     @ApiResponse(responseCode = "400", description = "auth.refresh.response.badrequest"),
+                     @ApiResponse(responseCode = "401", description = "auth.refresh.response.unauthorized"),
+    })
+    AuthenticationWrapper refresh(RefreshAuthenticationCommand command);
+
     @Operation(summary = "auth.logout.summary", description = "auth.logout.description", method = "POST",
                responses = {
                      @ApiResponse(responseCode = "200", description = "auth.logout.response.success"),
                      @ApiResponse(responseCode = "400", description = "auth.logout.response.badrequest"),
     })
-    void logout(String authorizationHeader);
+    void logout(String authorizationHeader, AuthenticatedUser authenticatedUser);
 
 }

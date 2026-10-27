@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.event;
+package com.fiap.siaes.sk.infrastructure.event;
 
 import com.fiap.siaes.sk.domain.event.DomainEvent;
 import com.fiap.siaes.sk.domain.event.DomainEventPublisher;

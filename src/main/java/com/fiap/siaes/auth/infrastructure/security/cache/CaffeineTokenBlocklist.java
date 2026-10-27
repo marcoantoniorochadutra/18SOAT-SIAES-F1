@@ -1,6 +1,6 @@
 package com.fiap.siaes.auth.infrastructure.security.cache;
 
-import com.fiap.siaes.auth.domain.security.TokenBlacklist;
+import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Objects.nonNull;
 
 @Component
-public class CaffeineTokenBlocklist implements TokenBlacklist {
+public class CaffeineTokenBlocklist implements TokenBlocklist {
 
     private final Cache<String, Boolean> blockedTokens;
 

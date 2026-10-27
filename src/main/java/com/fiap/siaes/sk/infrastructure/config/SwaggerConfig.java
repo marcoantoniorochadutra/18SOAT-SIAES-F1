@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.config;
+package com.fiap.siaes.sk.infrastructure.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;

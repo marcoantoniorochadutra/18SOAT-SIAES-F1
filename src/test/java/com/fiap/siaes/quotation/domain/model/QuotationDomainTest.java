@@ -30,11 +30,35 @@ import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UnitTest - Domain - Quotation")
 class QuotationDomainTest {
+
+    @Test
+    @DisplayName("Deve remover espaços da descrição do orçamento e tratar descrição em branco como ausente")
+    void shouldNormalizeQuotationDescription() {
+        Quotation quotation = this.quotationBuilder().description("  Revisão  ")
+                .supplies(List.of(createQuotationSupplies(SuppliesId.generate(), 1)))
+                .build();
+        Quotation blank = this.quotationBuilder().description("   ")
+                .supplies(List.of(createQuotationSupplies(SuppliesId.generate(), 1)))
+                .build();
+
+        assertEquals("Revisão", quotation.getDescription());
+        assertNull(blank.getDescription());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir alterar os itens do orçamento por fora do agregado")
+    void shouldNotAllowExternalChangesToItems() {
+        Quotation quotation = createQuotation(CustomerId.generate(), QuotationStatus.DRAFT);
+        var supplies = quotation.getSupplies();
+
+        assertThrows(UnsupportedOperationException.class, supplies::clear);
+    }
 
     @Test
     @DisplayName("Deve criar um orçamento em rascunho com histórico de status e sem eventos")

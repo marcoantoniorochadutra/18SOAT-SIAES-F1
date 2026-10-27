@@ -85,7 +85,7 @@ public interface QuotationControllerOpenApi {
                      @ApiResponse(responseCode = "404", description = "quotation.response.notfound"),
                      @ApiResponse(responseCode = "409", description = "quotation.decision.response.conflict"),
     })
-    QuotationApprovalLinkResponse getApprovalLink(QuotationId id);
+    QuotationApprovalLinkResponse issueApprovalLink(QuotationId id);
 
     @Operation(summary = "quotation.decide.summary", description = "quotation.decide.description", method = "PATCH",
                responses = {

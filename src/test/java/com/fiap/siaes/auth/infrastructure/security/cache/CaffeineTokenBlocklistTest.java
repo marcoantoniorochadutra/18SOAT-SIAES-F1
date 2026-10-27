@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UnitTest - Infrastructure - Caffeine Token Blocklist")
-class CaffeineTokenBlacklistTest {
+class CaffeineTokenBlocklistTest {
 
     private static final String TOKEN = "access-token";
 

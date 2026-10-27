@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.persistence;
+package com.fiap.siaes.sk.infrastructure.persistence;
 
 import com.fiap.siaes.sk.domain.UUIDWrapper;
 import org.hibernate.type.descriptor.WrapperOptions;

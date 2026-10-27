@@ -14,22 +14,18 @@ public final class Sku {
     private final String value;
 
     private Sku(String value) {
+        this.value = value;
+    }
+
+    public static Sku create(String value) {
         if (isBlank(value)) {
             throw new SkuValueIsNullException();
         }
 
-        this.value = this.sanitize(value);
-    }
-
-    public static Sku create(String value) {
-        return new Sku(value);
+        return new Sku(value.trim().toUpperCase());
     }
 
     public static Sku recreate(String value) {
         return new Sku(value);
-    }
-
-    private String sanitize(String value) {
-        return value.trim().toUpperCase();
     }
 }

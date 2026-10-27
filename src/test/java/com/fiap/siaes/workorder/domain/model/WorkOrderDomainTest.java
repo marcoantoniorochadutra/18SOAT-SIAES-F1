@@ -44,6 +44,15 @@ class WorkOrderDomainTest {
     }
 
     @Test
+    @DisplayName("Não deve permitir alterar o histórico de status por fora do agregado")
+    void shouldNotAllowExternalChangesToStatusHistory() {
+        WorkOrder workOrder = createWorkOrder(WorkOrderStatus.RECEIVED);
+        var history = workOrder.getStatusHistory();
+
+        assertThrows(UnsupportedOperationException.class, history::clear);
+    }
+
+    @Test
     @DisplayName("Deve iniciar o diagnóstico da ordem de serviço recebida e registrar no histórico")
     void shouldStartDiagnosis() {
         WorkOrder workOrder = createWorkOrder(WorkOrderStatus.RECEIVED);

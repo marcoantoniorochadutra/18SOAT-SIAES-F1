@@ -1,6 +1,6 @@
 package com.fiap.siaes.auth.domain.security;
 
-public interface TokenBlacklist {
+public interface TokenBlocklist {
 
     void block(String token);
 

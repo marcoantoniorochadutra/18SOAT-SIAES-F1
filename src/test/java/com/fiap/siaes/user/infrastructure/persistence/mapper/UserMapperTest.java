@@ -36,8 +36,6 @@ class UserMapperTest {
                 .lastStatus(UserStatus.ACTIVE)
                 .statusHistory(Set.of(statusHistory))
                 .customerId(CustomerId.generate())
-                .lastLoginAt(Instant.now())
-                .refreshToken("refresh-token")
                 .build();
 
         UserJpaEntity actualEntity = UserMapper.toEntity(user);
@@ -49,8 +47,6 @@ class UserMapperTest {
         assertEquals(user.getRole(), actualEntity.getRole());
         assertEquals(user.getLastStatus(), actualEntity.getLastStatus());
         assertEquals(user.getCustomerId(), actualEntity.getCustomerId());
-        assertEquals(user.getLastLoginAt(), actualEntity.getLastLoginAt());
-        assertEquals(user.getRefreshToken(), actualEntity.getRefreshToken());
         assertEquals(1, actualEntity.getStatusHistory().size());
         UserStatusHistoryJpaEntity historyEntity = actualEntity.getStatusHistory().iterator().next();
         assertEquals(statusHistory.getId(), historyEntity.getId());
@@ -73,7 +69,8 @@ class UserMapperTest {
                 Set.of(historyEntity),
                 CustomerId.generate(),
                 Instant.now(),
-                "refresh-token");
+                "refresh-token-hash",
+                Instant.now().plusSeconds(3600));
 
         User actualUser = UserMapper.toDomain(entity);
 
@@ -86,6 +83,7 @@ class UserMapperTest {
         assertEquals(entity.getCustomerId(), actualUser.getCustomerId());
         assertEquals(entity.getLastLoginAt(), actualUser.getLastLoginAt());
         assertEquals(entity.getRefreshToken(), actualUser.getRefreshToken());
+        assertEquals(entity.getRefreshTokenExpiresAt(), actualUser.getRefreshTokenExpiresAt());
         assertEquals(1, actualUser.getStatusHistory().size());
         UserStatusHistory history = actualUser.getStatusHistory().iterator().next();
         assertEquals(historyEntity.getId(), history.getId());
@@ -114,7 +112,7 @@ class UserMapperTest {
     void shouldMapToEmptyHistoryWhenEntityHistoryIsNull() {
         var entity = new UserJpaEntity(
                 UserId.generate(), "Maria Silva", "maria@email.com", "hashed-password",
-                UserRole.MANAGER, UserStatus.ACTIVE, null, null, null, null);
+                UserRole.MANAGER, UserStatus.ACTIVE, null, null, null, null, null);
 
         User actualUser = UserMapper.toDomain(entity);
 

@@ -1,9 +1,9 @@
 package com.fiap.siaes.user.infrastructure.persistence.entity;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
-import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.enums.UserStatus;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,10 +35,10 @@ public class UserJpaEntity {
     private String email;
     private String password;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UserStatus lastStatus;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -46,6 +46,8 @@ public class UserJpaEntity {
     private Set<UserStatusHistoryJpaEntity> statusHistory;
 
     private CustomerId customerId;
+
     private Instant lastLoginAt;
     private String refreshToken;
+    private Instant refreshTokenExpiresAt;
 }

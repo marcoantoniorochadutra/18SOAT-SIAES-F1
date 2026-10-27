@@ -2,25 +2,25 @@ package com.fiap.siaes.quotation.infrastructure.web;
 
 import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
-import com.fiap.siaes.quotation.application.dto.QuotationApprovalLinkResponse;
 import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
-import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase.CreateQuotationCommand;
-import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase.QuotationSuppliesItemCommand;
+import com.fiap.siaes.quotation.application.dto.QuotationApprovalLinkResponse;
 import com.fiap.siaes.quotation.application.usecase.CompleteQuotationUseCase;
 import com.fiap.siaes.quotation.application.usecase.CompleteQuotationUseCase.CompleteQuotationCommand;
 import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase;
+import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase.CreateQuotationCommand;
+import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase.QuotationSuppliesItemCommand;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByCustomerUseCase;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByCustomerUseCase.DecideQuotationByCustomerCommand;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationApprovalLinkUseCase;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationApprovalLinkUseCase.GetQuotationApprovalLinkCommand;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase.GetQuotationByIdCommand;
 import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase;
+import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase.GetQuotationByIdCommand;
+import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase;
+import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase.IssueQuotationApprovalLinkCommand;
 import com.fiap.siaes.quotation.application.usecase.ListQuotationsUseCase;
-import com.fiap.siaes.quotation.application.usecase.UpdateQuotationUseCase.UpdateQuotationCommand;
 import com.fiap.siaes.quotation.application.usecase.UpdateQuotationUseCase;
+import com.fiap.siaes.quotation.application.usecase.UpdateQuotationUseCase.UpdateQuotationCommand;
 import com.fiap.siaes.quotation.domain.exception.QuotationAlreadyOpenException;
-import com.fiap.siaes.quotation.domain.exception.QuotationNotEditableException;
 import com.fiap.siaes.quotation.domain.exception.QuotationNotAwaitingApprovalException;
+import com.fiap.siaes.quotation.domain.exception.QuotationNotEditableException;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationDecision;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationStatus;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
@@ -41,11 +41,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.quotation.QuotationTestFactory.DESCRIPTION;
 import static com.fiap.siaes.quotation.QuotationTestFactory.ODOMETER;
 import static com.fiap.siaes.quotation.QuotationTestFactory.createQuotation;
 import static com.fiap.siaes.quotation.application.dto.QuotationResponse.from;
-import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.vehicle.VehicleTestFactory.PLATE;
 import static com.fiap.siaes.vehicle.VehicleTestFactory.createVehicle;
 import static org.hamcrest.Matchers.containsString;
@@ -79,7 +79,7 @@ class QuotationControllerTest extends ControllerTestUtils {
     private ListQuotationsUseCase listQuotationsUseCase;
 
     @MockitoBean
-    private GetQuotationApprovalLinkUseCase getQuotationApprovalLinkUseCase;
+    private IssueQuotationApprovalLinkUseCase issueQuotationApprovalLinkUseCase;
 
     @MockitoBean
     private DecideQuotationByCustomerUseCase decideQuotationByCustomerUseCase;
@@ -187,7 +187,7 @@ class QuotationControllerTest extends ControllerTestUtils {
         var id = QuotationId.generate();
         var response = QuotationApprovalLinkResponse.of("https://siaes.com/quotationApprovals/token", Instant.now());
 
-        when(this.getQuotationApprovalLinkUseCase.execute(GetQuotationApprovalLinkCommand.of(id))).thenReturn(response);
+        when(this.issueQuotationApprovalLinkUseCase.execute(IssueQuotationApprovalLinkCommand.of(id))).thenReturn(response);
 
         super.executePostAuthenticated(QuotationController.ENDPOINT + "/" + id + "/approvalLink", null)
                 .andExpect(status().isOk())
@@ -199,7 +199,7 @@ class QuotationControllerTest extends ControllerTestUtils {
     void shouldNotGetApprovalLinkWhenQuotationAlreadyDecided() throws Exception {
         var id = QuotationId.generate();
 
-        when(this.getQuotationApprovalLinkUseCase.execute(GetQuotationApprovalLinkCommand.of(id)))
+        when(this.issueQuotationApprovalLinkUseCase.execute(IssueQuotationApprovalLinkCommand.of(id)))
                 .thenThrow(new QuotationNotAwaitingApprovalException(id.toString(), "APPROVED"));
 
         super.executePostAuthenticated(QuotationController.ENDPOINT + "/" + id + "/approvalLink", null)

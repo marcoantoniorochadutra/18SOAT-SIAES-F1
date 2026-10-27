@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,5 +104,9 @@ public class WorkOrder extends AggregateRoot {
             this.statusHistory = new HashSet<>();
 
         this.statusHistory.add(WorkOrderStatusHistory.of(newStatus));
+    }
+
+    public Set<WorkOrderStatusHistory> getStatusHistory() {
+        return isNull(this.statusHistory) ? Set.of() : Collections.unmodifiableSet(this.statusHistory);
     }
 }

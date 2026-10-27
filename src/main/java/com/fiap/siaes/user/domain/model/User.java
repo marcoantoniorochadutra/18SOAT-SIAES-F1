@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,8 +30,10 @@ public class User {
     private Set<UserStatusHistory> statusHistory;
 
     private CustomerId customerId;
+
     private Instant lastLoginAt;
     private String refreshToken;
+    private Instant refreshTokenExpiresAt;
 
     @Builder
     public User(UserId id, String name, String email, Password password, UserRole role, CustomerId customerId) {
@@ -54,7 +57,8 @@ public class User {
 
     @Builder(builderMethodName = "recreate", builderClassName = "RecreateBuilder")
     public User(UserId id, String name, String email, Password password, UserRole role, UserStatus lastStatus,
-                Set<UserStatusHistory> statusHistory, CustomerId customerId, Instant lastLoginAt, String refreshToken) {
+                Set<UserStatusHistory> statusHistory, CustomerId customerId, Instant lastLoginAt,
+                String refreshToken, Instant refreshTokenExpiresAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -65,6 +69,26 @@ public class User {
         this.customerId = customerId;
         this.lastLoginAt = lastLoginAt;
         this.refreshToken = refreshToken;
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+    }
+
+    public void startSession(String refreshTokenHash, Instant refreshTokenExpiresAt) {
+        this.lastLoginAt = Instant.now();
+        this.rotateRefreshToken(refreshTokenHash, refreshTokenExpiresAt);
+    }
+
+    public void rotateRefreshToken(String refreshTokenHash, Instant refreshTokenExpiresAt) {
+        this.refreshToken = refreshTokenHash;
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+    }
+
+    public void endSession() {
+        this.refreshToken = null;
+        this.refreshTokenExpiresAt = null;
+    }
+
+    public boolean hasValidRefreshToken(Instant now) {
+        return nonNull(this.refreshToken) && nonNull(this.refreshTokenExpiresAt) && this.refreshTokenExpiresAt.isAfter(now);
     }
 
     private void updateStatus(UserStatus newStatus) {
@@ -78,5 +102,9 @@ public class User {
             this.statusHistory = new HashSet<>();
 
         this.statusHistory.add(UserStatusHistory.of(newStatus));
+    }
+
+    public Set<UserStatusHistory> getStatusHistory() {
+        return isNull(this.statusHistory) ? Set.of() : Collections.unmodifiableSet(this.statusHistory);
     }
 }

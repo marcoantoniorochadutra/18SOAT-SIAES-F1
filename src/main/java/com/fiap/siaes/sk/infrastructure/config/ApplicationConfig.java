@@ -1,4 +1,4 @@
-package com.fiap.siaes.sk.infraestructure.config;
+package com.fiap.siaes.sk.infrastructure.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

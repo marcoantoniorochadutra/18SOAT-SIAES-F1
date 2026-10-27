@@ -5,15 +5,9 @@ import com.fiap.siaes.user.domain.model.vo.UserId;
 
 public interface TokenIssuer {
 
-    String USER_DATA_CLAIM = "userData";
-
     String issueAccessToken(UserId userId, UserRole role);
 
-    String issueRefreshToken(UserId userId);
+    RefreshToken issueRefreshToken();
 
-    record UserClaim(UserId userId, UserRole role) {
-        public static UserClaim of(UserId userId, UserRole role) {
-            return new UserClaim(userId, role);
-        }
-    }
+    String hashRefreshToken(String value);
 }

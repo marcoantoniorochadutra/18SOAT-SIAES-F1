@@ -55,6 +55,10 @@ public class Vehicle {
         this.year = year;
     }
 
+    public boolean isOwnedBy(CustomerId customerId) {
+        return this.customerId.equals(customerId);
+    }
+
     private void validateVehicleYear(int year) {
         if (year > Year.now(ZoneId.systemDefault()).getValue() + 1) {
             throw new InvalidVehicleYearException(year);

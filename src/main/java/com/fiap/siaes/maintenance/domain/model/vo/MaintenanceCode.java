@@ -14,22 +14,18 @@ public final class MaintenanceCode {
     private final String value;
 
     private MaintenanceCode(String value) {
+        this.value = value;
+    }
+
+    public static MaintenanceCode create(String value) {
         if (isBlank(value)) {
             throw new MaintenanceCodeValueIsNullException();
         }
 
-        this.value = this.sanitize(value);
-    }
-
-    public static MaintenanceCode create(String value) {
-        return new MaintenanceCode(value);
+        return new MaintenanceCode(value.trim().toUpperCase());
     }
 
     public static MaintenanceCode recreate(String value) {
         return new MaintenanceCode(value);
-    }
-
-    private String sanitize(String value) {
-        return value.trim().toUpperCase();
     }
 }

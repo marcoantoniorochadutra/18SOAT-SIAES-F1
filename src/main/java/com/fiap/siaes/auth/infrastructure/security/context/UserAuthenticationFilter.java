@@ -6,11 +6,11 @@ import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
 import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
-import com.fiap.siaes.auth.domain.security.TokenBlacklist;
-import com.fiap.siaes.auth.domain.security.TokenIssuer.UserClaim;
+import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
 import com.fiap.siaes.auth.infrastructure.security.authorization.BearerTokenExtractor;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
+import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer.UserClaim;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.sk.domain.exception.DomainException;
 import com.fiap.siaes.user.domain.model.vo.UserId;
@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-import static com.fiap.siaes.auth.domain.security.TokenIssuer.USER_DATA_CLAIM;
+import static com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer.USER_DATA_CLAIM;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -48,7 +48,7 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class UserAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenBlacklist tokenBlocklist;
+    private final TokenBlocklist tokenBlocklist;
     private final ObjectMapper objectMapper;
     private final JwtProperties jwtProperties;
     private final UserRepository userRepository;

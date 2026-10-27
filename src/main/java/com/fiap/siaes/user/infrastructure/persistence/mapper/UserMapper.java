@@ -31,6 +31,7 @@ public class UserMapper {
                 .customerId(user.getCustomerId())
                 .lastLoginAt(user.getLastLoginAt())
                 .refreshToken(user.getRefreshToken())
+                .refreshTokenExpiresAt(user.getRefreshTokenExpiresAt())
                 .build();
     }
 
@@ -49,6 +50,7 @@ public class UserMapper {
                 .customerId(entity.getCustomerId())
                 .lastLoginAt(entity.getLastLoginAt())
                 .refreshToken(entity.getRefreshToken())
+                .refreshTokenExpiresAt(entity.getRefreshTokenExpiresAt())
                 .build();
     }
 

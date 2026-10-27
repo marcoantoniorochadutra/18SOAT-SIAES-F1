@@ -7,6 +7,7 @@ import com.fiap.siaes.inventory.domain.repository.StockMovementRepository;
 import com.fiap.siaes.inventory.infrastructure.persistence.entity.StockMovementJpaEntity;
 import com.fiap.siaes.inventory.infrastructure.persistence.mapper.StockMovementMapper;
 import com.fiap.siaes.inventory.infrastructure.persistence.repository.StockMovementJpaRepository;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
@@ -47,6 +48,6 @@ public class StockMovementRepositoryAdapter implements StockMovementRepository {
                 .map(StockMovementMapper::toDomain)
                 .map(StockMovementResponse::from);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 }

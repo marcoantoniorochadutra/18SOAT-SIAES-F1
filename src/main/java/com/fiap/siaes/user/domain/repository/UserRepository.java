@@ -6,6 +6,8 @@ import com.fiap.siaes.user.domain.model.User;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 
+import java.util.Optional;
+
 import static java.util.Objects.isNull;
 
 public interface UserRepository extends RepositoryBase<User, UserId> {
@@ -24,4 +26,6 @@ public interface UserRepository extends RepositoryBase<User, UserId> {
     UserAuthenticationProjection findUserAuthById(UserId userId);
 
     boolean existsByEmail(String email);
+
+    Optional<User> findByRefreshToken(String refreshTokenHash);
 }

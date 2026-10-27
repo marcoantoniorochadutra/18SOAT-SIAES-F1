@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.fiap.siaes.user.UserTestFactory.createUserJpaEntity;
 import static com.fiap.siaes.utils.TestUtils.captureSave;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -121,5 +122,15 @@ class UserRepositoryAdapterTest {
         when(this.userJpaRepository.existsByEmail("inexistente@email.com")).thenReturn(false);
 
         assertFalse(this.userRepositoryAdapter.existsByEmail("inexistente@email.com"));
+    }
+
+    @Test
+    @DisplayName("Deve buscar o usuário pelo hash do token de atualização")
+    void shouldFindByRefreshToken() {
+        UserJpaEntity entity = createUserJpaEntity();
+
+        when(this.userJpaRepository.findByRefreshToken("refresh-token-hash")).thenReturn(Optional.of(entity));
+
+        assertEquals(entity.getId(), this.userRepositoryAdapter.findByRefreshToken("refresh-token-hash").orElseThrow().getId());
     }
 }
