@@ -1,10 +1,11 @@
 package com.fiap.siaes.user.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.User;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
 import com.fiap.siaes.user.infrastructure.persistence.mapper.UserMapper;
-import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import com.fiap.siaes.user.infrastructure.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -33,17 +34,28 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public UserAuthenticationProjection findByEmail(String email) {
-        return this.userJpaRepository.findByEmail(email);
+    public Optional<UserCredentials> findCredentialsByEmail(String email) {
+        return this.userJpaRepository.findUserAuthByEmail(email).map(UserMapper::toCredentials);
     }
 
     @Override
-    public UserAuthenticationProjection findUserAuthById(UserId userId) {
-        return this.userJpaRepository.findUserAuthById(userId);
+    public Optional<UserCredentials> findCredentialsById(UserId userId) {
+        return this.userJpaRepository.findUserAuthById(userId).map(UserMapper::toCredentials);
     }
 
     @Override
     public boolean existsByEmail(String email) {
         return this.userJpaRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findByRefreshToken(String refreshTokenHash) {
+        return this.userJpaRepository.findByRefreshToken(refreshTokenHash).map(UserMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAllByCustomerId(CustomerId customerId) {
+        this.userJpaRepository.deleteAllByCustomerId(customerId);
     }
 }

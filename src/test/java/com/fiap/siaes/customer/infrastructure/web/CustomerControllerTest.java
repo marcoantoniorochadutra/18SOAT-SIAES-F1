@@ -3,6 +3,7 @@ package com.fiap.siaes.customer.infrastructure.web;
 import com.fiap.siaes.customer.application.dto.CustomerResponse;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.CreateCustomerUseCase.CreateCustomerCommand;
+import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase.DeleteCustomerCommand;
 import com.fiap.siaes.customer.application.usecase.DeleteCustomerUseCase;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase;
 import com.fiap.siaes.customer.application.usecase.GetCustomerByIdUseCase.GetCustomerByIdCommand;
@@ -238,23 +239,26 @@ class CustomerControllerTest extends ControllerTestUtils {
     @DisplayName("[204] Deve remover cliente com sucesso")
     void shouldDeleteCustomer() throws Exception {
         var id = CustomerId.generate();
+        this.authenticateAs(AUTHENTICATED_USER_ADMIN);
 
         this.executeDelete(CustomerController.ENDPOINT + "/" + id)
                 .andExpect(status().isNoContent());
 
-        verify(this.deleteCustomerUseCase).execute(id);
+        verify(this.deleteCustomerUseCase).execute(DeleteCustomerCommand.of(id, AUTHENTICATED_USER_ADMIN));
     }
 
     @Test
     @DisplayName("[404] Não deve remover cliente inexistente")
     void shouldNotDeleteNonExistentCustomer() throws Exception {
         var id = CustomerId.generate();
+        var command = DeleteCustomerCommand.of(id, AUTHENTICATED_USER_ADMIN);
+        this.authenticateAs(AUTHENTICATED_USER_ADMIN);
 
-        doThrow(new CustomerNotFoundException(id.toString())).when(this.deleteCustomerUseCase).execute(id);
+        doThrow(new CustomerNotFoundException(id.toString())).when(this.deleteCustomerUseCase).execute(command);
 
         this.executeDelete(CustomerController.ENDPOINT + "/" + id)
                 .andExpect(status().isNotFound());
 
-        verify(this.deleteCustomerUseCase).execute(id);
+        verify(this.deleteCustomerUseCase).execute(command);
     }
 }

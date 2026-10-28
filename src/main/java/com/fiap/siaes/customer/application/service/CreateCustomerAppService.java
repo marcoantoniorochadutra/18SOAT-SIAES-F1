@@ -18,7 +18,7 @@ public class CreateCustomerAppService implements CreateCustomerUseCase {
     private final CustomerRepository customerRepository;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public CustomerId execute(CreateCustomerCommand command) {
         Customer customer = this.createCustomer(command);
 

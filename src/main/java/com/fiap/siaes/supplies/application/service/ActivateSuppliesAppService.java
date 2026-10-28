@@ -16,7 +16,7 @@ public class ActivateSuppliesAppService implements ActivateSuppliesUseCase {
     private final SuppliesRepository suppliesRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void execute(SuppliesId id) {
         Supplies supplies = this.suppliesRepository.findByIdOrThrowNotFound(id);
 

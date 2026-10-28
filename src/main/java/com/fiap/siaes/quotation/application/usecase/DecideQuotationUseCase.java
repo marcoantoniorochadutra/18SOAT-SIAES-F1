@@ -1,5 +1,6 @@
 package com.fiap.siaes.quotation.application.usecase;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationDecision;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationDecisionChannel;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
@@ -11,7 +12,7 @@ public interface DecideQuotationUseCase {
     void execute(DecideQuotationCommand command);
 
     @Builder
-    record DecideQuotationCommand(QuotationId quotationId, QuotationDecision decision, String reason,
+    record DecideQuotationCommand(QuotationId quotationId, CustomerId ownerId, QuotationDecision decision, String reason,
                                   QuotationDecisionChannel channel, UserId decidedBy, String decidedByName) {
     }
 }

@@ -10,9 +10,9 @@ public interface UserAuthenticationProjection {
     UUID getCustomerId();
     String getPassword();
     String getEmail();
-    Integer getRole();
+    String getRole();
 
     default UserRole getUserRole() {
-        return UserRole.fromOrdinal(this.getRole());
+        return UserRole.valueOf(this.getRole());
     }
 }

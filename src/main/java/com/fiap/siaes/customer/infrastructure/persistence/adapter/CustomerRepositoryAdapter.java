@@ -10,6 +10,7 @@ import com.fiap.siaes.customer.infrastructure.persistence.entity.CustomerJpa;
 import com.fiap.siaes.customer.infrastructure.persistence.mapper.CustomerMapper;
 import com.fiap.siaes.customer.infrastructure.persistence.repository.CustomerJpaRepository;
 import com.fiap.siaes.sk.document.domain.Document;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class CustomerRepositoryAdapter implements CustomerRepository, CustomerQu
                                                                                       PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(CustomerMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 
     @Override
@@ -63,8 +64,8 @@ public class CustomerRepositoryAdapter implements CustomerRepository, CustomerQu
     }
 
     @Override
-    public boolean existsByDocumentAndIdNot(String document, CustomerId id) {
-        return this.customerJpaRepository.existsByDocumentAndIdNot(document, id);
+    public boolean existsByDocumentAndIdNot(Document document, CustomerId id) {
+        return this.customerJpaRepository.existsByDocumentAndIdNot(document.getValue(), id);
     }
 
     @Override

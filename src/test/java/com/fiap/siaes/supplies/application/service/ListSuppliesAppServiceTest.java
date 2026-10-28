@@ -1,5 +1,6 @@
 package com.fiap.siaes.supplies.application.service;
 
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.supplies.application.dto.SuppliesFilter;
@@ -46,7 +47,7 @@ class ListSuppliesAppServiceTest {
                 SuppliesResponse.from(createSupplies()));
 
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(supplies)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(supplies)));
 
         PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 
@@ -67,7 +68,7 @@ class ListSuppliesAppServiceTest {
         var supplies = List.of(SuppliesResponse.from(createSupplies(false)));
 
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(supplies)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(supplies)));
 
         PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 
@@ -82,7 +83,7 @@ class ListSuppliesAppServiceTest {
         var pageQuery = PageQuery.of(null, null);
 
         when(this.suppliesQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<SuppliesResponse> response = this.listSuppliesAppService.execute(ListSuppliesCommand.of(filter, pageQuery));
 

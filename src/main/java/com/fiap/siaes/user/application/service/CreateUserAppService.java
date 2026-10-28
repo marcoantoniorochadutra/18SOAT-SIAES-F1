@@ -30,7 +30,7 @@ public class CreateUserAppService implements CreateUserUseCase {
     private final PasswordHasher passwordHasher;
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public UserId execute(CreateUserCommand command) {
         UserContact contact = this.resolveContact(command);
         this.validateCommand(command, contact);
@@ -43,6 +43,7 @@ public class CreateUserAppService implements CreateUserUseCase {
     }
 
     private void validateCommand(CreateUserCommand command, UserContact contact) {
+        Password.validatePolicy(command.password());
         this.validateRoleIsAssignable(command.authenticatedUser(), command.role());
         this.validateEmailUniqueness(contact.email());
     }
@@ -84,7 +85,7 @@ public class CreateUserAppService implements CreateUserUseCase {
         return User.builder()
                 .name(contact.name())
                 .email(contact.email())
-                .password(Password.create(command.password(), this.passwordHasher))
+                .password(Password.fromHash(this.passwordHasher.hash(command.password())))
                 .role(command.role())
                 .customerId(command.customerId())
                 .build();

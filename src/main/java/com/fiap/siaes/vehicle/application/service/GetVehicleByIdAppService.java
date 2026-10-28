@@ -33,7 +33,7 @@ public class GetVehicleByIdAppService implements GetVehicleByIdUseCase {
         Vehicle vehicle = this.vehicleRepository.findByIdOrThrowNotFound(command.id());
 
         AuthenticatedUser authenticatedUser = command.authenticatedUser();
-        if (authenticatedUser.isCustomer() && authenticatedUser.isDifferentCustomer(vehicle.getCustomerId())) {
+        if (authenticatedUser.isCustomer() && !vehicle.isOwnedBy(authenticatedUser.customerId())) {
             throw new VehicleNotFoundException(command.id().toString());
         }
 

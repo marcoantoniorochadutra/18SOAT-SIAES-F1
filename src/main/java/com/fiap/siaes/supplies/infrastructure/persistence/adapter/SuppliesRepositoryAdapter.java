@@ -1,5 +1,6 @@
 package com.fiap.siaes.supplies.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.supplies.application.dto.SuppliesFilter;
@@ -59,6 +60,6 @@ public class SuppliesRepositoryAdapter implements SuppliesRepository, SuppliesQu
                                                                                       PageRequest.of(pageQuery.page(), pageQuery.size()))
                 .map(SuppliesMapper::toResponse);
 
-        return PageResponse.from(results);
+        return PageResponses.from(results);
     }
 }

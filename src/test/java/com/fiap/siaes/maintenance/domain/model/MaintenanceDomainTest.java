@@ -3,12 +3,16 @@ package com.fiap.siaes.maintenance.domain.model;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceAlreadyActiveException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceAlreadyInactiveException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceCodeValueIsNullException;
+import com.fiap.siaes.maintenance.domain.exception.MaintenanceDescriptionRequiredException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenanceEstimatedDurationInvalidException;
 import com.fiap.siaes.maintenance.domain.exception.MaintenancePriceInvalidException;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceCode;
 import com.fiap.siaes.maintenance.domain.model.vo.MaintenanceId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 
@@ -49,8 +53,8 @@ class MaintenanceDomainTest {
     @Test
     @DisplayName("Deve gerar um id diferente para cada novo serviço")
     void shouldGenerateDifferentIdForEachNewMaintenance() {
-        Maintenance first = Maintenance.builder().code(CODE).price(PRICE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES).build();
-        Maintenance second = Maintenance.builder().code(CODE).price(PRICE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES).build();
+        Maintenance first = Maintenance.builder().code(CODE).description(DESCRIPTION).price(PRICE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES).build();
+        Maintenance second = Maintenance.builder().code(CODE).description(DESCRIPTION).price(PRICE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES).build();
 
         assertNotEquals(first.getId(), second.getId());
     }
@@ -63,10 +67,29 @@ class MaintenanceDomainTest {
         assertThrows(MaintenanceCodeValueIsNullException.class, builder::build);
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "\t"})
+    @DisplayName("Não deve criar serviço sem descrição")
+    void shouldNotCreateMaintenanceWithoutDescription(String description) {
+        var builder = Maintenance.builder().code(CODE).description(description).price(PRICE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
+
+        assertThrows(MaintenanceDescriptionRequiredException.class, builder::build);
+    }
+
+    @Test
+    @DisplayName("Deve remover os espaços das extremidades da descrição do serviço")
+    void shouldTrimMaintenanceDescription() {
+        Maintenance maintenance = Maintenance.builder().code(CODE).description("  " + DESCRIPTION + "  ").price(PRICE)
+                .estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES).build();
+
+        assertEquals(DESCRIPTION, maintenance.getDescription());
+    }
+
     @Test
     @DisplayName("Não deve criar serviço sem preço")
     void shouldNotCreateMaintenanceWithoutPrice() {
-        var builder = Maintenance.builder().code(CODE).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
+        var builder = Maintenance.builder().code(CODE).description(DESCRIPTION).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
 
         assertThrows(MaintenancePriceInvalidException.class, builder::build);
     }
@@ -74,7 +97,7 @@ class MaintenanceDomainTest {
     @Test
     @DisplayName("Não deve criar serviço com preço negativo")
     void shouldNotCreateMaintenanceWithNegativePrice() {
-        var builder = Maintenance.builder().code(CODE).price(new BigDecimal("-0.01")).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
+        var builder = Maintenance.builder().code(CODE).description(DESCRIPTION).price(new BigDecimal("-0.01")).estimatedDurationMinutes(ESTIMATED_DURATION_MINUTES);
 
         assertThrows(MaintenancePriceInvalidException.class, builder::build);
     }
@@ -82,8 +105,8 @@ class MaintenanceDomainTest {
     @Test
     @DisplayName("Não deve criar serviço com duração estimada zerada ou negativa")
     void shouldNotCreateMaintenanceWithInvalidEstimatedDuration() {
-        var zero = Maintenance.builder().code(CODE).price(PRICE).estimatedDurationMinutes(0);
-        var negative = Maintenance.builder().code(CODE).price(PRICE).estimatedDurationMinutes(-10);
+        var zero = Maintenance.builder().code(CODE).description(DESCRIPTION).price(PRICE).estimatedDurationMinutes(0);
+        var negative = Maintenance.builder().code(CODE).description(DESCRIPTION).price(PRICE).estimatedDurationMinutes(-10);
 
         assertThrows(MaintenanceEstimatedDurationInvalidException.class, zero::build);
         assertThrows(MaintenanceEstimatedDurationInvalidException.class, negative::build);

@@ -1,10 +1,14 @@
 package com.fiap.siaes.user.infrastructure.persistence.mapper;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.vo.Password;
 import com.fiap.siaes.user.domain.model.User;
 import com.fiap.siaes.user.domain.model.UserStatusHistory;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserStatusHistoryJpaEntity;
+import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import lombok.experimental.UtilityClass;
 
 import java.util.HashSet;
@@ -31,6 +35,7 @@ public class UserMapper {
                 .customerId(user.getCustomerId())
                 .lastLoginAt(user.getLastLoginAt())
                 .refreshToken(user.getRefreshToken())
+                .refreshTokenExpiresAt(user.getRefreshTokenExpiresAt())
                 .build();
     }
 
@@ -42,13 +47,14 @@ public class UserMapper {
                 .id(entity.getId())
                 .name(entity.getName())
                 .email(entity.getEmail())
-                .password(Password.recreate(entity.getPassword()))
+                .password(Password.fromHash(entity.getPassword()))
                 .role(entity.getRole())
                 .lastStatus(entity.getLastStatus())
                 .statusHistory(toHistoryDomain(entity.getStatusHistory()))
                 .customerId(entity.getCustomerId())
                 .lastLoginAt(entity.getLastLoginAt())
                 .refreshToken(entity.getRefreshToken())
+                .refreshTokenExpiresAt(entity.getRefreshTokenExpiresAt())
                 .build();
     }
 
@@ -68,5 +74,15 @@ public class UserMapper {
         return statusHistory.stream()
                 .map(history -> new UserStatusHistory(history.getId(), history.getStatus(), history.getUpdatedAt(), null))
                 .collect(Collectors.toSet());
+    }
+
+    public static UserCredentials toCredentials(UserAuthenticationProjection projection) {
+        return UserCredentials.builder()
+                .id(UserId.from(projection.getId()))
+                .customerId(isNull(projection.getCustomerId()) ? null : CustomerId.from(projection.getCustomerId()))
+                .email(projection.getEmail())
+                .password(projection.getPassword())
+                .role(projection.getUserRole())
+                .build();
     }
 }

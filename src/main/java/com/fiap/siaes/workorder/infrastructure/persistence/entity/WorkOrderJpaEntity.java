@@ -1,6 +1,7 @@
 package com.fiap.siaes.workorder.infrastructure.persistence.entity;
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
@@ -54,6 +55,15 @@ public class WorkOrderJpaEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "work_order_id", nullable = false)
     private Set<WorkOrderStatusHistoryJpaEntity> statusHistory;
+
+    @Column(name = "diagnosis", length = 2000)
+    private String diagnosis;
+
+    @Column(name = "diagnosed_by")
+    private UserId diagnosedBy;
+
+    @Column(name = "diagnosed_at")
+    private Instant diagnosedAt;
 
     @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)

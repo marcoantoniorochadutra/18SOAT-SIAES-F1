@@ -1,5 +1,6 @@
 package com.fiap.siaes.quotation.infrastructure.web;
 
+import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalResponse;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByTokenUseCase;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByTokenUseCase.DecideQuotationByTokenCommand;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PublicEndpoint
 @RequestMapping(QuotationExternalController.ENDPOINT)
 @RequiredArgsConstructor
 public class QuotationExternalController implements QuotationExternalControllerOpenApi {

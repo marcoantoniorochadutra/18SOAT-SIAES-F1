@@ -2,7 +2,7 @@ package com.fiap.siaes.inventory.application.dto;
 
 import com.fiap.siaes.inventory.domain.model.StockItem;
 import com.fiap.siaes.supplies.application.dto.SuppliesReferenceResponse;
-import com.fiap.siaes.supplies.domain.model.Supplies;
+
 
 public record StockItemResponse(
         SuppliesReferenceResponse supplies,
@@ -15,9 +15,9 @@ public record StockItemResponse(
         return new StockItemResponse(supplies, quantity, reservedQuantity, availableQuantity);
     }
 
-    public static StockItemResponse from(StockItem stockItem, Supplies supplies) {
+    public static StockItemResponse from(StockItem stockItem, SuppliesReferenceResponse supplies) {
         return StockItemResponse.of(
-                SuppliesReferenceResponse.from(supplies),
+                supplies,
                 stockItem.getQuantity(),
                 stockItem.getReservedQuantity(),
                 stockItem.getAvailableQuantity());

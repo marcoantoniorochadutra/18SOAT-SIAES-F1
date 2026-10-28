@@ -2,13 +2,13 @@ package com.fiap.siaes.vehicle.application.service;
 
 
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleFilter;
 import com.fiap.siaes.vehicle.application.dto.VehicleResponse;
 import com.fiap.siaes.vehicle.application.port.VehicleQueryPort;
 import com.fiap.siaes.vehicle.application.usecase.ListVehiclesUseCase.ListVehiclesCommand;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
+
+import java.util.List;
 
 import static com.fiap.siaes.customer.CustomerTestFactory.createCustomer;
 import static com.fiap.siaes.user.UserTestFactory.authenticatedUserCustomer;
@@ -52,7 +54,7 @@ class ListVehiclesAppServiceTest {
                 VehicleResponse.from(createVehicle(), createCustomer()));
 
         when(this.vehicleQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(vehicles)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(vehicles)));
 
         PageResponse<VehicleResponse> response = this.listVehiclesAppService.execute(ListVehiclesCommand.of(filter, pageQuery, authenticatedUserManager()));
 
@@ -71,7 +73,7 @@ class ListVehiclesAppServiceTest {
         var pageQuery = PageQuery.of(null, null);
 
         when(this.vehicleQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<VehicleResponse> response = this.listVehiclesAppService.execute(ListVehiclesCommand.of(filter, pageQuery, authenticatedUserManager()));
 
@@ -87,7 +89,7 @@ class ListVehiclesAppServiceTest {
         var customerId = CustomerId.generate();
         var filter = VehicleFilter.builder().customerId(CustomerId.generate()).build();
         var pageQuery = PageQuery.of(0, 10);
-        PageResponse<VehicleResponse> page = PageResponse.from(new SliceImpl<>(List.of()));
+        PageResponse<VehicleResponse> page = PageResponses.from(new SliceImpl<>(List.of()));
 
         when(this.vehicleQueryPort.findAllByFilter(filter.withCustomerId(customerId), pageQuery)).thenReturn(page);
 

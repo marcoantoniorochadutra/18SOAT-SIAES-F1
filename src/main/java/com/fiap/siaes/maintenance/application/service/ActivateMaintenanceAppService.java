@@ -16,7 +16,7 @@ public class ActivateMaintenanceAppService implements ActivateMaintenanceUseCase
     private final MaintenanceRepository maintenanceRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void execute(MaintenanceId id) {
         Maintenance maintenance = this.maintenanceRepository.findByIdOrThrowNotFound(id);
 

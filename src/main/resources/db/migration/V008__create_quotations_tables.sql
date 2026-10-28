@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS quotations (
     odometer BIGINT NOT NULL,
     last_status VARCHAR(30) NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT fk_quotations_customer_id FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_quotations_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     CONSTRAINT ck_quotations_odometer CHECK (odometer >= 0)

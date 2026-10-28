@@ -1,5 +1,6 @@
 package com.fiap.siaes.vehicle.domain.model;
 
+import com.fiap.siaes.vehicle.domain.exception.PlateInvalidException;
 import com.fiap.siaes.vehicle.domain.exception.PlateValueIsNullException;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +10,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("UnitTest - Domain - Plate")
@@ -29,9 +32,25 @@ class PlateTest {
     }
 
     @Test
-    @DisplayName("Deve recriar a placa aplicando a mesma sanitização")
-    void shouldRecreateSanitizedPlate() {
-        assertEquals("ABC1D23", Plate.recreate("abc-1d23").getValue());
+    @DisplayName("Deve recriar a placa com o valor persistido, sem revalidar")
+    void shouldRecreatePlateWithPersistedValue() {
+        assertEquals("ABC1D23", Plate.recreate("ABC1D23").getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AB1234", "ABCD123", "1BC1234", "ABC12345", "ABC-12D3"})
+    @DisplayName("Não deve criar placa fora do formato antigo ou Mercosul")
+    void shouldNotCreatePlateWithInvalidFormat(String value) {
+        var exception = assertThrows(PlateInvalidException.class, () -> Plate.create(value));
+
+        assertExceptionParameters(exception, value);
+    }
+
+    @Test
+    @DisplayName("Deve sanitizar a placa de filtros e retornar nulo quando vazia")
+    void shouldSanitizePlate() {
+        assertEquals("ABC1D23", Plate.sanitize(" abc-1d23 "));
+        assertNull(Plate.sanitize(" "));
     }
 
     @ParameterizedTest

@@ -34,14 +34,12 @@ public class DecideQuotationByTokenAppService implements DecideQuotationByTokenU
         Quotation quotation = this.quotationRepository.findByIdOrThrowNotFound(token.getQuotationId());
         Customer customer = this.customerRepository.findByIdOrThrowNotFound(quotation.getCustomerId());
 
-        if (!customer.getDocument().endsWith(command.documentLastDigits())) {
-            token.registerFailedAttempt();
-            this.quotationApprovalTokenRepository.save(token);
-            throw new QuotationApprovalDocumentMismatchException();
-        }
+        boolean confirmed = token.confirm(customer.getDocument(), command.documentLastDigits());
 
-        token.use();
         this.quotationApprovalTokenRepository.save(token);
+
+        if (!confirmed)
+            throw new QuotationApprovalDocumentMismatchException();
 
         this.decideQuotationUseCase.execute(DecideQuotationCommand.builder()
                                                     .quotationId(quotation.getId())

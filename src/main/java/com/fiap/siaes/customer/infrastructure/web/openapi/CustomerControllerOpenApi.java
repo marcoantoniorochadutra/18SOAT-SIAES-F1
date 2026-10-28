@@ -64,6 +64,6 @@ public interface CustomerControllerOpenApi {
                      @ApiResponse(responseCode = "204", description = "customer.delete.response.success"),
                      @ApiResponse(responseCode = "404", description = "customer.response.notfound"),
     })
-    public void delete(CustomerId id);
+    public void delete(CustomerId id, AuthenticatedUser authenticatedUser);
 
 }

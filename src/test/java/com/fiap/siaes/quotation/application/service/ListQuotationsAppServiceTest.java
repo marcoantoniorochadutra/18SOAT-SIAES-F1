@@ -2,12 +2,13 @@ package com.fiap.siaes.quotation.application.service;
 
 import com.fiap.siaes.customer.application.dto.CustomerReferenceResponse;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
-import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
+import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.port.QuotationQueryPort;
 import com.fiap.siaes.quotation.application.usecase.ListQuotationsUseCase.ListQuotationsCommand;
 import com.fiap.siaes.quotation.domain.model.enums.QuotationStatus;
 import com.fiap.siaes.quotation.domain.model.vo.QuotationId;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
@@ -61,7 +62,7 @@ class ListQuotationsAppServiceTest {
                                          .build());
 
         when(this.quotationQueryPort.findAllByFilter(filter, true, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(quotations)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(quotations)));
 
         PageResponse<ListQuotationResponse> response = this.listQuotationsAppService.execute(
                 ListQuotationsCommand.of(filter, pageQuery, authenticatedUserManager()));
@@ -76,7 +77,7 @@ class ListQuotationsAppServiceTest {
         var customerId = CustomerId.generate();
         var filter = QuotationFilter.of(null, CustomerId.generate(), null, null);
         var pageQuery = PageQuery.of(0, 10);
-        PageResponse<ListQuotationResponse> page = PageResponse.from(new SliceImpl<>(List.of()));
+        PageResponse<ListQuotationResponse> page = PageResponses.from(new SliceImpl<>(List.of()));
 
         when(this.quotationQueryPort.findAllByFilter(filter.withCustomerId(customerId), false, pageQuery)).thenReturn(page);
 

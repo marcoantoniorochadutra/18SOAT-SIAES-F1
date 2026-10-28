@@ -1,7 +1,10 @@
 package com.fiap.siaes.user.infrastructure.persistence.adapter;
 
+import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.UserTestFactory;
 import com.fiap.siaes.user.domain.model.User;
+import com.fiap.siaes.user.domain.model.UserCredentials;
+import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
@@ -15,11 +18,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.fiap.siaes.user.UserTestFactory.createUserJpaEntity;
 import static com.fiap.siaes.utils.TestUtils.captureSave;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -85,26 +89,52 @@ class UserRepositoryAdapterTest {
     }
 
     @Test
-    @DisplayName("Deve buscar a projeção de autenticação pelo e-mail")
-    void shouldFindByEmail() {
-        var projection = mock(UserAuthenticationProjection.class);
-        when(this.userJpaRepository.findByEmail("maria@email.com")).thenReturn(projection);
+    @DisplayName("Deve buscar as credenciais pelo e-mail convertendo a projeção")
+    void shouldFindCredentialsByEmail() {
+        var id = UserId.generate();
+        var customerId = CustomerId.generate();
+        var projection = this.mockProjection(id, customerId);
+        when(this.userJpaRepository.findUserAuthByEmail("maria@email.com")).thenReturn(Optional.of(projection));
 
-        UserAuthenticationProjection found = this.userRepositoryAdapter.findByEmail("maria@email.com");
+        UserCredentials found = this.userRepositoryAdapter.findCredentialsByEmail("maria@email.com").orElseThrow();
 
-        assertSame(projection, found);
+        assertEquals(id, found.id());
+        assertEquals(customerId, found.customerId());
+        assertEquals("maria@email.com", found.email());
+        assertEquals("hashed-password", found.password());
+        assertEquals(UserRole.CUSTOMER, found.role());
     }
 
     @Test
-    @DisplayName("Deve buscar a projeção de autenticação pelo id do usuário")
-    void shouldFindUserAuthById() {
+    @DisplayName("Deve buscar as credenciais pelo id do usuário")
+    void shouldFindCredentialsById() {
         var id = UserId.generate();
+        var projection = this.mockProjection(id, null);
+        when(this.userJpaRepository.findUserAuthById(id)).thenReturn(Optional.of(projection));
+
+        UserCredentials found = this.userRepositoryAdapter.findCredentialsById(id).orElseThrow();
+
+        assertEquals(id, found.id());
+        assertNull(found.customerId());
+    }
+
+    @Test
+    @DisplayName("Deve retornar vazio quando não houver usuário com o e-mail informado")
+    void shouldReturnEmptyCredentialsWhenEmailDoesNotExist() {
+        when(this.userJpaRepository.findUserAuthByEmail("maria@email.com")).thenReturn(Optional.empty());
+
+        assertTrue(this.userRepositoryAdapter.findCredentialsByEmail("maria@email.com").isEmpty());
+    }
+
+    private UserAuthenticationProjection mockProjection(UserId id, CustomerId customerId) {
         var projection = mock(UserAuthenticationProjection.class);
-        when(this.userJpaRepository.findUserAuthById(id)).thenReturn(projection);
-
-        UserAuthenticationProjection found = this.userRepositoryAdapter.findUserAuthById(id);
-
-        assertSame(projection, found);
+        when(projection.getId()).thenReturn(id.id());
+        when(projection.getCustomerId()).thenReturn(customerId == null ? null : customerId.id());
+        when(projection.getEmail()).thenReturn("maria@email.com");
+        when(projection.getPassword()).thenReturn("hashed-password");
+        when(projection.getRole()).thenReturn(customerId == null ? UserRole.MANAGER.name() : UserRole.CUSTOMER.name());
+        when(projection.getUserRole()).thenCallRealMethod();
+        return projection;
     }
 
     @Test
@@ -121,5 +151,15 @@ class UserRepositoryAdapterTest {
         when(this.userJpaRepository.existsByEmail("inexistente@email.com")).thenReturn(false);
 
         assertFalse(this.userRepositoryAdapter.existsByEmail("inexistente@email.com"));
+    }
+
+    @Test
+    @DisplayName("Deve buscar o usuário pelo hash do token de atualização")
+    void shouldFindByRefreshToken() {
+        UserJpaEntity entity = createUserJpaEntity();
+
+        when(this.userJpaRepository.findByRefreshToken("refresh-token-hash")).thenReturn(Optional.of(entity));
+
+        assertEquals(entity.getId(), this.userRepositoryAdapter.findByRefreshToken("refresh-token-hash").orElseThrow().getId());
     }
 }

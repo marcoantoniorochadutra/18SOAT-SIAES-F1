@@ -29,4 +29,6 @@ public interface VehicleRepository extends RepositoryBase<Vehicle, VehicleId> {
     boolean existsByPlateAndIdNot(Plate plate, VehicleId id);
 
     void deleteById(VehicleId id);
+
+    void deleteAllByCustomerId(CustomerId customerId);
 }

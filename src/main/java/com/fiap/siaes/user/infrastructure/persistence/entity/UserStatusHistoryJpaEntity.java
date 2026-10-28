@@ -24,7 +24,7 @@ public class UserStatusHistoryJpaEntity {
     @Id
     private UserStatusHistoryId id;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
 
     private Instant updatedAt;

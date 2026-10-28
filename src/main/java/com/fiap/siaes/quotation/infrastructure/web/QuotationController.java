@@ -2,20 +2,20 @@ package com.fiap.siaes.quotation.infrastructure.web;
 
 import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
 import com.fiap.siaes.quotation.application.dto.QuotationApprovalLinkResponse;
 import com.fiap.siaes.quotation.application.dto.QuotationFilter;
 import com.fiap.siaes.quotation.application.dto.QuotationResponse;
-import com.fiap.siaes.quotation.application.dto.ListQuotationResponse;
 import com.fiap.siaes.quotation.application.usecase.CompleteQuotationUseCase;
 import com.fiap.siaes.quotation.application.usecase.CompleteQuotationUseCase.CompleteQuotationCommand;
 import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase;
 import com.fiap.siaes.quotation.application.usecase.CreateQuotationUseCase.CreateQuotationCommand;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByCustomerUseCase;
 import com.fiap.siaes.quotation.application.usecase.DecideQuotationByCustomerUseCase.DecideQuotationByCustomerCommand;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationApprovalLinkUseCase;
-import com.fiap.siaes.quotation.application.usecase.GetQuotationApprovalLinkUseCase.GetQuotationApprovalLinkCommand;
 import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase;
 import com.fiap.siaes.quotation.application.usecase.GetQuotationByIdUseCase.GetQuotationByIdCommand;
+import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase;
+import com.fiap.siaes.quotation.application.usecase.IssueQuotationApprovalLinkUseCase.IssueQuotationApprovalLinkCommand;
 import com.fiap.siaes.quotation.application.usecase.ListQuotationsUseCase;
 import com.fiap.siaes.quotation.application.usecase.ListQuotationsUseCase.ListQuotationsCommand;
 import com.fiap.siaes.quotation.application.usecase.UpdateQuotationUseCase;
@@ -47,7 +47,7 @@ import static com.fiap.siaes.sk.util.ControllerUtils.updatedResponse;
 @RestController
 @RequestMapping(QuotationController.ENDPOINT)
 @RequiredArgsConstructor
-@Authentication(minimumRole = UserRole.MECHANIC, deniedRoles = {UserRole.CUSTOMER})
+@Authentication(minimumRole = UserRole.MECHANIC)
 public class QuotationController implements QuotationControllerOpenApi {
 
     public static final String ENDPOINT = "/api/v1/quotations";
@@ -57,7 +57,7 @@ public class QuotationController implements QuotationControllerOpenApi {
     private final CompleteQuotationUseCase completeQuotationUseCase;
     private final GetQuotationByIdUseCase getQuotationByIdUseCase;
     private final ListQuotationsUseCase listQuotationsUseCase;
-    private final GetQuotationApprovalLinkUseCase getQuotationApprovalLinkUseCase;
+    private final IssueQuotationApprovalLinkUseCase issueQuotationApprovalLinkUseCase;
     private final DecideQuotationByCustomerUseCase decideQuotationByCustomerUseCase;
 
     @Override
@@ -103,8 +103,8 @@ public class QuotationController implements QuotationControllerOpenApi {
 
     @Override
     @PostMapping("/{id}/approvalLink")
-    public QuotationApprovalLinkResponse getApprovalLink(@PathVariable QuotationId id) {
-        return this.getQuotationApprovalLinkUseCase.execute(GetQuotationApprovalLinkCommand.of(id));
+    public QuotationApprovalLinkResponse issueApprovalLink(@PathVariable QuotationId id) {
+        return this.issueQuotationApprovalLinkUseCase.execute(IssueQuotationApprovalLinkCommand.of(id));
     }
 
     @Override

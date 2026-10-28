@@ -83,6 +83,7 @@ class SendQuotationForApprovalAppServiceTest {
         QuotationApprovalToken token = this.mockIssuedToken(quotation);
         this.mockNotifiers();
         when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
+        when(this.whatsAppNotifier.channel()).thenReturn(NotificationChannel.WHATSAPP);
 
         this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
 
@@ -97,6 +98,7 @@ class SendQuotationForApprovalAppServiceTest {
         Quotation quotation = this.mockQuotationOf(customer);
         QuotationApprovalToken token = this.mockIssuedToken(quotation);
         this.mockNotifiers();
+        when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
         when(this.whatsAppNotifier.channel()).thenReturn(NotificationChannel.WHATSAPP);
 
         this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
@@ -116,6 +118,20 @@ class SendQuotationForApprovalAppServiceTest {
         verifyNoInteractions(this.quotationApprovalTokenHelper);
         verify(this.emailNotifier, never()).send(any());
         verify(this.whatsAppNotifier, never()).send(any());
+    }
+
+    @Test
+    @DisplayName("Não deve emitir link quando nenhum canal registrado alcança o cliente")
+    void shouldNotIssueTokenWhenNoRegisteredChannelReachesCustomer() {
+        Customer customer = this.customerWith(null, "11999999999");
+        Quotation quotation = this.mockQuotationOf(customer);
+        this.quotationApprovalNotifiers.add(this.emailNotifier);
+        when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
+
+        this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
+
+        verifyNoInteractions(this.quotationApprovalTokenHelper);
+        verify(this.emailNotifier, never()).send(any());
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fiap.siaes.inventory.application.dto.StockItemResponse;
 import com.fiap.siaes.inventory.application.usecase.GetStockItemUseCase;
 import com.fiap.siaes.inventory.domain.model.StockItem;
 import com.fiap.siaes.inventory.domain.repository.StockItemRepository;
+import com.fiap.siaes.supplies.application.dto.SuppliesReferenceResponse;
 import com.fiap.siaes.supplies.domain.model.Supplies;
 import com.fiap.siaes.supplies.domain.model.vo.SuppliesId;
 import com.fiap.siaes.supplies.domain.repository.SuppliesRepository;
@@ -25,6 +26,6 @@ public class GetStockItemAppService implements GetStockItemUseCase {
         StockItem stockItem = this.stockItemRepository.findByIdOrThrowNotFound(suppliesId);
         Supplies supplies = this.suppliesRepository.findByIdOrThrowNotFound(suppliesId);
 
-        return StockItemResponse.from(stockItem, supplies);
+        return StockItemResponse.from(stockItem, SuppliesReferenceResponse.from(supplies));
     }
 }

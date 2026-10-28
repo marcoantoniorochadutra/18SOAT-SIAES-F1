@@ -1,11 +1,12 @@
 package com.fiap.siaes.maintenance.application.service;
 
-import com.fiap.siaes.sk.pagination.PageQuery;
-import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.maintenance.application.dto.MaintenanceFilter;
 import com.fiap.siaes.maintenance.application.dto.MaintenanceResponse;
 import com.fiap.siaes.maintenance.application.port.MaintenanceQueryPort;
 import com.fiap.siaes.maintenance.application.usecase.ListMaintenancesUseCase.ListMaintenancesCommand;
+import com.fiap.siaes.sk.infrastructure.persistence.PageResponses;
+import com.fiap.siaes.sk.pagination.PageQuery;
+import com.fiap.siaes.sk.pagination.PageResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +18,8 @@ import org.springframework.data.domain.SliceImpl;
 
 import java.util.List;
 
-import static com.fiap.siaes.maintenance.MaintenanceTestFactory.DESCRIPTION;
 import static com.fiap.siaes.maintenance.MaintenanceTestFactory.CODE;
+import static com.fiap.siaes.maintenance.MaintenanceTestFactory.DESCRIPTION;
 import static com.fiap.siaes.maintenance.MaintenanceTestFactory.createMaintenance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -46,7 +47,7 @@ class ListMaintenancesAppServiceTest {
                 MaintenanceResponse.from(createMaintenance()));
 
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(maintenance)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(maintenance)));
 
         PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 
@@ -67,7 +68,7 @@ class ListMaintenancesAppServiceTest {
         var maintenance = List.of(MaintenanceResponse.from(createMaintenance(false)));
 
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(maintenance)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(maintenance)));
 
         PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 
@@ -82,7 +83,7 @@ class ListMaintenancesAppServiceTest {
         var pageQuery = PageQuery.of(null, null);
 
         when(this.maintenanceQueryPort.findAllByFilter(filter, pageQuery))
-                .thenReturn(PageResponse.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
+                .thenReturn(PageResponses.from(new SliceImpl<>(List.of(), Pageable.ofSize(PageQuery.DEFAULT_SIZE), false)));
 
         PageResponse<MaintenanceResponse> response = this.listMaintenanceAppService.execute(ListMaintenancesCommand.of(filter, pageQuery));
 

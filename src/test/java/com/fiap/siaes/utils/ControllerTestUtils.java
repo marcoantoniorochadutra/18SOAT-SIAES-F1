@@ -3,7 +3,7 @@ package com.fiap.siaes.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.auth.infrastructure.security.context.UserAuthenticationFilter;
-import com.fiap.siaes.sk.infraestructure.config.I18nConfig;
+import com.fiap.siaes.sk.infrastructure.config.I18nConfig;
 import com.fiap.siaes.user.UserTestFactory;
 import com.fiap.siaes.utils.ControllerTestUtils.SecurityArgumentResolverConfig;
 import org.springframework.beans.factory.annotation.Autowired;

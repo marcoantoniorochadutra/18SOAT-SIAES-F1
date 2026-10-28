@@ -60,6 +60,9 @@ spring:
 siaes:
   mail:
     from: ${MAIL_FROM:no-reply@siaes.com}
+  notification:
+    whatsapp:
+      enabled: ${WHATSAPP_ENABLED:false}
   quotation:
     approval:
       time-to-live: ${QUOTATION_APPROVAL_TIME_TO_LIVE:72h}
@@ -74,6 +77,6 @@ server:
 logging:
   level:
     root: INFO
-    com.mbd.siaes: ${LOG_LEVEL_APP:INFO}
+    com.fiap.siaes: ${LOG_LEVEL_APP:INFO}
     org.springframework: INFO
     org.hibernate: WARN

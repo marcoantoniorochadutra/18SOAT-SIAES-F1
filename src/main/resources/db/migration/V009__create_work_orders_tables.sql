@@ -3,11 +3,15 @@ CREATE TABLE IF NOT EXISTS work_orders (
     customer_id UUID NOT NULL,
     vehicle_id UUID NOT NULL,
     last_status VARCHAR(30) NOT NULL,
+    diagnosis VARCHAR(2000),
+    diagnosed_by UUID,
+    diagnosed_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL,
     finished_at TIMESTAMP,
     version BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT fk_work_orders_customer_id FOREIGN KEY (customer_id) REFERENCES customers(id),
-    CONSTRAINT fk_work_orders_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+    CONSTRAINT fk_work_orders_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
+    CONSTRAINT fk_work_orders_diagnosed_by FOREIGN KEY (diagnosed_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_work_orders_customer_id ON work_orders(customer_id);

@@ -3,10 +3,15 @@ package com.fiap.siaes.vehicle.domain.model;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.vehicle.domain.exception.InvalidVehicleYearException;
 import com.fiap.siaes.vehicle.domain.exception.PlateValueIsNullException;
+import com.fiap.siaes.vehicle.domain.exception.VehicleBrandRequiredException;
+import com.fiap.siaes.vehicle.domain.exception.VehicleModelRequiredException;
 import com.fiap.siaes.vehicle.domain.model.vo.Plate;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Year;
 import java.time.ZoneId;
@@ -48,8 +53,8 @@ class VehicleDomainTest {
     @Test
     @DisplayName("Deve gerar um id diferente para cada novo veículo")
     void shouldGenerateDifferentIdForEachNewVehicle() {
-        Vehicle first = Vehicle.builder().plate(PLATE).year(2020).build();
-        Vehicle second = Vehicle.builder().plate(PLATE).year(2020).build();
+        Vehicle first = Vehicle.builder().plate(PLATE).brand("Fiat").model("Uno").year(2020).build();
+        Vehicle second = Vehicle.builder().plate(PLATE).brand("Fiat").model("Uno").year(2020).build();
 
         assertNotEquals(first.getId(), second.getId());
     }
@@ -57,7 +62,7 @@ class VehicleDomainTest {
     @Test
     @DisplayName("Deve aceitar veículo com ano até o próximo ano")
     void shouldAcceptVehicleUntilNextYear() {
-        Vehicle vehicle = Vehicle.builder().plate(PLATE).year(NEXT_YEAR).build();
+        Vehicle vehicle = Vehicle.builder().plate(PLATE).brand("Fiat").model("Uno").year(NEXT_YEAR).build();
 
         assertEquals(NEXT_YEAR, vehicle.getYear());
     }
@@ -66,7 +71,7 @@ class VehicleDomainTest {
     @DisplayName("Não deve criar veículo com ano posterior ao próximo ano")
     void shouldNotCreateVehicleWithYearAfterNextYear() {
         int invalidYear = NEXT_YEAR + 1;
-        var builder = Vehicle.builder().plate(PLATE).year(invalidYear);
+        var builder = Vehicle.builder().plate(PLATE).brand("Fiat").model("Uno").year(invalidYear);
 
         var exception = assertThrows(InvalidVehicleYearException.class, builder::build);
 
@@ -76,9 +81,29 @@ class VehicleDomainTest {
     @Test
     @DisplayName("Não deve criar veículo sem placa")
     void shouldNotCreateVehicleWithoutPlate() {
-        var builder = Vehicle.builder().plate(" ").year(2020);
+        var builder = Vehicle.builder().plate(" ").brand("Fiat").model("Uno").year(2020);
 
         assertThrows(PlateValueIsNullException.class, builder::build);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    @DisplayName("Não deve criar veículo sem marca")
+    void shouldNotCreateVehicleWithoutBrand(String brand) {
+        var builder = Vehicle.builder().plate(PLATE).brand(brand).model("Uno").year(2020);
+
+        assertThrows(VehicleBrandRequiredException.class, builder::build);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    @DisplayName("Não deve criar veículo sem modelo")
+    void shouldNotCreateVehicleWithoutModel(String model) {
+        var builder = Vehicle.builder().plate(PLATE).brand("Fiat").model(model).year(2020);
+
+        assertThrows(VehicleModelRequiredException.class, builder::build);
     }
 
     @Test

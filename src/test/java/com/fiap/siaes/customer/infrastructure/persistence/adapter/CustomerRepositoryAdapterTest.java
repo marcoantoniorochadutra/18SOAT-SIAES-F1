@@ -158,7 +158,7 @@ class CustomerRepositoryAdapterTest {
         var id = CustomerId.generate();
         when(this.customerJpaRepository.existsByDocumentAndIdNot("52998224725", id)).thenReturn(true);
 
-        assertThat(this.customerRepositoryAdapter.existsByDocumentAndIdNot("52998224725", id)).isTrue();
+        assertThat(this.customerRepositoryAdapter.existsByDocumentAndIdNot(Document.create("52998224725"), id)).isTrue();
     }
 
     @Test

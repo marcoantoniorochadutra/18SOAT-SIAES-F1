@@ -6,14 +6,16 @@ import com.fiap.siaes.auth.domain.exception.BlockedTokenException;
 import com.fiap.siaes.auth.domain.exception.InsufficientRoleException;
 import com.fiap.siaes.auth.domain.exception.InvalidTokenException;
 import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
-import com.fiap.siaes.auth.domain.security.TokenBlacklist;
+import com.fiap.siaes.auth.domain.exception.UndeclaredEndpointAccessException;
+import com.fiap.siaes.auth.domain.security.TokenBlocklist;
 import com.fiap.siaes.auth.infrastructure.security.authorization.Authentication;
+import com.fiap.siaes.auth.infrastructure.security.authorization.PublicEndpoint;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtProperties;
 import com.fiap.siaes.auth.infrastructure.security.jwt.JwtTokenIssuer;
+import com.fiap.siaes.user.domain.model.UserCredentials;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.domain.repository.UserRepository;
-import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,6 +42,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,11 +50,12 @@ import static org.mockito.Mockito.when;
 class UserAuthenticationFilterTest {
 
     private static final String TOKEN = "access-token";
+    private static final String EMAIL = "maria@email.com";
     private static final UserId USER_ID = UserId.generate();
     private static final JwtProperties JWT_PROPERTIES = new JwtProperties("test-secret-key-at-least-32-bytes-long!!", 1, 1);
 
     @Mock
-    private TokenBlacklist tokenBlocklist;
+    private TokenBlocklist tokenBlocklist;
 
     @Mock
     private UserRepository userRepository;
@@ -60,9 +65,6 @@ class UserAuthenticationFilterTest {
 
     @Mock
     private HandlerExceptionResolver handlerExceptionResolver;
-
-    @Mock
-    private UserAuthenticationProjection userAuthenticationProjection;
 
     @Mock
     private HttpServletRequest request;
@@ -90,13 +92,53 @@ class UserAuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("Deve seguir a cadeia de filtros quando o endpoint não exige autenticação")
-    void shouldContinueTheChainWhenEndpointHasNoAuthenticationAnnotation() throws Exception {
+    @DisplayName("Deve seguir a cadeia de filtros quando a requisição não corresponde a um endpoint")
+    void shouldContinueTheChainWhenRequestHasNoHandlerMethod() throws Exception {
         when(this.request.getHeader("Authorization")).thenReturn(null);
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
         verify(this.filterChain).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve seguir a cadeia de filtros quando o endpoint é público")
+    void shouldContinueTheChainWhenEndpointIsPublic() throws Exception {
+        this.mockHandlerMethod(PublicController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn(null);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.filterChain).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar com 401 quando o endpoint não declara nenhuma anotação de acesso")
+    void shouldRejectWithUnauthorizedWhenEndpointHasNoAnnotation() throws Exception {
+        this.mockHandlerMethod(UnannotatedController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn(null);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.handlerExceptionResolver)
+                .resolveException(eq(this.request), eq(this.response), isNull(), isA(UndeclaredEndpointAccessException.class));
+        verify(this.filterChain, never()).doFilter(this.request, this.response);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar com 401 o endpoint sem anotação de acesso mesmo com token válido")
+    void shouldRejectWithUnauthorizedWhenEndpointHasNoAnnotationEvenWithValidToken() throws Exception {
+        String token = this.jwtTokenIssuer.issueAccessToken(USER_ID, UserRole.ADMIN);
+
+        this.mockHandlerMethod(UnannotatedController.class, "handle");
+        when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
+
+        this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
+
+        verify(this.handlerExceptionResolver)
+                .resolveException(eq(this.request), eq(this.response), isNull(), isA(UndeclaredEndpointAccessException.class));
+        verify(this.filterChain, never()).doFilter(this.request, this.response);
+        verifyNoInteractions(this.userRepository);
     }
 
     @Test
@@ -119,10 +161,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(ClassLevelController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userAuthenticationProjection.getId()).thenReturn(USER_ID.id());
-        when(this.userAuthenticationProjection.getEmail()).thenReturn("maria@email.com");
-        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.MANAGER);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.of(credentials("maria@email.com", UserRole.MANAGER)));
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -140,10 +179,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(MethodOverridesClassController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userAuthenticationProjection.getId()).thenReturn(USER_ID.id());
-        when(this.userAuthenticationProjection.getEmail()).thenReturn("maria@email.com");
-        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.MANAGER);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.of(credentials("maria@email.com", UserRole.MANAGER)));
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -157,8 +193,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(ClassLevelController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.CUSTOMER);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.of(credentials(EMAIL, UserRole.CUSTOMER)));
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -174,8 +209,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(DeniedRoleController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.MECHANIC);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.of(credentials(EMAIL, UserRole.MECHANIC)));
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -191,10 +225,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(DeniedRoleController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userAuthenticationProjection.getId()).thenReturn(USER_ID.id());
-        when(this.userAuthenticationProjection.getEmail()).thenReturn("joao@email.com");
-        when(this.userAuthenticationProjection.getUserRole()).thenReturn(UserRole.CUSTOMER);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(this.userAuthenticationProjection);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.of(credentials("joao@email.com", UserRole.CUSTOMER)));
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -221,7 +252,7 @@ class UserAuthenticationFilterTest {
 
         this.mockHandlerMethod(ClassLevelController.class, "handle");
         when(this.request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(this.userRepository.findUserAuthById(USER_ID)).thenReturn(null);
+        when(this.userRepository.findCredentialsById(USER_ID)).thenReturn(Optional.empty());
 
         this.userAuthenticationFilter.doFilter(this.request, this.response, this.filterChain);
 
@@ -243,11 +274,29 @@ class UserAuthenticationFilterTest {
         verify(this.filterChain, never()).doFilter(this.request, this.response);
     }
 
+    private UserCredentials credentials(String email, UserRole role) {
+        return UserCredentials.builder()
+                .id(USER_ID)
+                .email(email)
+                .password("hashed-password")
+                .role(role)
+                .build();
+    }
+
     private void mockHandlerMethod(Class<?> controllerType, String methodName) throws Exception {
         Object bean = controllerType.getDeclaredConstructor().newInstance();
         HandlerMethod handlerMethod = new HandlerMethod(bean, controllerType.getMethod(methodName));
         when(this.requestMappingHandlerMapping.getHandler(this.request))
                 .thenReturn(new HandlerExecutionChain(handlerMethod));
+    }
+
+    @PublicEndpoint
+    static class PublicController {
+        public void handle() { /* Teste para validar endpoint público */ }
+    }
+
+    static class UnannotatedController {
+        public void handle() { /* Teste para validar negação por padrão */ }
     }
 
     @Authentication(minimumRole = UserRole.MANAGER)

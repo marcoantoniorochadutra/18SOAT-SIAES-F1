@@ -9,6 +9,7 @@ import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.WorkOrderStatusHistory;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
 import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
+import com.fiap.siaes.workorder.domain.model.vo.Diagnosis;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderStatusHistoryId;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderJpaEntity;
@@ -32,6 +33,8 @@ public class WorkOrderMapper {
         if (isNull(workOrder))
             return null;
 
+        Diagnosis diagnosis = workOrder.getDiagnosis();
+
         return WorkOrderJpaEntity.builder()
                 .id(workOrder.getId())
                 .customerId(workOrder.getCustomerId())
@@ -40,6 +43,9 @@ public class WorkOrderMapper {
                 .statusHistory(workOrder.getStatusHistory().stream()
                                        .map(WorkOrderMapper::toEntity)
                                        .collect(Collectors.toCollection(HashSet::new)))
+                .diagnosis(isNull(diagnosis) ? null : diagnosis.description())
+                .diagnosedBy(isNull(diagnosis) ? null : diagnosis.diagnosedBy())
+                .diagnosedAt(isNull(diagnosis) ? null : diagnosis.diagnosedAt())
                 .createdAt(workOrder.getCreatedAt())
                 .finishedAt(workOrder.getFinishedAt())
                 .version(workOrder.getVersion())
@@ -58,6 +64,7 @@ public class WorkOrderMapper {
                 .statusHistory(entity.getStatusHistory().stream()
                                        .map(WorkOrderMapper::toDomain)
                                        .collect(Collectors.toCollection(HashSet::new)))
+                .diagnosis(toDiagnosis(entity))
                 .createdAt(entity.getCreatedAt())
                 .finishedAt(entity.getFinishedAt())
                 .version(entity.getVersion())
@@ -74,6 +81,13 @@ public class WorkOrderMapper {
                 .createdAt(projection.getCreatedAt())
                 .finishedAt(projection.getFinishedAt())
                 .build();
+    }
+
+    private static Diagnosis toDiagnosis(WorkOrderJpaEntity entity) {
+        if (isNull(entity.getDiagnosis()))
+            return null;
+
+        return Diagnosis.of(entity.getDiagnosis(), entity.getDiagnosedBy(), entity.getDiagnosedAt());
     }
 
     public static List<StatusTimeline> toStatusTimelines(List<WorkOrderStatusHistoryProjection> projections) {

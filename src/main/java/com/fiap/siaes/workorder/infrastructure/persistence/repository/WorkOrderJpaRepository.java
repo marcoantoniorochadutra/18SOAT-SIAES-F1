@@ -45,6 +45,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrderJpaEntity
                                                      @Param("status") String status,
                                                      Pageable pageable);
 
+    void deleteAllByCustomerId(CustomerId customerId);
+
     @Query(value = """
             SELECT
                 h.id AS id,
