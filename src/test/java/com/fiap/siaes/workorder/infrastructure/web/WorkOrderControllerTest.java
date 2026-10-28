@@ -7,6 +7,8 @@ import com.fiap.siaes.utils.ControllerTestUtils;
 import com.fiap.siaes.vehicle.application.dto.VehicleReferenceResponse;
 import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
+import com.fiap.siaes.workorder.application.dto.WorkOrderExecutionTimeResponse;
+import com.fiap.siaes.workorder.application.dto.WorkOrderExecutionTimeResponse.StageResponse;
 import com.fiap.siaes.workorder.application.usecase.CancelWorkOrderUseCase;
 import com.fiap.siaes.workorder.application.usecase.CancelWorkOrderUseCase.CancelWorkOrderCommand;
 import com.fiap.siaes.workorder.application.usecase.CreateWorkOrderUseCase;
@@ -17,12 +19,15 @@ import com.fiap.siaes.workorder.application.usecase.FinishWorkOrderUseCase;
 import com.fiap.siaes.workorder.application.usecase.FinishWorkOrderUseCase.FinishWorkOrderCommand;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase.GetWorkOrderByIdCommand;
+import com.fiap.siaes.workorder.application.usecase.GetWorkOrderExecutionTimeUseCase;
+import com.fiap.siaes.workorder.application.usecase.GetWorkOrderExecutionTimeUseCase.GetWorkOrderExecutionTimeCommand;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase;
 import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase.RegisterWorkOrderDiagnosisCommand;
 import com.fiap.siaes.workorder.application.usecase.RegisterWorkOrderDiagnosisUseCase;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase.StartWorkOrderDiagnosisCommand;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderDiagnosisNotAllowedException;
+import com.fiap.siaes.workorder.domain.exception.WorkOrderMetricsPeriodInvalidException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderOpenQuotationException;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderStatusTransitionInvalidException;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
@@ -80,6 +85,70 @@ class WorkOrderControllerTest extends ControllerTestUtils {
 
     @MockitoBean
     private ListWorkOrdersUseCase listWorkOrdersUseCase;
+
+    @MockitoBean
+    private GetWorkOrderExecutionTimeUseCase getWorkOrderExecutionTimeUseCase;
+
+    @Test
+    @DisplayName("[200] Deve retornar o tempo médio de execução do período informado")
+    void shouldGetExecutionTime() throws Exception {
+        var from = Instant.parse("2026-10-01T00:00:00Z");
+        var to = Instant.parse("2026-10-31T23:59:59Z");
+        var response = WorkOrderExecutionTimeResponse.builder()
+                .from(from)
+                .to(to)
+                .workOrderCount(2)
+                .averageMinutes(90L)
+                .minMinutes(60L)
+                .maxMinutes(120L)
+                .stages(List.of(StageResponse.of(WorkOrderStatus.IN_EXECUTION, 90)))
+                .build();
+
+        when(this.getWorkOrderExecutionTimeUseCase.execute(GetWorkOrderExecutionTimeCommand.of(from, to))).thenReturn(response);
+
+        super.executeGetAuthenticated(WorkOrderController.ENDPOINT + "/metrics/executionTime?from=" + from + "&to=" + to)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workOrderCount").value(2))
+                .andExpect(jsonPath("$.averageMinutes").value(90))
+                .andExpect(jsonPath("$.minMinutes").value(60))
+                .andExpect(jsonPath("$.maxMinutes").value(120))
+                .andExpect(jsonPath("$.stages[0].status").value("IN_EXECUTION"))
+                .andExpect(jsonPath("$.stages[0].averageMinutes").value(90));
+    }
+
+    @Test
+    @DisplayName("[200] Deve retornar o tempo médio de execução sem período informado")
+    void shouldGetExecutionTimeWithoutPeriod() throws Exception {
+        var response = WorkOrderExecutionTimeResponse.builder().stages(List.of()).build();
+
+        when(this.getWorkOrderExecutionTimeUseCase.execute(GetWorkOrderExecutionTimeCommand.of(null, null))).thenReturn(response);
+
+        super.executeGetAuthenticated(WorkOrderController.ENDPOINT + "/metrics/executionTime")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workOrderCount").value(0));
+    }
+
+    @Test
+    @DisplayName("[400] Não deve retornar o tempo médio de execução com início posterior ao fim")
+    void shouldNotGetExecutionTimeWithStartAfterEnd() throws Exception {
+        var from = Instant.parse("2026-11-01T00:00:00Z");
+        var to = Instant.parse("2026-10-01T00:00:00Z");
+
+        when(this.getWorkOrderExecutionTimeUseCase.execute(GetWorkOrderExecutionTimeCommand.of(from, to)))
+                .thenThrow(new WorkOrderMetricsPeriodInvalidException(from.toString(), to.toString()));
+
+        super.executeGetAuthenticated(WorkOrderController.ENDPOINT + "/metrics/executionTime?from=" + from + "&to=" + to)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("[400] Não deve retornar o tempo médio de execução com data fora do formato ISO-8601")
+    void shouldNotGetExecutionTimeWithInvalidDate() throws Exception {
+        super.executeGetAuthenticated(WorkOrderController.ENDPOINT + "/metrics/executionTime?from=01/10/2026")
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(this.getWorkOrderExecutionTimeUseCase);
+    }
 
     @Test
     @DisplayName("[201] Deve criar ordem de serviço com sucesso")

@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS work_orders (
 CREATE INDEX IF NOT EXISTS idx_work_orders_customer_id ON work_orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_vehicle_id ON work_orders(vehicle_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_last_status ON work_orders(last_status);
+CREATE INDEX IF NOT EXISTS idx_work_orders_finished_at ON work_orders(finished_at);
 
 CREATE TABLE IF NOT EXISTS work_order_status_history (
     id UUID PRIMARY KEY NOT NULL,

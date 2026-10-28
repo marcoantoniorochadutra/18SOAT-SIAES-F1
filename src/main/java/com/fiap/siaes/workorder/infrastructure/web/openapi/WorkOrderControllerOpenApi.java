@@ -4,6 +4,7 @@ import com.fiap.siaes.auth.application.dto.AuthenticatedUser;
 import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.workorder.application.dto.WorkOrderFilter;
+import com.fiap.siaes.workorder.application.dto.WorkOrderExecutionTimeResponse;
 import com.fiap.siaes.workorder.application.dto.WorkOrderResponse;
 import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.application.usecase.CreateWorkOrderUseCase.CreateWorkOrderCommand;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+
+import java.time.Instant;
 
 @Tag(name = "Work Orders", description = "workorder.tag.description")
 public interface WorkOrderControllerOpenApi {
@@ -99,5 +102,17 @@ public interface WorkOrderControllerOpenApi {
                      @ApiResponse(responseCode = "403", description = "workorder.response.forbidden"),
     })
     PageResponse<ListWorkOrderResponse> list(@ParameterObject WorkOrderFilter filter, @ParameterObject PageQuery pageQuery, AuthenticatedUser authenticatedUser);
+
+    @Operation(summary = "workorder.metrics.executionTime.summary", description = "workorder.metrics.executionTime.description", method = "GET",
+               parameters = {
+                       @Parameter(name = "from", in = ParameterIn.QUERY, description = "workorder.metrics.executionTime.parameter.from", example = "2026-10-01T00:00:00Z"),
+                       @Parameter(name = "to", in = ParameterIn.QUERY, description = "workorder.metrics.executionTime.parameter.to", example = "2026-10-31T23:59:59Z")
+               },
+               responses = {
+                     @ApiResponse(responseCode = "200", description = "workorder.metrics.executionTime.response.success"),
+                     @ApiResponse(responseCode = "400", description = "workorder.metrics.executionTime.response.badrequest"),
+                     @ApiResponse(responseCode = "403", description = "workorder.response.forbidden"),
+    })
+    WorkOrderExecutionTimeResponse getExecutionTime(Instant from, Instant to);
 
 }

@@ -5,11 +5,15 @@ import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderJpaEntity;
 import com.fiap.siaes.workorder.infrastructure.persistence.projection.ListWorkOrderProjection;
+import com.fiap.siaes.workorder.infrastructure.persistence.projection.WorkOrderStatusHistoryProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.Instant;
+import java.util.List;
 
 public interface WorkOrderJpaRepository extends JpaRepository<WorkOrderJpaEntity, WorkOrderId> {
 
@@ -42,4 +46,17 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrderJpaEntity
                                                      Pageable pageable);
 
     void deleteAllByCustomerId(CustomerId customerId);
+
+    @Query(value = """
+            SELECT
+                h.id AS id,
+                h.work_order_id AS workOrderId,
+                h.status AS status,
+                h.updated_at AS updatedAt
+            FROM {h-schema} work_order_status_history h
+            INNER JOIN {h-schema} work_orders w ON w.id = h.work_order_id
+            WHERE w.finished_at BETWEEN :from AND :to
+            """,
+           nativeQuery = true)
+    List<WorkOrderStatusHistoryProjection> findStatusHistoryOfFinishedBetween(@Param("from") Instant from, @Param("to") Instant to);
 }

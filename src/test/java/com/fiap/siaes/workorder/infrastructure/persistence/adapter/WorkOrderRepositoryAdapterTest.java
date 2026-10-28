@@ -9,10 +9,12 @@ import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderNotFoundException;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderJpaEntity;
 import com.fiap.siaes.workorder.infrastructure.persistence.mapper.WorkOrderMapper;
 import com.fiap.siaes.workorder.infrastructure.persistence.projection.ListWorkOrderProjection;
+import com.fiap.siaes.workorder.infrastructure.persistence.projection.WorkOrderStatusHistoryProjection;
 import com.fiap.siaes.workorder.infrastructure.persistence.repository.WorkOrderJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -152,6 +155,54 @@ class WorkOrderRepositoryAdapterTest {
         PageResponse<ListWorkOrderResponse> response = this.workOrderRepositoryAdapter.findAllByFilter(filter, PageQuery.of(0, 20));
 
         assertThat(response.content()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve agrupar o histórico de status das ordens de serviço finalizadas no período")
+    void shouldFindStatusTimelinesOfFinishedBetween() {
+        var from = Instant.parse("2026-10-01T00:00:00Z");
+        var to = Instant.parse("2026-10-31T23:59:59Z");
+        var firstWorkOrderId = UUID.randomUUID();
+        var secondWorkOrderId = UUID.randomUUID();
+        var receivedAt = Instant.parse("2026-10-10T08:00:00Z");
+
+        when(this.workOrderJpaRepository.findStatusHistoryOfFinishedBetween(from, to))
+                .thenReturn(List.of(this.createStatusHistoryProjection(firstWorkOrderId, "RECEIVED", receivedAt),
+                                    this.createStatusHistoryProjection(secondWorkOrderId, "IN_EXECUTION", receivedAt),
+                                    this.createStatusHistoryProjection(firstWorkOrderId, "IN_DIAGNOSIS", receivedAt.plus(Duration.ofMinutes(30))),
+                                    this.createStatusHistoryProjection(secondWorkOrderId, "FINISHED", receivedAt.plus(Duration.ofMinutes(90)))));
+
+        List<StatusTimeline> timelines = this.workOrderRepositoryAdapter.findStatusTimelinesOfFinishedBetween(from, to);
+
+        assertEquals(2, timelines.size());
+        assertEquals(Duration.ofMinutes(30), timelines.getFirst().timeInStatus().get(WorkOrderStatus.RECEIVED));
+        assertEquals(Duration.ofMinutes(90), timelines.getLast().timeInStatus().get(WorkOrderStatus.IN_EXECUTION));
+    }
+
+    private WorkOrderStatusHistoryProjection createStatusHistoryProjection(UUID workOrderId, String status, Instant updatedAt) {
+        var id = UUID.randomUUID();
+
+        return new WorkOrderStatusHistoryProjection() {
+            @Override
+            public UUID getId() {
+                return id;
+            }
+
+            @Override
+            public UUID getWorkOrderId() {
+                return workOrderId;
+            }
+
+            @Override
+            public String getStatus() {
+                return status;
+            }
+
+            @Override
+            public Instant getUpdatedAt() {
+                return updatedAt;
+            }
+        };
     }
 
     private ListWorkOrderProjection createListWorkOrderProjection() {
