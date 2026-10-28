@@ -7,6 +7,7 @@ import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.application.port.WorkOrderQueryPort;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import com.fiap.siaes.workorder.domain.repository.WorkOrderRepository;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderJpaEntity;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static com.fiap.siaes.sk.util.FunctionalUtils.getIfNotNullOrDefault;
@@ -59,5 +62,10 @@ public class WorkOrderRepositoryAdapter implements WorkOrderRepository, WorkOrde
                 .map(WorkOrderMapper::toResponse);
 
         return PageResponse.from(results);
+    }
+
+    @Override
+    public List<StatusTimeline> findStatusTimelinesOfFinishedBetween(Instant from, Instant to) {
+        return WorkOrderMapper.toStatusTimelines(this.workOrderJpaRepository.findStatusHistoryOfFinishedBetween(from, to));
     }
 }

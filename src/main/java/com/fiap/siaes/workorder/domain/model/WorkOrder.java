@@ -7,12 +7,15 @@ import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.event.WorkOrderCancelledEvent;
 import com.fiap.siaes.workorder.domain.exception.WorkOrderStatusTransitionInvalidException;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
@@ -84,6 +87,10 @@ public class WorkOrder extends AggregateRoot {
         this.transitionTo(WorkOrderStatus.CANCELLED);
 
         this.registerEvent(WorkOrderCancelledEvent.of(this.id, cancelledBy, Instant.now()));
+    }
+
+    public Map<WorkOrderStatus, Duration> timeInStatus() {
+        return StatusTimeline.of(this.statusHistory).timeInStatus();
     }
 
     private void transitionTo(WorkOrderStatus newStatus) {

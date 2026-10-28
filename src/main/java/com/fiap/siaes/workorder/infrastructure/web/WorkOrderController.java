@@ -6,6 +6,7 @@ import com.fiap.siaes.sk.pagination.PageQuery;
 import com.fiap.siaes.sk.pagination.PageResponse;
 import com.fiap.siaes.user.domain.model.enums.UserRole;
 import com.fiap.siaes.workorder.application.dto.WorkOrderFilter;
+import com.fiap.siaes.workorder.application.dto.WorkOrderExecutionTimeResponse;
 import com.fiap.siaes.workorder.application.dto.WorkOrderResponse;
 import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.application.usecase.CancelWorkOrderUseCase;
@@ -18,6 +19,8 @@ import com.fiap.siaes.workorder.application.usecase.FinishWorkOrderUseCase;
 import com.fiap.siaes.workorder.application.usecase.FinishWorkOrderUseCase.FinishWorkOrderCommand;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase;
 import com.fiap.siaes.workorder.application.usecase.GetWorkOrderByIdUseCase.GetWorkOrderByIdCommand;
+import com.fiap.siaes.workorder.application.usecase.GetWorkOrderExecutionTimeUseCase;
+import com.fiap.siaes.workorder.application.usecase.GetWorkOrderExecutionTimeUseCase.GetWorkOrderExecutionTimeCommand;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase;
 import com.fiap.siaes.workorder.application.usecase.ListWorkOrdersUseCase.ListWorkOrdersCommand;
 import com.fiap.siaes.workorder.application.usecase.StartWorkOrderDiagnosisUseCase;
@@ -35,8 +38,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
 
 import static com.fiap.siaes.sk.util.ControllerUtils.createdResponse;
 
@@ -55,6 +61,7 @@ public class WorkOrderController implements WorkOrderControllerOpenApi {
     private final CancelWorkOrderUseCase cancelWorkOrderUseCase;
     private final GetWorkOrderByIdUseCase getWorkOrderByIdUseCase;
     private final ListWorkOrdersUseCase listWorkOrdersUseCase;
+    private final GetWorkOrderExecutionTimeUseCase getWorkOrderExecutionTimeUseCase;
 
     @Override
     @PostMapping
@@ -106,5 +113,13 @@ public class WorkOrderController implements WorkOrderControllerOpenApi {
                                                     @Valid @ParameterObject PageQuery pageQuery,
                                                     @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return this.listWorkOrdersUseCase.execute(ListWorkOrdersCommand.of(filter, pageQuery, authenticatedUser));
+    }
+
+    @Override
+    @GetMapping("/metrics/executionTime")
+    @Authentication(minimumRole = UserRole.MANAGER)
+    public WorkOrderExecutionTimeResponse getExecutionTime(@RequestParam(required = false) Instant from,
+                                                           @RequestParam(required = false) Instant to) {
+        return this.getWorkOrderExecutionTimeUseCase.execute(GetWorkOrderExecutionTimeCommand.of(from, to));
     }
 }

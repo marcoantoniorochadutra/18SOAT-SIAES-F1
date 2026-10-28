@@ -11,7 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.time.Duration;
+import java.util.Map;
+
 import static com.fiap.siaes.utils.TestUtils.assertExceptionParameters;
+import static com.fiap.siaes.workorder.WorkOrderTestFactory.createFinishedWorkOrder;
 import static com.fiap.siaes.workorder.WorkOrderTestFactory.createWorkOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -22,6 +26,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UnitTest - Domain - Work Order")
 class WorkOrderDomainTest {
+
+    @Test
+    @DisplayName("Deve calcular o tempo em cada status até a mudança para o status seguinte")
+    void shouldCalculateTimeInStatus() {
+        WorkOrder workOrder = createFinishedWorkOrder(30, 60, 240, 120);
+
+        Map<WorkOrderStatus, Duration> timeInStatus = workOrder.timeInStatus();
+
+        assertEquals(Map.of(WorkOrderStatus.RECEIVED, Duration.ofMinutes(30),
+                            WorkOrderStatus.IN_DIAGNOSIS, Duration.ofMinutes(60),
+                            WorkOrderStatus.AWAITING_APPROVAL, Duration.ofMinutes(240),
+                            WorkOrderStatus.IN_EXECUTION, Duration.ofMinutes(120)), timeInStatus);
+    }
 
     @Test
     @DisplayName("Deve criar uma ordem de serviço recebida com histórico de status")

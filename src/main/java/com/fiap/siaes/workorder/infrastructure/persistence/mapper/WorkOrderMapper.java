@@ -8,13 +8,19 @@ import com.fiap.siaes.workorder.application.dto.ListWorkOrderResponse;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.WorkOrderStatusHistory;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
+import com.fiap.siaes.workorder.domain.model.vo.WorkOrderStatusHistoryId;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderJpaEntity;
 import com.fiap.siaes.workorder.infrastructure.persistence.entity.WorkOrderStatusHistoryJpaEntity;
 import com.fiap.siaes.workorder.infrastructure.persistence.projection.ListWorkOrderProjection;
+import com.fiap.siaes.workorder.infrastructure.persistence.projection.WorkOrderStatusHistoryProjection;
 import lombok.experimental.UtilityClass;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -68,6 +74,20 @@ public class WorkOrderMapper {
                 .createdAt(projection.getCreatedAt())
                 .finishedAt(projection.getFinishedAt())
                 .build();
+    }
+
+    public static List<StatusTimeline> toStatusTimelines(List<WorkOrderStatusHistoryProjection> projections) {
+        return projections.stream()
+                .collect(Collectors.groupingBy(WorkOrderStatusHistoryProjection::getWorkOrderId, LinkedHashMap<UUID, List<WorkOrderStatusHistory>>::new,
+                                               Collectors.mapping(WorkOrderMapper::toDomain, Collectors.toList())))
+                .values().stream()
+                .map(StatusTimeline::of)
+                .toList();
+    }
+
+    private static WorkOrderStatusHistory toDomain(WorkOrderStatusHistoryProjection projection) {
+        return new WorkOrderStatusHistory(new WorkOrderStatusHistoryId(projection.getId()), WorkOrderStatus.valueOf(projection.getStatus()),
+                                          projection.getUpdatedAt());
     }
 
     private static WorkOrderStatusHistoryJpaEntity toEntity(WorkOrderStatusHistory history) {
