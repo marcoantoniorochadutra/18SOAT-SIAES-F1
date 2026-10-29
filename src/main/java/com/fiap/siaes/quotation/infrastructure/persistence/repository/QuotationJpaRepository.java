@@ -9,6 +9,7 @@ import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuotationJpaRepository extends JpaRepository<QuotationJpaEntity, QuotationId> {
+
+    @Override
+    @EntityGraph(attributePaths = {"statusHistory", "supplies", "maintenances"})
+    Optional<QuotationJpaEntity> findById(QuotationId id);
 
     boolean existsByWorkOrderIdAndLastStatusNotIn(WorkOrderId workOrderId, Collection<QuotationStatus> lastStatuses);
 
@@ -43,9 +48,9 @@ public interface QuotationJpaRepository extends JpaRepository<QuotationJpaEntity
             FROM {h-schema} quotations q
             INNER JOIN {h-schema} customers c ON c.id = q.customer_id
             INNER JOIN {h-schema} vehicles v ON v.id = q.vehicle_id
-            WHERE (:workOrderId IS NULL OR q.work_order_id = :workOrderId)
-                AND (:customerId IS NULL OR q.customer_id = :customerId)
-                AND (:vehicleId IS NULL OR q.vehicle_id = :vehicleId)
+            WHERE (CAST(:workOrderId AS uuid) IS NULL OR q.work_order_id = CAST(:workOrderId AS uuid))
+                AND (CAST(:customerId AS uuid) IS NULL OR q.customer_id = CAST(:customerId AS uuid))
+                AND (CAST(:vehicleId AS uuid) IS NULL OR q.vehicle_id = CAST(:vehicleId AS uuid))
                 AND (:status IS NULL OR q.last_status = :status)
                 AND (:includeDrafts OR q.last_status <> 'DRAFT')
             ORDER BY q.created_at DESC

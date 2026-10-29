@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomerDeletedSubscriber {
+public class QuotationCustomerDeletedSubscriber {
 
     private final DeleteCustomerQuotationsUseCase deleteCustomerQuotationsUseCase;
 

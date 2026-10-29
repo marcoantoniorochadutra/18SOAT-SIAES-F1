@@ -53,6 +53,26 @@ public class QuotationTestFactory {
                 .build();
     }
 
+    public static Quotation createQuotation(WorkOrderId workOrderId, CustomerId customerId, VehicleId vehicleId,
+                                            SuppliesId suppliesId, MaintenanceId maintenanceId, QuotationStatus status) {
+        Set<QuotationStatusHistory> statusHistory = new HashSet<>();
+        statusHistory.add(new QuotationStatusHistory(QuotationStatusHistoryId.generate(), status, Instant.now()));
+
+        return Quotation.recreate()
+                .id(QuotationId.generate())
+                .workOrderId(workOrderId)
+                .customerId(customerId)
+                .vehicleId(vehicleId)
+                .description(DESCRIPTION)
+                .odometer(ODOMETER)
+                .lastStatus(status)
+                .statusHistory(statusHistory)
+                .supplies(new ArrayList<>(List.of(createQuotationSupplies(suppliesId, 2))))
+                .maintenances(new ArrayList<>(List.of(createQuotationMaintenance(maintenanceId, 1))))
+                .createdAt(Instant.now())
+                .build();
+    }
+
     public static Quotation createQuotation() {
         return createQuotation(CustomerId.generate(), QuotationStatus.AWAITING_APPROVAL);
     }

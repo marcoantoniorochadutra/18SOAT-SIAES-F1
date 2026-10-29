@@ -1,7 +1,7 @@
-package com.fiap.siaes.workorder.infrastructure.subscriber;
+package com.fiap.siaes.vehicle.infrastructure.subscriber;
 
 import com.fiap.siaes.customer.domain.event.CustomerDeletedEvent;
-import com.fiap.siaes.workorder.application.usecase.DeleteCustomerWorkOrdersUseCase;
+import com.fiap.siaes.vehicle.application.usecase.DeleteCustomerVehiclesUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomerDeletedSubscriber {
+public class VehicleCustomerDeletedSubscriber {
 
-    private final DeleteCustomerWorkOrdersUseCase deleteCustomerWorkOrdersUseCase;
+    private final DeleteCustomerVehiclesUseCase deleteCustomerVehiclesUseCase;
 
     @EventListener
-    @Order(2)
+    @Order(3)
     public void on(CustomerDeletedEvent event) {
-        this.deleteCustomerWorkOrdersUseCase.execute(event.customerId());
+        this.deleteCustomerVehiclesUseCase.execute(event.customerId());
     }
 }
