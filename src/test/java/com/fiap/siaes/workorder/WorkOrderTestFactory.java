@@ -6,6 +6,7 @@ import com.fiap.siaes.vehicle.domain.model.vo.VehicleId;
 import com.fiap.siaes.workorder.domain.model.WorkOrder;
 import com.fiap.siaes.workorder.domain.model.WorkOrderStatusHistory;
 import com.fiap.siaes.workorder.domain.model.enums.WorkOrderStatus;
+import com.fiap.siaes.workorder.domain.model.vo.Diagnosis;
 import com.fiap.siaes.workorder.domain.model.vo.StatusTimeline;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderId;
 import com.fiap.siaes.workorder.domain.model.vo.WorkOrderStatusHistoryId;
@@ -37,6 +38,35 @@ public class WorkOrderTestFactory {
         WorkOrder workOrder = createWorkOrder(WorkOrderStatus.IN_DIAGNOSIS);
         workOrder.registerDiagnosis(DIAGNOSIS, UserId.generate());
         return workOrder;
+    }
+
+    public static WorkOrder createWorkOrder(CustomerId customerId, VehicleId vehicleId) {
+        return WorkOrder.builder()
+                .customerId(customerId)
+                .vehicleId(vehicleId)
+                .build();
+    }
+
+    public static WorkOrder createWorkOrder(CustomerId customerId, VehicleId vehicleId, WorkOrderStatus status, UserId diagnosedBy) {
+        List<WorkOrderStatus> flow = List.of(WorkOrderStatus.RECEIVED, WorkOrderStatus.IN_DIAGNOSIS, WorkOrderStatus.AWAITING_APPROVAL,
+                                             WorkOrderStatus.IN_EXECUTION, WorkOrderStatus.FINISHED, WorkOrderStatus.DELIVERED);
+        List<WorkOrderStatus> statuses = flow.subList(0, flow.indexOf(status) + 1);
+        Instant createdAt = Instant.now().minus(Duration.ofMinutes(statuses.size()));
+
+        Set<WorkOrderStatusHistory> statusHistory = new HashSet<>();
+        for (int i = 0; i < statuses.size(); i++) {
+            statusHistory.add(new WorkOrderStatusHistory(WorkOrderStatusHistoryId.generate(), statuses.get(i), createdAt.plus(Duration.ofMinutes(i))));
+        }
+
+        return WorkOrder.recreate()
+                .id(WorkOrderId.generate())
+                .customerId(customerId)
+                .vehicleId(vehicleId)
+                .lastStatus(status)
+                .statusHistory(statusHistory)
+                .diagnosis(Diagnosis.of(DIAGNOSIS, diagnosedBy, createdAt))
+                .createdAt(createdAt)
+                .build();
     }
 
     public static WorkOrder createWorkOrder(CustomerId customerId, WorkOrderStatus status) {

@@ -17,13 +17,13 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnitTest - Subscriber - Customer Deleted (Work Order)")
-class CustomerDeletedSubscriberTest {
+class WorkOrderCustomerDeletedSubscriberTest {
 
     @Mock
     private DeleteCustomerWorkOrdersUseCase deleteCustomerWorkOrdersUseCase;
 
     @InjectMocks
-    private CustomerDeletedSubscriber customerDeletedSubscriber;
+    private WorkOrderCustomerDeletedSubscriber customerDeletedSubscriber;
 
     @Test
     @DisplayName("Deve remover as ordens de serviço do cliente excluído")

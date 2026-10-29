@@ -32,7 +32,7 @@ public interface VehicleJpaRepository extends JpaRepository<VehicleJpaEntity, Ve
                 AND (:brand IS NULL OR v.brand ILIKE '%' || :brand || '%')
                 AND (:model IS NULL OR v.model ILIKE '%' || :model || '%')
                 AND (:year IS NULL OR v.year = :year)
-                AND (:customerId IS NULL OR v.customer_id = :customerId)
+                AND (CAST(:customerId AS uuid) IS NULL OR v.customer_id = CAST(:customerId AS uuid))
             ORDER BY v.id
             """,
            nativeQuery = true)

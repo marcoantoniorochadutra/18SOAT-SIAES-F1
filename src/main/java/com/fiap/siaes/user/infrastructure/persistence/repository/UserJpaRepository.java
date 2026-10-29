@@ -4,12 +4,17 @@ import com.fiap.siaes.customer.domain.model.vo.CustomerId;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import com.fiap.siaes.user.infrastructure.persistence.entity.UserJpaEntity;
 import com.fiap.siaes.user.infrastructure.persistence.projection.UserAuthenticationProjection;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UserId> {
+
+    @Override
+    @EntityGraph(attributePaths = "statusHistory")
+    Optional<UserJpaEntity> findById(UserId id);
 
     @Query(value = """
         SELECT u.id AS id,

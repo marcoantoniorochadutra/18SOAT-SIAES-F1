@@ -39,6 +39,16 @@ public class UserTestFactory {
                 .build();
     }
 
+    public static User createUser(UserRole role, CustomerId customerId, Password password) {
+        return User.builder()
+                .name(Faker.instance().name().fullName())
+                .email(Faker.instance().internet().emailAddress())
+                .password(password)
+                .role(role)
+                .customerId(customerId)
+                .build();
+    }
+
     public static UserJpaEntity createUserJpaEntity() {
         return new UserJpaEntity(
                 UserId.generate(),

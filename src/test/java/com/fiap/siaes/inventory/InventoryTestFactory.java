@@ -36,6 +36,18 @@ public class InventoryTestFactory {
                 .build();
     }
 
+    public static StockItem createStockItem(SuppliesId suppliesId, int quantity) {
+        return createStockItem(suppliesId, quantity, 0);
+    }
+
+    public static StockItem createStockItem(SuppliesId suppliesId, int quantity, int reservedQuantity) {
+        return StockItem.recreate()
+                .suppliesId(suppliesId)
+                .quantity(quantity)
+                .reservedQuantity(reservedQuantity)
+                .build();
+    }
+
     public static StockItemJpaEntity createStockItemJpaEntity() {
         return StockItemJpaEntity.builder()
                 .suppliesId(SuppliesId.generate())

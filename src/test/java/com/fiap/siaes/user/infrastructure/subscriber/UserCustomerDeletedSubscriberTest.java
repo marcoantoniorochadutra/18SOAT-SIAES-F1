@@ -1,8 +1,8 @@
-package com.fiap.siaes.vehicle.infrastructure.subscriber;
+package com.fiap.siaes.user.infrastructure.subscriber;
 
 import com.fiap.siaes.customer.domain.event.CustomerDeletedEvent;
 import com.fiap.siaes.customer.domain.model.vo.CustomerId;
-import com.fiap.siaes.vehicle.application.usecase.DeleteCustomerVehiclesUseCase;
+import com.fiap.siaes.user.application.usecase.DeleteCustomerUsersUseCase;
 import com.fiap.siaes.user.domain.model.vo.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,22 +16,22 @@ import java.time.Instant;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UnitTest - Subscriber - Customer Deleted (Vehicle)")
-class CustomerDeletedSubscriberTest {
+@DisplayName("UnitTest - Subscriber - Customer Deleted (User)")
+class UserCustomerDeletedSubscriberTest {
 
     @Mock
-    private DeleteCustomerVehiclesUseCase deleteCustomerVehiclesUseCase;
+    private DeleteCustomerUsersUseCase deleteCustomerUsersUseCase;
 
     @InjectMocks
-    private CustomerDeletedSubscriber customerDeletedSubscriber;
+    private UserCustomerDeletedSubscriber customerDeletedSubscriber;
 
     @Test
-    @DisplayName("Deve remover os veículos do cliente excluído")
-    void shouldDeleteCustomerVehicles() {
+    @DisplayName("Deve remover os usuários do cliente excluído")
+    void shouldDeleteCustomerUsers() {
         var event = CustomerDeletedEvent.of(CustomerId.generate(), UserId.generate(), Instant.now());
 
         this.customerDeletedSubscriber.on(event);
 
-        verify(this.deleteCustomerVehiclesUseCase).execute(event.customerId());
+        verify(this.deleteCustomerUsersUseCase).execute(event.customerId());
     }
 }

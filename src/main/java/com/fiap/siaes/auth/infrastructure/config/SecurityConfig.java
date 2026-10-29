@@ -47,6 +47,7 @@ public class SecurityConfig {
 
     private HttpSecurity statelessHttp(HttpSecurity http) {
         return http
+                .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

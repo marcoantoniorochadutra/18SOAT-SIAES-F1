@@ -8,14 +8,20 @@ import com.fiap.siaes.workorder.infrastructure.persistence.projection.ListWorkOr
 import com.fiap.siaes.workorder.infrastructure.persistence.projection.WorkOrderStatusHistoryProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface WorkOrderJpaRepository extends JpaRepository<WorkOrderJpaEntity, WorkOrderId> {
+
+    @Override
+    @EntityGraph(attributePaths = "statusHistory")
+    Optional<WorkOrderJpaEntity> findById(WorkOrderId id);
 
     @Query(value = """
             SELECT
@@ -32,9 +38,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrderJpaEntity
             FROM {h-schema} work_orders w
             INNER JOIN {h-schema} customers c ON c.id = w.customer_id
             INNER JOIN {h-schema} vehicles v ON v.id = w.vehicle_id
-            WHERE (:customerId IS NULL OR w.customer_id = :customerId)
+            WHERE (CAST(:customerId AS uuid) IS NULL OR w.customer_id = CAST(:customerId AS uuid))
                 AND (:document IS NULL OR c.document = :document)
-                AND (:vehicleId IS NULL OR w.vehicle_id = :vehicleId)
+                AND (CAST(:vehicleId AS uuid) IS NULL OR w.vehicle_id = CAST(:vehicleId AS uuid))
                 AND (:status IS NULL OR w.last_status = :status)
             ORDER BY w.created_at DESC
             """,
