@@ -1,11 +1,11 @@
 package com.fiap.siaes.auth.domain.exception;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import org.springframework.http.HttpStatus;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 
 public class UndeclaredEndpointAccessException extends DomainException {
 
     public UndeclaredEndpointAccessException() {
-        super(HttpStatus.UNAUTHORIZED);
+        super(ErrorType.UNAUTHENTICATED);
     }
 }

@@ -1,11 +1,11 @@
 package com.fiap.siaes.vehicle.domain.exception;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import org.springframework.http.HttpStatus;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 
 public class InvalidVehicleYearException extends DomainException {
 
     public InvalidVehicleYearException(int year) {
-        super(HttpStatus.BAD_REQUEST, year);
+        super(ErrorType.INVALID, year);
     }
 }

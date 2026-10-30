@@ -59,6 +59,13 @@ class DocumentTest {
     }
 
     @Test
+    @DisplayName("Não deve criar documento sem dígitos")
+    void shouldNotCreateDocumentWithoutDigits() {
+        assertThrows(InvalidDocumentLengthException.class, () -> Document.create("abc.---"));
+        assertThrows(InvalidDocumentLengthException.class, () -> Document.recreate(null));
+    }
+
+    @Test
     @DisplayName("Não deve criar CPF ou CNPJ com dígitos verificadores inválidos")
     void shouldNotCreateDocumentWithInvalidCheckDigits() {
         assertThrows(InvalidDocumentException.class, () -> Document.create("529.982.247-26"));

@@ -32,4 +32,6 @@ COPY --from=build /workspace/target/extracted/snapshot-dependencies/ ./
 COPY --from=build /workspace/target/extracted/application/ ./
 USER siaes
 EXPOSE 8715
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD wget -q --spider "http://127.0.0.1:${SERVER_PORT:-8715}${SERVER_CONTEXT_PATH%/}/v3/api-docs" || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]

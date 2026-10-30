@@ -1,6 +1,7 @@
 package com.fiap.siaes.sk.infrastructure.web;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 import com.fiap.siaes.sk.domain.exception.InternalException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     public ProblemDetail handleDomainException(DomainException exception, Locale locale) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(exception.getStatus());
+        ProblemDetail problemDetail = ProblemDetail.forStatus(toHttpStatus(exception.getType()));
         problemDetail.setTitle(this.translate(exception.getMessageKey(), exception.getParameters(), locale));
         problemDetail.setDetail(this.translate(exception.getDetailKey(), exception.getParameters(), locale));
         return problemDetail;
@@ -73,6 +74,16 @@ public class GlobalExceptionHandler {
         problemDetail.setDetail(this.translate(context + ".detail", null, locale));
         problemDetail.setProperty("fields", fields);
         return problemDetail;
+    }
+
+    private static HttpStatus toHttpStatus(ErrorType type) {
+        return switch (type) {
+            case INVALID -> HttpStatus.BAD_REQUEST;
+            case NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case CONFLICT -> HttpStatus.CONFLICT;
+            case UNAUTHENTICATED -> HttpStatus.UNAUTHORIZED;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
+        };
     }
 
     private FieldErrorResponse toFieldErrorResponse(FieldError fieldError) {

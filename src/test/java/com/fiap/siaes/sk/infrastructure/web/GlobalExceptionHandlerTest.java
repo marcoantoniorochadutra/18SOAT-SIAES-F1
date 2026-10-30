@@ -1,16 +1,25 @@
 package com.fiap.siaes.sk.infrastructure.web;
 
+import com.fiap.siaes.auth.domain.exception.InvalidCredentialsException;
+import com.fiap.siaes.auth.domain.exception.RoleNotAllowedException;
 import com.fiap.siaes.customer.domain.exception.CustomerEmailAlreadyExistsException;
 import com.fiap.siaes.sk.document.domain.Document;
 import com.fiap.siaes.sk.document.domain.exception.InvalidDocumentException;
+import com.fiap.siaes.sk.domain.exception.DomainException;
 import com.fiap.siaes.sk.domain.exception.InternalException;
 import com.fiap.siaes.sk.infrastructure.config.I18nConfig;
+import com.fiap.siaes.user.domain.model.enums.UserRole;
+import com.fiap.siaes.vehicle.domain.exception.VehicleNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,6 +38,15 @@ class GlobalExceptionHandlerTest {
         assertThat(problem.getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(problem.getTitle()).isEqualTo("E-mail já cadastrado");
         assertThat(problem.getDetail()).isEqualTo("Já existe um cliente cadastrado com o e-mail joao@email.com.");
+    }
+
+    @ParameterizedTest
+    @MethodSource("exceptionsByHttpStatus")
+    @DisplayName("Deve converter o tipo de erro do domínio no status HTTP")
+    void mapsErrorTypeToHttpStatus(DomainException exception, HttpStatus expectedStatus) {
+        ProblemDetail problem = this.handler.handleDomainException(exception, Locale.forLanguageTag("pt-BR"));
+
+        assertThat(problem.getStatus()).isEqualTo(expectedStatus.value());
     }
 
     @Test
@@ -79,5 +97,14 @@ class GlobalExceptionHandlerTest {
                 new CustomerEmailAlreadyExistsException("joao@email.com"), Locale.forLanguageTag("pt"));
 
         assertThat(problem.getTitle()).isEqualTo("E-mail já cadastrado");
+    }
+
+    static Stream<Arguments> exceptionsByHttpStatus() {
+        return Stream.of(
+                Arguments.of(new InvalidDocumentException("123"), HttpStatus.BAD_REQUEST),
+                Arguments.of(new VehicleNotFoundException("1"), HttpStatus.NOT_FOUND),
+                Arguments.of(new CustomerEmailAlreadyExistsException("joao@email.com"), HttpStatus.CONFLICT),
+                Arguments.of(new InvalidCredentialsException(), HttpStatus.UNAUTHORIZED),
+                Arguments.of(new RoleNotAllowedException(UserRole.CUSTOMER), HttpStatus.FORBIDDEN));
     }
 }

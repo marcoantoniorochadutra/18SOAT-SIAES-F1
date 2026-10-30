@@ -39,3 +39,6 @@ out/
 /.trail
 .claude
 .mcp.json
+
+# Raw Trivy results; the Markdown report is the versioned artifact
+docs/security/*.json
