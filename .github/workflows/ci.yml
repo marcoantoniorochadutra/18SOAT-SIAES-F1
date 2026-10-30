@@ -98,45 +98,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Scan repository (secrets, Dockerfile/compose)
-        run: |
-          mkdir -p trivy-reports
-          docker run --rm -v "$PWD:/src" -v trivy-cache:/root/.cache/trivy "$TRIVY_IMAGE" \
-            fs --offline-scan --scanners secret,misconfig --skip-dirs /src/trivy-reports \
-            --format json --output /src/trivy-reports/fs.json /src
+      - name: Scan repository and image, write Markdown report
+        run: bash devops/security-scan.sh siaes-app:ci trivy-reports
 
-      - name: Scan image (Alpine packages, Java runtime, jars)
+      - name: Convert reports to SARIF and write job summary
         run: |
-          docker run --rm -v "$PWD:/src" -v trivy-cache:/root/.cache/trivy \
-            -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
-            image --format json --output /src/trivy-reports/image.json siaes-app:ci
-
-      - name: Convert reports and write job summary
-        run: |
-          for scan in fs image; do
+          for scan in repository image; do
             docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" \
-              convert --format sarif --output "/src/trivy-reports/$scan.sarif" "/src/trivy-reports/$scan.json"
-            {
-              echo "## Trivy: $scan"
-              echo '```'
-              docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" \
-                convert --format table --severity HIGH,CRITICAL "/src/trivy-reports/$scan.json"
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
+              convert --format sarif --output "/src/trivy-reports/trivy-$scan.sarif" "/src/trivy-reports/trivy-$scan.json"
           done
+          cat trivy-reports/trivy-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish repository findings to GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
         with:
-          sarif_file: trivy-reports/fs.sarif
+          sarif_file: trivy-reports/trivy-repository.sarif
           category: trivy-fs
 
       - name: Publish image findings to GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
         with:
-          sarif_file: trivy-reports/image.sarif
+          sarif_file: trivy-reports/trivy-image.sarif
           category: trivy-image
 
       - name: Upload Trivy reports
@@ -150,7 +134,7 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" \
             convert --format table --severity HIGH,CRITICAL --exit-code "$TRIVY_EXIT_CODE" \
-            /src/trivy-reports/fs.json > /dev/null
+            /src/trivy-reports/trivy-repository.json > /dev/null
           docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" \
             convert --format table --severity HIGH,CRITICAL --exit-code "$TRIVY_EXIT_CODE" \
-            /src/trivy-reports/image.json > /dev/null
+            /src/trivy-reports/trivy-image.json > /dev/null

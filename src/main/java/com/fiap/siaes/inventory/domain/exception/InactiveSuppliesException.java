@@ -1,11 +1,11 @@
 package com.fiap.siaes.inventory.domain.exception;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import org.springframework.http.HttpStatus;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 
 public class InactiveSuppliesException extends DomainException {
 
     public InactiveSuppliesException(String suppliesId) {
-        super(HttpStatus.CONFLICT, suppliesId);
+        super(ErrorType.CONFLICT, suppliesId);
     }
 }

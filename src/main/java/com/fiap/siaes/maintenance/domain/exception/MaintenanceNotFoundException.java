@@ -1,11 +1,11 @@
 package com.fiap.siaes.maintenance.domain.exception;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import org.springframework.http.HttpStatus;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 
 public class MaintenanceNotFoundException extends DomainException {
 
     public MaintenanceNotFoundException(String id) {
-        super(HttpStatus.NOT_FOUND, id);
+        super(ErrorType.NOT_FOUND, id);
     }
 }

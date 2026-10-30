@@ -1,11 +1,11 @@
 package com.fiap.siaes.inventory.domain.exception;
 
 import com.fiap.siaes.sk.domain.exception.DomainException;
-import org.springframework.http.HttpStatus;
+import com.fiap.siaes.sk.domain.exception.ErrorType;
 
 public class StockAdjustmentReasonRequiredException extends DomainException {
 
     public StockAdjustmentReasonRequiredException(String suppliesId) {
-        super(HttpStatus.BAD_REQUEST, suppliesId);
+        super(ErrorType.INVALID, suppliesId);
     }
 }
