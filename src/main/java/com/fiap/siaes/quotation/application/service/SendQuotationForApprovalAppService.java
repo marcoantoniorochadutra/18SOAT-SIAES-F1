@@ -59,7 +59,6 @@ public class SendQuotationForApprovalAppService implements SendQuotationForAppro
     private String recipientFor(NotificationChannel channel, Customer customer) {
         return switch (channel) {
             case EMAIL -> customer.getEmail();
-            case WHATSAPP -> customer.getPhone();
         };
     }
 }

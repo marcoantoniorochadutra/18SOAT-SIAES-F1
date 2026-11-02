@@ -1,0 +1,51 @@
+-- Demo data for the dev profile only (spring.flyway.locations in application-dev.yml).
+-- Repeatable and idempotent: fixed ids and ON CONFLICT DO NOTHING, so a re-run never duplicates or overwrites.
+-- Every demo user has the password Siaes@123 (BCrypt, strength 10).
+
+INSERT INTO customers (id, document, name, phone, email) VALUES
+    ('00000000-0000-0000-0000-000000000101', '52998224725', 'João da Silva', '11987654321', 'joao.silva@siaes.com'),
+    ('00000000-0000-0000-0000-000000000102', '11222333000181', 'Transportadora Rápida Ltda', '1133334444', 'contato@transportadorarapida.com')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO users (id, name, email, password, role, last_status, customer_id) VALUES
+    ('00000000-0000-0000-0000-000000000001', 'Administrador', 'admin@siaes.com', '$2a$10$rGRYhiTybMKEOGmcN9irm.JSiKvkUpKj5Y5ltlYYUK4NcMEW88yPG', 'ADMIN', 'ACTIVE', NULL),
+    ('00000000-0000-0000-0000-000000000002', 'Gerente da Oficina', 'gerente@siaes.com', '$2a$10$rGRYhiTybMKEOGmcN9irm.JSiKvkUpKj5Y5ltlYYUK4NcMEW88yPG', 'MANAGER', 'ACTIVE', NULL),
+    ('00000000-0000-0000-0000-000000000003', 'Mecânico Responsável', 'mecanico@siaes.com', '$2a$10$rGRYhiTybMKEOGmcN9irm.JSiKvkUpKj5Y5ltlYYUK4NcMEW88yPG', 'MECHANIC', 'ACTIVE', NULL),
+    ('00000000-0000-0000-0000-000000000004', 'João da Silva', 'joao.silva@siaes.com', '$2a$10$rGRYhiTybMKEOGmcN9irm.JSiKvkUpKj5Y5ltlYYUK4NcMEW88yPG', 'CUSTOMER', 'ACTIVE', '00000000-0000-0000-0000-000000000101')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_status_history (id, user_id, status, updated_at) VALUES
+    ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000001', 'ACTIVE', now()),
+    ('00000000-0000-0000-0000-000000000012', '00000000-0000-0000-0000-000000000002', 'ACTIVE', now()),
+    ('00000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-000000000003', 'ACTIVE', now()),
+    ('00000000-0000-0000-0000-000000000014', '00000000-0000-0000-0000-000000000004', 'ACTIVE', now())
+ON CONFLICT DO NOTHING;
+
+INSERT INTO vehicles (id, customer_id, plate, brand, model, year) VALUES
+    ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000101', 'ABC1D23', 'Volkswagen', 'Gol', 2019),
+    ('00000000-0000-0000-0000-000000000202', '00000000-0000-0000-0000-000000000102', 'XYZ4567', 'Mercedes-Benz', 'Sprinter', 2021)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO maintenances (id, code, description, price, estimated_duration_minutes) VALUES
+    ('00000000-0000-0000-0000-000000000301', 'TROCA-OLEO', 'Troca de óleo e filtro', 120.00, 40),
+    ('00000000-0000-0000-0000-000000000302', 'ALINHAMENTO', 'Alinhamento e balanceamento', 150.00, 60),
+    ('00000000-0000-0000-0000-000000000303', 'REVISAO-FREIOS', 'Revisão do sistema de freios', 250.00, 90)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO supplies (id, sku, description, unit_price) VALUES
+    ('00000000-0000-0000-0000-000000000401', 'OLEO-5W30-1L', 'Óleo sintético 5W30 (1 litro)', 45.90),
+    ('00000000-0000-0000-0000-000000000402', 'FILTRO-OLEO', 'Filtro de óleo', 32.50),
+    ('00000000-0000-0000-0000-000000000403', 'PASTILHA-FREIO', 'Jogo de pastilhas de freio dianteiras', 189.00)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO stock_items (supplies_id, quantity, reserved_quantity) VALUES
+    ('00000000-0000-0000-0000-000000000401', 50, 0),
+    ('00000000-0000-0000-0000-000000000402', 20, 0),
+    ('00000000-0000-0000-0000-000000000403', 10, 0)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO stock_movements (id, supplies_id, type, quantity, stock_after, reserved_after, performed_by, performed_by_name, occurred_at) VALUES
+    ('00000000-0000-0000-0000-000000000501', '00000000-0000-0000-0000-000000000401', 'INITIAL', 50, 50, 0, '00000000-0000-0000-0000-000000000001', 'Administrador', now()),
+    ('00000000-0000-0000-0000-000000000502', '00000000-0000-0000-0000-000000000402', 'INITIAL', 20, 20, 0, '00000000-0000-0000-0000-000000000001', 'Administrador', now()),
+    ('00000000-0000-0000-0000-000000000503', '00000000-0000-0000-0000-000000000403', 'INITIAL', 10, 10, 0, '00000000-0000-0000-0000-000000000001', 'Administrador', now())
+ON CONFLICT DO NOTHING;

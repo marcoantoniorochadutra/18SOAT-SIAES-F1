@@ -49,9 +49,6 @@ class SendQuotationForApprovalAppServiceTest {
     @Mock
     private QuotationApprovalNotifier emailNotifier;
 
-    @Mock
-    private QuotationApprovalNotifier whatsAppNotifier;
-
     @Spy
     private List<QuotationApprovalNotifier> quotationApprovalNotifiers = new ArrayList<>();
 
@@ -59,71 +56,24 @@ class SendQuotationForApprovalAppServiceTest {
     private SendQuotationForApprovalAppService sendQuotationForApprovalAppService;
 
     @Test
-    @DisplayName("Deve enviar o mesmo link por e-mail e WhatsApp quando o cliente tiver os dois contatos")
-    void shouldSendByEmailAndWhatsApp() {
+    @DisplayName("Deve enviar o link de aprovação por e-mail")
+    void shouldSendByEmail() {
         Customer customer = createCustomer();
         Quotation quotation = this.mockQuotationOf(customer);
         QuotationApprovalToken token = this.mockIssuedToken(quotation);
-        this.mockNotifiers();
+        this.quotationApprovalNotifiers.add(this.emailNotifier);
         when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
-        when(this.whatsAppNotifier.channel()).thenReturn(NotificationChannel.WHATSAPP);
 
         this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
 
         verify(this.quotationApprovalTokenHelper).issue(quotation.getId());
         verify(this.emailNotifier).send(QuotationApprovalNotification.of(customer.getEmail(), customer.getName(), LINK, token.getExpiresAt()));
-        verify(this.whatsAppNotifier).send(QuotationApprovalNotification.of(customer.getPhone(), customer.getName(), LINK, token.getExpiresAt()));
     }
 
     @Test
-    @DisplayName("Deve enviar o link de aprovação somente por e-mail quando o cliente não tiver telefone")
-    void shouldSendByEmailWithoutPhone() {
-        Customer customer = this.customerWith("cliente@email.com", null);
-        Quotation quotation = this.mockQuotationOf(customer);
-        QuotationApprovalToken token = this.mockIssuedToken(quotation);
-        this.mockNotifiers();
-        when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
-        when(this.whatsAppNotifier.channel()).thenReturn(NotificationChannel.WHATSAPP);
-
-        this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
-
-        verify(this.emailNotifier).send(QuotationApprovalNotification.of("cliente@email.com", customer.getName(), LINK, token.getExpiresAt()));
-        verify(this.whatsAppNotifier, never()).send(any());
-    }
-
-    @Test
-    @DisplayName("Deve enviar o link de aprovação pelo WhatsApp quando o cliente não tiver e-mail")
-    void shouldSendByWhatsAppWithoutEmail() {
-        Customer customer = this.customerWith(null, "11999999999");
-        Quotation quotation = this.mockQuotationOf(customer);
-        QuotationApprovalToken token = this.mockIssuedToken(quotation);
-        this.mockNotifiers();
-        when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
-        when(this.whatsAppNotifier.channel()).thenReturn(NotificationChannel.WHATSAPP);
-
-        this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
-
-        verify(this.whatsAppNotifier).send(QuotationApprovalNotification.of("11999999999", customer.getName(), LINK, token.getExpiresAt()));
-        verify(this.emailNotifier, never()).send(any());
-    }
-
-    @Test
-    @DisplayName("Não deve emitir link nem enviar quando o cliente não tiver contato")
-    void shouldNotSendWithoutContact() {
-        Customer customer = this.customerWith(null, " ");
-        Quotation quotation = this.mockQuotationOf(customer);
-
-        this.sendQuotationForApprovalAppService.execute(SendQuotationForApprovalCommand.of(quotation.getId()));
-
-        verifyNoInteractions(this.quotationApprovalTokenHelper);
-        verify(this.emailNotifier, never()).send(any());
-        verify(this.whatsAppNotifier, never()).send(any());
-    }
-
-    @Test
-    @DisplayName("Não deve emitir link quando nenhum canal registrado alcança o cliente")
-    void shouldNotIssueTokenWhenNoRegisteredChannelReachesCustomer() {
-        Customer customer = this.customerWith(null, "11999999999");
+    @DisplayName("Não deve emitir link nem enviar quando o cliente não tiver e-mail")
+    void shouldNotSendWithoutEmail() {
+        Customer customer = this.customerWithoutEmail();
         Quotation quotation = this.mockQuotationOf(customer);
         this.quotationApprovalNotifiers.add(this.emailNotifier);
         when(this.emailNotifier.channel()).thenReturn(NotificationChannel.EMAIL);
@@ -164,19 +114,15 @@ class SendQuotationForApprovalAppServiceTest {
         return token;
     }
 
-    private void mockNotifiers() {
-        this.quotationApprovalNotifiers.addAll(List.of(this.emailNotifier, this.whatsAppNotifier));
-    }
-
-    private Customer customerWith(String email, String phone) {
+    private Customer customerWithoutEmail() {
         Customer customer = createCustomer();
 
         return Customer.recreate()
                 .id(customer.getId())
                 .document(customer.getDocument())
                 .name(customer.getName())
-                .email(email)
-                .phone(phone)
+                .email(null)
+                .phone(customer.getPhone())
                 .createdAt(customer.getCreatedAt())
                 .updatedAt(customer.getUpdatedAt())
                 .build();

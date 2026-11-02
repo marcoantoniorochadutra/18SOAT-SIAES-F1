@@ -26,6 +26,7 @@
         <jacoco.minimum.line.coverage>0.80</jacoco.minimum.line.coverage>
         <jacoco.haltOnFailure>true</jacoco.haltOnFailure>
         <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
+        <exec-maven-plugin.version>3.6.4</exec-maven-plugin.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>marcoantoniorochadutra</sonar.organization>
         <sonar.projectKey>marcoantoniorochadutra_18SOAT-SIAES-F1</sonar.projectKey>
@@ -289,5 +290,54 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>security</id>
+            <properties>
+                <trivy.image>aquasec/trivy:0.76.1</trivy.image>
+                <trivy.severity>HIGH,CRITICAL</trivy.severity>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>trivy-scan</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>--rm</argument>
+                                        <argument>-v</argument>
+                                        <argument>${project.build.directory}:/target:ro</argument>
+                                        <argument>-v</argument>
+                                        <argument>trivy-cache:/root/.cache/trivy</argument>
+                                        <argument>${trivy.image}</argument>
+                                        <argument>rootfs</argument>
+                                        <argument>--quiet</argument>
+                                        <argument>--scanners</argument>
+                                        <argument>vuln</argument>
+                                        <argument>--severity</argument>
+                                        <argument>${trivy.severity}</argument>
+                                        <argument>--exit-code</argument>
+                                        <argument>1</argument>
+                                        <argument>/target/${project.build.finalName}.jar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
