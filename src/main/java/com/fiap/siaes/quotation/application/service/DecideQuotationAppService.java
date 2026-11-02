@@ -31,18 +31,23 @@ public class DecideQuotationAppService implements DecideQuotationUseCase {
         if (nonNull(command.ownerId()) && !quotation.isOwnedBy(command.ownerId()))
             throw new QuotationNotFoundException(command.quotationId().toString());
 
-        if (command.decision().isApprove()) {
-            quotation.approve(command.channel(), command.decidedBy());
-            this.quotationStockHelper.consumeAll(quotation, command.decidedBy(), command.decidedByName());
-        } else {
-            quotation.reject(command.channel(), command.decidedBy(), command.reason());
-            this.quotationStockHelper.releaseAll(quotation, command.decidedBy(), command.decidedByName());
-        }
+        this.applyDecision(command, quotation);
 
         this.quotationRepository.save(quotation);
 
         this.quotationApprovalTokenHelper.revokeCurrent(quotation.getId());
 
         this.domainEventPublisher.publish(quotation.pullDomainEvents());
+    }
+
+    private void applyDecision(DecideQuotationCommand command, Quotation quotation) {
+        if (command.decision().isApprove()) {
+            quotation.approve(command.channel(), command.decidedBy());
+            this.quotationStockHelper.consumeAll(quotation, command.decidedBy(), command.decidedByName());
+            return;
+        }
+
+        quotation.reject(command.channel(), command.decidedBy(), command.reason());
+        this.quotationStockHelper.releaseAll(quotation, command.decidedBy(), command.decidedByName());
     }
 }

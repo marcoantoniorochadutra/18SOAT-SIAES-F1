@@ -112,6 +112,32 @@ class CustomerControllerIT extends IntegrationTestUtils {
     }
 
     @Test
+    @DisplayName("[200] Mecânico deve buscar cliente pelo CPF/CNPJ e pelo id")
+    void shouldFindCustomerAsMechanic() throws Exception {
+        var customer = this.persistCustomer();
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executeGet(CustomerController.ENDPOINT + "?document=" + customer.getDocument().getValue(), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.content.length()", 1))
+                .andExpect(jsonValue("$.content[0].id", customer.getId().toString()));
+
+        super.executeGet(this.url(customer), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.id", customer.getId().toString()));
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve remover clientes")
+    void shouldNotDeleteCustomerAsMechanic() throws Exception {
+        var customer = this.persistCustomer();
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executeDelete(this.url(customer), mechanicToken)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("[403] Cliente não deve listar clientes")
     void shouldNotListCustomersAsCustomer() throws Exception {
         var customer = this.persistCustomer();

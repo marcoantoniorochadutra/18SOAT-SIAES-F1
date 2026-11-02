@@ -98,11 +98,27 @@ class MaintenanceControllerIT extends IntegrationTestUtils {
     }
 
     @Test
-    @DisplayName("[403] Mecânico não deve listar serviços")
-    void shouldNotListMaintenancesAsMechanic() throws Exception {
+    @DisplayName("[200] Mecânico deve listar e buscar serviços")
+    void shouldListAndGetMaintenancesAsMechanic() throws Exception {
+        var maintenance = this.persistMaintenance();
         var mechanicToken = super.loginAs(UserRole.MECHANIC);
 
         super.executeGet(MaintenanceController.ENDPOINT, mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.content[0].id", maintenance.getId().toString()));
+
+        super.executeGet(this.url(maintenance), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.id", maintenance.getId().toString()));
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve inativar serviços")
+    void shouldNotDeactivateMaintenanceAsMechanic() throws Exception {
+        var maintenance = this.persistMaintenance();
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executePatch(this.url(maintenance) + "/deactivate", mechanicToken, null)
                 .andExpect(status().isForbidden());
     }
 

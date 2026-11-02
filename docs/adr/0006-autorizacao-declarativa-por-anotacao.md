@@ -5,7 +5,7 @@
 
 ## Contexto
 
-Cada endpoint tem um público diferente: gerente para catálogo e estoque, mecânico para OS e orçamento, cliente para os próprios dados, e alguns endpoints públicos (login, link de aprovação). Regras de URL no `SecurityFilterChain` ficam longe do endpoint e é fácil esquecer uma rota nova.
+Cada endpoint tem um público diferente: gerente para cadastrar catálogo, estoque e clientes, mecânico para OS e orçamento (com leitura dos cadastros de que precisa), cliente para os próprios dados, e alguns endpoints públicos (login, link de aprovação). Regras de URL no `SecurityFilterChain` ficam longe do endpoint e é fácil esquecer uma rota nova.
 
 ## Decisão
 

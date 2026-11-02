@@ -14,7 +14,7 @@ Uma oficina mecânica de médio porte controla atendimento, diagnóstico, execu�
 |---|---|---|
 | Administrador | `ADMIN` | Operação completa do sistema |
 | Gerente | `MANAGER` | Cadastros, catálogo, estoque, usuários e métricas |
-| Mecânico | `MECHANIC` | Abrir e conduzir a OS: diagnóstico, orçamento, finalização, entrega |
+| Mecânico | `MECHANIC` | Abrir e conduzir a OS: diagnóstico, orçamento, finalização, entrega. Consulta clientes, veículos, catálogo e saldo de estoque, sem alterá-los |
 | Cliente com conta | `CUSTOMER` | Acompanhar as próprias OS e decidir os próprios orçamentos |
 | Cliente sem conta | — | Decidir o orçamento pelo link recebido |
 | Sistema | — | Reserva de estoque, mudança automática de status, envio do link, histórico |

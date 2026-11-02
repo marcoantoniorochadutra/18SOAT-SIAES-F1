@@ -79,6 +79,7 @@ public class CustomerController implements CustomerControllerOpenApi {
 
     @Override
     @GetMapping
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public PageResponse<CustomerResponse> listAllCustomer(@ParameterObject CustomerFilter filter,
                                                           @Valid @ParameterObject PageQuery pageQuery) {
         return this.listCustomersUseCase.execute(ListCustomersCommand.of(filter, pageQuery));

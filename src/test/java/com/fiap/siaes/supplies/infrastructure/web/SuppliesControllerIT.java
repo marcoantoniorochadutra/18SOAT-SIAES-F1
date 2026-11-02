@@ -115,11 +115,27 @@ class SuppliesControllerIT extends IntegrationTestUtils {
     }
 
     @Test
-    @DisplayName("[403] Mecânico não deve listar insumos")
-    void shouldNotListSuppliesAsMechanic() throws Exception {
+    @DisplayName("[200] Mecânico deve listar e buscar insumos")
+    void shouldListAndGetSuppliesAsMechanic() throws Exception {
+        var supplies = this.persistSupplies();
         var mechanicToken = super.loginAs(UserRole.MECHANIC);
 
         super.executeGet(SuppliesController.ENDPOINT, mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.content[0].id", supplies.getId().toString()));
+
+        super.executeGet(this.url(supplies), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.id", supplies.getId().toString()));
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve inativar insumos")
+    void shouldNotDeactivateSuppliesAsMechanic() throws Exception {
+        var supplies = this.persistSupplies();
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executePatch(this.url(supplies) + "/deactivate", mechanicToken, null)
                 .andExpect(status().isForbidden());
     }
 

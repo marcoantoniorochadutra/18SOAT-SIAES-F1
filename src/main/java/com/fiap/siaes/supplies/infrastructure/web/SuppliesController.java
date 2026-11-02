@@ -70,12 +70,14 @@ public class SuppliesController implements SuppliesControllerOpenApi {
 
     @Override
     @GetMapping("/{id}")
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public SuppliesResponse getById(@PathVariable SuppliesId id) {
         return this.getSuppliesByIdUseCase.execute(id);
     }
 
     @Override
     @GetMapping
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public PageResponse<SuppliesResponse> list(@ParameterObject SuppliesFilter filter,
                                                @Valid @ParameterObject PageQuery pageQuery) {
         return this.listSuppliesUseCase.execute(ListSuppliesCommand.of(filter, pageQuery));
