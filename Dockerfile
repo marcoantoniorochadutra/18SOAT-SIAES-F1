@@ -31,7 +31,7 @@ COPY --from=build /workspace/target/extracted/spring-boot-loader/ ./
 COPY --from=build /workspace/target/extracted/snapshot-dependencies/ ./
 COPY --from=build /workspace/target/extracted/application/ ./
 USER siaes
-EXPOSE 8715
+EXPOSE 8715 8716
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD wget -q --spider "http://127.0.0.1:${SERVER_PORT:-8715}${SERVER_CONTEXT_PATH%/}/v3/api-docs" || exit 1
+    CMD wget -q --spider "http://127.0.0.1:${MANAGEMENT_PORT:-8716}/actuator/health/liveness" || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]

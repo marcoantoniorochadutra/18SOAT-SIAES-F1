@@ -1,0 +1,392 @@
+{
+  "uid": "siaes-overview",
+  "title": "SIAES - Visão geral",
+  "tags": [
+    "siaes"
+  ],
+  "timezone": "browser",
+  "editable": false,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "schemaVersion": 41,
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Aplicação no ar",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "up{job=\"siaes\"}",
+          "legendFormat": "siaes",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "FORA",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "NO AR",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Requisições por segundo, por endpoint",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "sum by (method, uri) (rate(http_server_requests_seconds_count{application=\"siaes\"}[1m]))",
+          "legendFormat": "{{method}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Taxa de erro 5xx",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "(sum(rate(http_server_requests_seconds_count{application=\"siaes\",status=~\"5..\"}[5m])) or vector(0)) / sum(rate(http_server_requests_seconds_count{application=\"siaes\"}[5m]))",
+          "legendFormat": "5xx",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Respostas 4xx por status",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "sum by (status) (rate(http_server_requests_seconds_count{application=\"siaes\",status=~\"4..\"}[5m]))",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Latência p95 por endpoint",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{application=\"siaes\"}[5m])))",
+          "legendFormat": "{{uri}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Memória heap usada",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "sum(jvm_memory_used_bytes{application=\"siaes\",area=\"heap\"})",
+          "legendFormat": "heap",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Threads ativas",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "jvm_threads_live_threads{application=\"siaes\"}",
+          "legendFormat": "threads",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Conexões do pool (Hikari)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "hikaricp_connections_active{application=\"siaes\"}",
+          "legendFormat": "ativas",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "hikaricp_connections_idle{application=\"siaes\"}",
+          "legendFormat": "ociosas",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 9,
+      "type": "bargauge",
+      "title": "Eventos de domínio por tipo",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "sum by (event) (increase(siaes_domain_events_total{application=\"siaes\"}[$__range]))",
+          "legendFormat": "{{event}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Orçamentos aprovados x rejeitados",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "siaes-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "siaes-prometheus"
+          },
+          "expr": "sum by (event) (increase(siaes_domain_events_total{application=\"siaes\",event=~\"QuotationApprovedEvent|QuotationRejectedEvent\"}[1h]))",
+          "legendFormat": "{{event}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

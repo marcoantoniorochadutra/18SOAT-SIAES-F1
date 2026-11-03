@@ -14,8 +14,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-siaes}
       MAIL_HOST: siaes-mailpit
       MAIL_PORT: 1025
+      MANAGEMENT_PORT: 8716
     ports:
       - "8715:8715"
+    expose:
+      - "8716"
     depends_on:
       siaes-postgres:
         condition: service_healthy
@@ -47,5 +50,37 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  siaes-prometheus:
+    image: prom/prometheus:v3.15.1
+    container_name: siaes-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - siaes-prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - siaes-app
+
+  siaes-grafana:
+    image: grafana/grafana:13.2.0
+    container_name: siaes-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - siaes-grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - siaes-prometheus
+
 volumes:
   siaes-postgres-data:
+  siaes-prometheus-data:
+  siaes-grafana-data:
