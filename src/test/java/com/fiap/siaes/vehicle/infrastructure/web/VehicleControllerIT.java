@@ -113,11 +113,27 @@ class VehicleControllerIT extends IntegrationTestUtils {
     }
 
     @Test
-    @DisplayName("[403] Mecânico não deve acessar veículos")
-    void shouldNotListVehiclesAsMechanic() throws Exception {
+    @DisplayName("[200] Mecânico deve listar e buscar veículos")
+    void shouldListAndGetVehiclesAsMechanic() throws Exception {
+        var vehicle = this.persistVehicle();
         var mechanicToken = super.loginAs(UserRole.MECHANIC);
 
         super.executeGet(VehicleController.ENDPOINT, mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.content[0].id", vehicle.getId().toString()));
+
+        super.executeGet(this.url(vehicle), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.id", vehicle.getId().toString()));
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve remover veículos")
+    void shouldNotDeleteVehicleAsMechanic() throws Exception {
+        var vehicle = this.persistVehicle();
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executeDelete(this.url(vehicle), mechanicToken)
                 .andExpect(status().isForbidden());
     }
 

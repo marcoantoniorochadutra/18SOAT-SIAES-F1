@@ -67,12 +67,14 @@ public class MaintenanceController implements MaintenanceControllerOpenApi {
 
     @Override
     @GetMapping("/{id}")
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public MaintenanceResponse getById(@PathVariable MaintenanceId id) {
         return this.getMaintenanceByIdUseCase.execute(id);
     }
 
     @Override
     @GetMapping
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public PageResponse<MaintenanceResponse> list(@ParameterObject MaintenanceFilter filter,
                                                @Valid @ParameterObject PageQuery pageQuery) {
         return this.listMaintenancesUseCase.execute(ListMaintenancesCommand.of(filter, pageQuery));

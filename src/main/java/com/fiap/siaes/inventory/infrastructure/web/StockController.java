@@ -45,6 +45,7 @@ public class StockController implements StockControllerOpenApi {
 
     @Override
     @GetMapping
+    @Authentication(minimumRole = UserRole.MECHANIC)
     public StockItemResponse get(@PathVariable SuppliesId suppliesId) {
         return this.getStockItemUseCase.execute(suppliesId);
     }

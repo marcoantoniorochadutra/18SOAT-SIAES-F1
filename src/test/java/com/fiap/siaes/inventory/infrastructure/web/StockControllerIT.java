@@ -61,11 +61,30 @@ class StockControllerIT extends IntegrationTestUtils {
     }
 
     @Test
-    @DisplayName("[403] Mecânico não deve consultar o estoque")
-    void shouldNotGetStockAsMechanic() throws Exception {
+    @DisplayName("[200] Mecânico deve consultar o saldo do estoque")
+    void shouldGetStockAsMechanic() throws Exception {
         var mechanicToken = super.loginAs(UserRole.MECHANIC);
 
         super.executeGet(this.stockUrl(), mechanicToken)
+                .andExpect(status().isOk())
+                .andExpect(jsonValue("$.quantity", INITIAL_STOCK));
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve movimentar o estoque")
+    void shouldNotMoveStockAsMechanic() throws Exception {
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executePatch(this.stockUrl(), mechanicToken, null)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("[403] Mecânico não deve consultar as movimentações do estoque")
+    void shouldNotGetStockMovementsAsMechanic() throws Exception {
+        var mechanicToken = super.loginAs(UserRole.MECHANIC);
+
+        super.executeGet(this.stockUrl() + "/movements", mechanicToken)
                 .andExpect(status().isForbidden());
     }
 

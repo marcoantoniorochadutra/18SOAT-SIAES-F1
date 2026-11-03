@@ -79,6 +79,7 @@ public class VehicleController implements VehicleControllerOpenApi {
 
     @Override
     @GetMapping("/{id}")
+    @Authentication(minimumRole = UserRole.CUSTOMER)
     public VehicleResponse getById(@PathVariable VehicleId id,
                                    @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return this.getVehicleByIdUseCase.execute(GetVehicleByIdCommand.of(id, authenticatedUser));
@@ -86,6 +87,7 @@ public class VehicleController implements VehicleControllerOpenApi {
 
     @Override
     @GetMapping
+    @Authentication(minimumRole = UserRole.CUSTOMER)
     public PageResponse<VehicleResponse> list(@ParameterObject VehicleFilter filter,
                                               @Valid @ParameterObject PageQuery pageQuery,
                                               @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
