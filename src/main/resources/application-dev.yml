@@ -35,9 +35,3 @@ siaes:
   quotation:
     approval:
       secret: ${QUOTATION_APPROVAL_SECRET:dev-only-insecure-quotation-approval-secret-0123456789}
-
-management:
-  datadog:
-    metrics:
-      export:
-        enabled: ${DATADOG_ENABLED:false}

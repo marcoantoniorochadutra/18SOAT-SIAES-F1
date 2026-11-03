@@ -24,6 +24,7 @@ Sistema Integrado de Atendimento e Execução de Serviços para oficinas mecâni
 - springdoc-openapi (Swagger UI)
 - JUnit 5, Mockito e JaCoCo (cobertura mínima de 80%)
 - Docker e Docker Compose, Mailpit para os e-mails em desenvolvimento
+- Spring Boot Actuator, Micrometer, Prometheus e Grafana para métricas
 - GitHub Actions, SonarCloud e Trivy
 
 ### Por que PostgreSQL
@@ -50,13 +51,17 @@ Sistema Integrado de Atendimento e Execução de Serviços para oficinas mecâni
 docker compose -f devops/docker-compose.yml up -d --build
 ```
 
-Sobem três contêineres:
+Sobem cinco contêineres:
 
 | Serviço | Endereço |
 |---|---|
 | API (`siaes-app`) | http://localhost:8715 |
 | PostgreSQL (`siaes-postgres`) | `localhost:5432`, banco `siaes`, usuário `siaes` |
 | Mailpit (`siaes-mailpit`) | SMTP em `localhost:1025`, caixa de entrada em http://localhost:8025 |
+| Prometheus (`siaes-prometheus`) | http://localhost:9090 |
+| Grafana (`siaes-grafana`) | http://localhost:3000, usuário `admin`, senha `admin` |
+
+Os detalhes do monitoramento estão em [Observabilidade](#observabilidade).
 
 Na primeira subida, o PostgreSQL também cria o banco `siaes_it`, usado pelos testes de integração (`devops/postgres/01-create-integration-test-database.sql`).
 
@@ -81,6 +86,8 @@ No perfil `dev`, todas têm valor padrão. No perfil `prod` (`SPRING_PROFILES_AC
 |---|---|---|
 | `SPRING_PROFILES_ACTIVE` | `dev` | |
 | `SERVER_PORT` / `SERVER_CONTEXT_PATH` | `8715` / `/` | |
+| `MANAGEMENT_PORT` | `8716` (Actuator: health e métricas) | |
+| `GRAFANA_ADMIN_PASSWORD` | `admin` (só no docker-compose) | |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `siaes` | sim |
 | `DB_USERNAME` / `DB_PASSWORD` | `siaes` / `siaes` | sim |
 | `DB_POOL_MAX_SIZE` / `DB_POOL_MIN_IDLE` | `5` / `1` | |
@@ -200,6 +207,28 @@ mvn clean install -Psecurity -Dtrivy.severity=MEDIUM,HIGH,CRITICAL   # mais ríg
 
 O resultado do script fica em `docs/security/trivy-report.md`, com o resumo por severidade e, para cada CVE, o pacote, a versão instalada e a versão que corrige. Os JSON brutos (`docs/security/*.json`) não são versionados. O layout do relatório está em `devops/trivy/report.md.tpl`.
 
+## Observabilidade
+
+A API expõe métricas pelo Spring Boot Actuator, no formato do Prometheus. O Prometheus coleta a cada 15 segundos, e o Grafana já sobe com a fonte de dados e o painel **SIAES - Visão geral**, na pasta SIAES. A decisão está no [ADR-0015](docs/adr/0015-observabilidade-prometheus-grafana.md).
+
+| O quê | Onde |
+|---|---|
+| Painel | http://localhost:3000, usuário `admin`, senha `admin` (troque com `GRAFANA_ADMIN_PASSWORD` fora do desenvolvimento) |
+| Consultas e alvos do Prometheus | http://localhost:9090, com o job `siaes` em http://localhost:9090/targets |
+| Métricas e health da API | `/actuator/prometheus`, `/actuator/health/liveness` e `/actuator/health/readiness`, na porta de gerenciamento `8716` |
+
+A porta 8716 não é publicada no compose: só o Prometheus a alcança, pela rede interna, e a porta da API (8715) não serve o Actuator. Para ver as métricas cruas:
+
+```bash
+docker compose -f devops/docker-compose.yml exec siaes-app wget -qO- localhost:8716/actuator/prometheus
+```
+
+O painel mostra:
+
+- requisições por segundo, taxa de erro 5xx, respostas 4xx e latência p95 por endpoint;
+- memória heap, threads e conexões do pool;
+- eventos de domínio por tipo (counter `siaes_domain_events_total`), incluindo orçamentos aprovados e rejeitados.
+
 ## Integração contínua
 
 O workflow `.github/workflows/ci.yml` roda em push e pull request para `main`:
@@ -226,6 +255,6 @@ src/main/resources/
 ├── db/migration/    # migrações Flyway
 ├── db/seed/         # dados de demonstração (só no perfil dev)
 └── messages/        # mensagens i18n (pt_BR e en)
-devops/              # docker-compose, init do PostgreSQL, script e template do Trivy
+devops/              # docker-compose, init do PostgreSQL, Prometheus, Grafana, script e template do Trivy
 docs/                # enunciado, arquitetura (C4), DDD, collection do Postman e relatório de segurança
 ```
