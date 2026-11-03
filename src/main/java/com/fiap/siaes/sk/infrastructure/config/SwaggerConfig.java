@@ -1,5 +1,6 @@
 package com.fiap.siaes.sk.infrastructure.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.examples.Example;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
@@ -28,6 +30,7 @@ public class SwaggerConfig {
     private static final String NO_CONTENT_STATUS_CODE = "204";
     public static final String PT_BR = "pt-BR";
     public static final String EN_US = "en-US";
+    public static final String BEARER_AUTH = "bearerAuth";
 
     @Bean
     public OpenAPI buildOpenAPI() {
@@ -35,7 +38,12 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("SIAES API")
                         .description("API do Sistema Integrado de Atendimento e Emissão de Serviços")
-                        .version("v1"));
+                        .version("v1"))
+                .components(new Components()
+                        .addSecuritySchemes(BEARER_AUTH, new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
     }
 
     @Bean

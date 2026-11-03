@@ -1,6 +1,3 @@
--- Demo data for the dev profile only (spring.flyway.locations in application-dev.yml).
--- Repeatable and idempotent: fixed ids and ON CONFLICT DO NOTHING, so a re-run never duplicates or overwrites.
--- Every demo user has the password Siaes@123 (BCrypt, strength 10).
 
 INSERT INTO customers (id, document, name, phone, email) VALUES
     ('00000000-0000-0000-0000-000000000101', '52998224725', 'João da Silva', '11987654321', 'joao.silva@siaes.com'),

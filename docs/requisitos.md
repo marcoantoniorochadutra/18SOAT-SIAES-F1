@@ -2,6 +2,8 @@
 
 Requisitos funcionais e não funcionais do SIAES, levantados a partir do enunciado do Tech Challenge da Fase 1 ([`docs/Fase 1 - Tech Challenge (1).pdf`](Fase%201%20-%20Tech%20Challenge%20(1).pdf)), com o que o código entrega para cada um, onde está e como verificar.
 
+Os termos do negócio usados aqui (OS, orçamento, reserva, link de aprovação...) estão definidos na [linguagem ubíqua](ddd/linguagem-ubiqua.md).
+
 Legenda de situação: ✅ atendido · ⚠️ atendido com ressalva (ver [limitações](#limitações-conhecidas)) · ➕ além do pedido.
 
 ## Contexto
@@ -77,7 +79,7 @@ Uma oficina mecânica de médio porte controla atendimento, diagnóstico, execu�
 
 | ID | Categoria | Requisito | Como o sistema atende | Evidência | Situação |
 |---|---|---|---|---|---|
-| RNF01 | Arquitetura | Back-end monolítico organizado em camadas | Monólito modular: um pacote por contexto delimitado, cada um com `domain`, `application` e `infrastructure` (hexagonal). O domínio não depende de Spring | [`docs/arquitetura/c4.md`](arquitetura/c4.md) | ✅ |
+| RNF01 | Arquitetura | Back-end monolítico organizado em camadas | Monólito modular: um pacote por contexto delimitado, cada um com `domain`, `application` e `infrastructure` (hexagonal). O domínio não depende de Spring | [C4 nível 3](<arquitetura/C4 - 3. Diagrama de Componente.pdf>), [ADR-0001](adr/0001-monolito-modular-hexagonal.md) | ✅ |
 | RNF02 | Persistência | Banco de livre escolha, com justificativa | PostgreSQL 17, com o schema versionado pelo Flyway e `ddl-auto: validate` | README, seção "Por que PostgreSQL" | ✅ |
 | RNF03 | Integridade e transações | Tratar as transações dos fluxos principais | App services com `@Transactional`; agregados que mudam juntos (orçamento, estoque e OS) mudam na mesma transação por eventos síncronos; efeitos secundários (histórico de estoque, e-mail) rodam após o commit (`AFTER_COMMIT`); timeout padrão de 30s | `sk/domain/event`, `*Subscriber` | ✅ |
 | RNF04 | Concorrência | Evitar atualizações perdidas e estoque negativo | Lock otimista (`@Version`) em OS, orçamento e estoque; chaves únicas e `CHECK` no banco | `*JpaEntity`, migrações em `db/migration` | ✅ |
@@ -86,17 +88,18 @@ Uma oficina mecânica de médio porte controla atendimento, diagnóstico, execu�
 | RNF07 | Segurança: dados sensíveis | Validar CPF/CNPJ e placa | Value objects `Document` e `Plate`, mais Bean Validation na entrada | `sk/document`, `vehicle/domain/model/vo` | ✅ |
 | RNF08 | Segurança: credenciais | Senhas e segredos protegidos | Senha com política forte e BCrypt; segredos do JWT e do link por variável de ambiente, obrigatórios no perfil `prod`; link público assinado (HMAC) | `Password`, `application-prod.yml` | ✅ |
 | RNF09 | Segurança: vulnerabilidades | Análise de vulnerabilidades com relatório | Trivy no repositório e na imagem: 0 achados; `mvn clean install -Psecurity` falha com HIGH ou CRITICAL; job do Trivy no CI | [`docs/security/trivy-report.md`](security/trivy-report.md) | ✅ |
-| RNF10 | Qualidade: testes | Testes unitários e de integração dos fluxos principais | 824 testes unitários (JUnit 5 e Mockito) e 65 de integração (`*IT`, contra PostgreSQL real) | `mvn verify` | ✅ |
+| RNF10 | Qualidade: testes | Testes unitários e de integração dos fluxos principais | 821 testes unitários (JUnit 5 e Mockito) e 76 de integração (`*IT`, contra PostgreSQL real) | `mvn verify` | ✅ |
 | RNF11 | Qualidade: cobertura | Mínimo de 80% nos domínios críticos | JaCoCo com verificação de 80% de linhas que quebra o build; último resultado: 99,0% de linhas e 94,4% de branches | `target/site/jacoco/index.html` | ✅ |
 | RNF12 | Qualidade: análise estática | Código revisado continuamente | SonarCloud no CI; `main` protegida, com alterações só por pull request | `.github/workflows/ci.yml` | ✅ |
 | RNF13 | Interoperabilidade | APIs RESTful documentadas | REST com versionamento (`/api/v1`), paginação padronizada e Swagger UI (springdoc) com textos em pt_BR e en | `http://localhost:8715/swagger-ui.html`, `*ControllerOpenApi` | ✅ |
 | RNF14 | Usabilidade da API | Erros claros e consistentes | `GlobalExceptionHandler` com `ProblemDetail` (RFC 9457) e mensagens internacionalizadas (pt_BR e en) | `sk/infrastructure/web`, `messages/` | ✅ |
-| RNF15 | Implantação | Dockerfile e docker-compose com o ambiente completo | Imagem multi-stage com runtime enxuto (jlink), usuário sem privilégios e `HEALTHCHECK`; compose com aplicação, PostgreSQL e Mailpit | `Dockerfile`, `devops/docker-compose.yml` | ✅ |
+| RNF15 | Implantação | Dockerfile e docker-compose com o ambiente completo | Imagem multi-stage com runtime enxuto (jlink), usuário sem privilégios e `HEALTHCHECK`; compose com aplicação, PostgreSQL, Mailpit, Prometheus e Grafana | `Dockerfile`, `devops/docker-compose.yml` | ✅ |
 | RNF16 | Manutenibilidade | Execução local simples | README com pré-requisitos, execução, testes, Swagger, variáveis de ambiente e usuários de demonstração (seed no perfil `dev`) | `readme.md` | ✅ |
 | RNF17 | Desempenho | Responder bem sob carga moderada | Threads virtuais, pool Hikari configurável, `open-in-view` desligado, consultas paginadas, efeitos secundários assíncronos | `application.yml`, `AsyncConfig` | ✅ |
-| RNF18 | Disponibilidade | Detectar falha e desligar sem perder requisições | `HEALTHCHECK` no contêiner e `shutdown: graceful` | `Dockerfile`, `application.yml` | ✅ |
+| RNF18 | Disponibilidade | Detectar falha e desligar sem perder requisições | `HEALTHCHECK` do contêiner na liveness do Actuator (`/actuator/health/liveness`), probes de liveness e readiness e `shutdown: graceful` | `Dockerfile`, `application.yml` | ✅ |
 | RNF19 | Auditabilidade | Rastrear quem fez o quê e quando | Histórico de status de OS, orçamento e usuário; histórico de movimentações de estoque; canal e autor da decisão do orçamento | `*StatusHistory`, `StockMovement` | ✅ |
 | RNF20 | Internacionalização | Mensagens em mais de um idioma | Bundles pt_BR e en para erros, validações, Swagger e notificações | `src/main/resources/messages` | ➕ |
+| RNF21 | Observabilidade | Acompanhar saúde, latência e volume da API | Métricas do Actuator no formato Prometheus, numa porta de gerenciamento interna (8716, não publicada): HTTP com histograma de latência, JVM, pool de conexões e o counter `siaes_domain_events_total` por tipo de evento. Prometheus coleta e o Grafana sobe com o painel "SIAES - Visão geral" provisionado | [ADR-0015](adr/0015-observabilidade-prometheus-grafana.md), `devops/grafana/`, `ActuatorIT` | ➕ |
 
 ## Restrições
 
@@ -123,3 +126,4 @@ Uma oficina mecânica de médio porte controla atendimento, diagnóstico, execu�
 | Segurança e qualidade | RNF05 a RNF11 |
 | Requisitos técnicos | RNF01 a RNF03, RNF13, RNF15, RNF16 |
 | Entregáveis (vulnerabilidades, Swagger, README) | RNF09, RNF13, RNF16 |
+| Além do enunciado | RF13, RF22, RNF20, RNF21 |
