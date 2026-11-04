@@ -20,4 +20,4 @@ Decisões de arquitetura do SIAES, no formato: contexto, decisão, alternativas 
 | [0014](0014-analise-de-vulnerabilidades-com-trivy.md) | Análise de vulnerabilidades com Trivy | Aceita |
 | [0015](0015-observabilidade-prometheus-grafana.md) | Observabilidade com Prometheus e Grafana | Aceita |
 
-Visões relacionadas: [C4 nível 2: contêineres](<../arquitetura/C4 - 1. Diagrama Container.pdf>), [C4 nível 3: componentes](<../arquitetura/C4 - 3. Diagrama de Componente.pdf>), [Event Storming](<../ddd/Event Storming.pdf>), [linguagem ubíqua](../ddd/linguagem-ubiqua.md).
+Visões relacionadas: [C4 nível 2: contêineres](<../arquitetura/C4 - 2. Diagrama Container.pdf>), [C4 nível 3: componentes](<../arquitetura/C4 - 3. Diagrama de Componente.pdf>), [Event Storming](../ddd/event-storming.pdf), [linguagem ubíqua](../ddd/linguagem-ubiqua.md).

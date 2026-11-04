@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Data | 2026-11-01 15:43 UTC |
-| Commit | `4d41518` |
+| Data | 2026-11-04 01:59 UTC |
+| Commit | `655d8b1` |
 | Ferramenta | Trivy 0.76.1 |
 | Imagem analisada | `siaes-app:latest` |
 
