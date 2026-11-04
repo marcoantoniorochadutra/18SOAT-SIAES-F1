@@ -187,8 +187,9 @@ O Event Storming foi feito no Miro e exportado para o repositório.
 
 | Documento | Conteúdo |
 |---|---|
-| Miro | _link do quadro a definir_ |
-| [docs/ddd/Event Storming.pdf](<docs/ddd/Event Storming.pdf>) | Exportação do quadro do Miro, em alta resolução |
+| [Quadro no Miro](https://miro.com/app/board/uXjVETfpOcc=/?share_link_id=642939009608) | Event Storming completo, com acesso público para visualização |
+| [docs/ddd/event-storming.pdf](docs/ddd/event-storming.pdf) | Exportação do quadro do Miro, em alta resolução |
+| [docs/ddd/diagramas.pdf](docs/ddd/diagramas.pdf) | Os quatro diagramas C4 num só arquivo, um nível por página |
 | [docs/ddd/linguagem-ubiqua.md](docs/ddd/linguagem-ubiqua.md) | Linguagem ubíqua e glossário: cada termo do negócio com o nome correspondente no código, os status, os papéis, os eventos e os termos evitados |
 
 O quadro segue as etapas do Event Storming, cada uma acrescentando uma camada sobre a anterior:
@@ -217,8 +218,8 @@ Onde está cada item que o enunciado pede na documentação DDD:
 
 | Documento | Conteúdo |
 |---|---|
-| [C4 nível 1: contexto](<docs/arquitetura/C4 - 2. Diagrama Contexto.pdf>) | Pessoas que usam o SIAES e sistemas externos |
-| [C4 nível 2: contêineres](<docs/arquitetura/C4 - 1. Diagrama Container.pdf>) | API, banco de dados, servidor SMTP, Prometheus e Grafana |
+| [C4 nível 1: contexto](<docs/arquitetura/C4 - 1. Diagrama Contexto.pdf>) | Pessoas que usam o SIAES e sistemas externos |
+| [C4 nível 2: contêineres](<docs/arquitetura/C4 - 2. Diagrama Container.pdf>) | API, banco de dados, servidor SMTP, Prometheus e Grafana |
 | [C4 nível 3: componentes](<docs/arquitetura/C4 - 3. Diagrama de Componente.pdf>) | Os contextos dentro da API e como se relacionam |
 | [C4 nível 4: classes](<docs/arquitetura/C4 - 4. Diagrama de Classes.pdf>) | Agregados, entidades, objetos de valor e enums do domínio |
 | [docs/adr/](docs/adr/README.md) | Architecture Decision Records: as 15 decisões de arquitetura, com alternativas e consequências |
@@ -226,7 +227,7 @@ Onde está cada item que o enunciado pede na documentação DDD:
 
 ## Vídeo da entrega
 
-_Link do YouTube a definir._
+Apresentação da solução, da arquitetura, do Event Storming e do fluxo da ordem de serviço em funcionamento: <https://www.youtube.com/watch?v=QoMLWREBdmo>
 
 ## Testes e cobertura
 
